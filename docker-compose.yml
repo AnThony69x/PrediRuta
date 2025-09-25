@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: prediruta_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - BACKEND_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - prediruta_net
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: prediruta_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - PYTHONUNBUFFERED=1
+      - ENV=development
+    volumes:
+      - ./backend:/app
+    networks:
+      - prediruta_net
+    restart: unless-stopped
+
+networks:
+  prediruta_net:
+    driver: bridge
