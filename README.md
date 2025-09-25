@@ -34,7 +34,7 @@ PrediRuta/
 
 ## ⚙️ Tecnologías utilizadas
 - **Frontend:** Next.js 13+, TailwindCSS, Supabase Auth/DB.  
-- **Backend:** Python 3.11, FastAPI, scikit-learn / TensorFlow (para predicciones).  
+- **Backend:** Python 3.13.7, FastAPI, scikit-learn / TensorFlow (para predicciones).  
 - **Base de datos:** PostgreSQL (Supabase).  
 - **Infraestructura:** Docker & Docker Compose.  
 
@@ -42,7 +42,7 @@ PrediRuta/
 
 ### 1. Clonar repositorio
 ```bash
-git clone https://github.com/tuusuario/prediruta.git
+git clone https://github.com/AnThony69x/PrediRuta.git
 cd prediruta
 ```
 
