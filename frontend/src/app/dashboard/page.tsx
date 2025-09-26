@@ -1,40 +1,29 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/useSession";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const session = data.session;
-      if (!session) {
-        router.replace("/login");
-        return;
-      }
-      setEmail(session.user.email ?? null);
-      setLoading(false);
-    });
-  }, [router]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace("/login");
-  };
+  const { session, loading } = useSession(true);
 
   if (loading) return <p className="p-6">Cargando...</p>;
 
   return (
     <main className="p-6 space-y-4">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
-      <p>Sesión iniciada como: <b>{email}</b></p>
-      <button onClick={handleLogout} className="bg-gray-800 text-white rounded px-4 py-2">
+      <p>
+        Sesión iniciada como:{" "}
+        <strong>{session?.user.email || "Desconocido"}</strong>
+      </p>
+      <Button
+        variant="outline"
+        onClick={async () => {
+          await supabase.auth.signOut();
+          window.location.href = "/login";
+        }}
+      >
         Cerrar sesión
-      </button>
+      </Button>
     </main>
   );
 }
