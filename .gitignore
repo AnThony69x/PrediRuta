@@ -33,6 +33,7 @@ logs
 *.pid
 *.pid.lock
 docker-compose.override.yml
+docker-compose.local.yml
 
 # VSCode / IDE
 .vscode/
