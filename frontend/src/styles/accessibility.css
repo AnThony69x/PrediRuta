@@ -1,0 +1,381 @@
+/* Accessibility Styles */
+
+/* OpenDyslexic Font */
+@import url('https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap');
+
+/* ========== SIDE MENU SPECIFIC STYLES ========== */
+
+/* Custom scrollbar for side menu */
+.accessibility-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accessibility-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.accessibility-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.accessibility-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth animations for menu items */
+.accessibility-option {
+  transition: all 0.2s ease;
+}
+
+.accessibility-option:hover {
+  transform: translateX(2px);
+}
+
+.accessibility-option.active {
+  transform: scale(0.98);
+}
+
+/* ========== FONT ADJUSTMENTS ========== */
+
+.readable-font {
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+}
+
+.readable-font * {
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+}
+
+.dyslexia-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+}
+
+.dyslexia-font * {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+}
+
+/* ========== TEXT SIZE ADJUSTMENTS ========== */
+
+.text-small {
+  font-size: 0.875rem !important;
+}
+
+.text-small * {
+  font-size: inherit !important;
+}
+
+.text-medium {
+  font-size: 1rem !important;
+}
+
+.text-medium * {
+  font-size: inherit !important;
+}
+
+.text-large {
+  font-size: 1.25rem !important;
+}
+
+.text-large * {
+  font-size: inherit !important;
+}
+
+/* ========== LINE HEIGHT ADJUSTMENTS ========== */
+
+.line-height-small {
+  line-height: 1.3 !important;
+}
+
+.line-height-small * {
+  line-height: inherit !important;
+}
+
+.line-height-medium {
+  line-height: 1.5 !important;
+}
+
+.line-height-medium * {
+  line-height: inherit !important;
+}
+
+.line-height-large {
+  line-height: 1.8 !important;
+}
+
+.line-height-large * {
+  line-height: inherit !important;
+}
+
+/* ========== TEXT SPACING ADJUSTMENTS ========== */
+
+.spacing-small {
+  letter-spacing: 0.025em !important;
+  word-spacing: 0.1em !important;
+}
+
+.spacing-small * {
+  letter-spacing: inherit !important;
+  word-spacing: inherit !important;
+}
+
+.spacing-medium {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.15em !important;
+}
+
+.spacing-medium * {
+  letter-spacing: inherit !important;
+  word-spacing: inherit !important;
+}
+
+.spacing-large {
+  letter-spacing: 0.1em !important;
+  word-spacing: 0.2em !important;
+}
+
+.spacing-large * {
+  letter-spacing: inherit !important;
+  word-spacing: inherit !important;
+}
+
+/* ========== HIGHLIGHT ADJUSTMENTS ========== */
+
+.highlight-headings h1,
+.highlight-headings h2,
+.highlight-headings h3,
+.highlight-headings h4,
+.highlight-headings h5,
+.highlight-headings h6 {
+  background-color: #fef3c7 !important;
+  padding: 4px 8px !important;
+  border-left: 4px solid #f59e0b !important;
+  margin: 8px 0 !important;
+}
+
+.highlight-links a {
+  background-color: #dbeafe !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+}
+
+.highlight-buttons button,
+.highlight-buttons input[type="submit"],
+.highlight-buttons input[type="button"],
+.highlight-buttons [role="button"] {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+  background-color: #eff6ff !important;
+}
+
+/* ========== CONTENT ADJUSTMENTS ========== */
+
+.hide-images img,
+.hide-images video,
+.hide-images svg,
+.hide-images picture {
+  display: none !important;
+}
+
+.hide-images img::after,
+.hide-images video::after {
+  content: "Imagen oculta para mejor accesibilidad";
+  display: block !important;
+  padding: 10px !important;
+  background-color: #f3f4f6 !important;
+  border: 1px dashed #9ca3af !important;
+  color: #6b7280 !important;
+  text-align: center !important;
+}
+
+.stop-animations *,
+.stop-animations *::before,
+.stop-animations *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.tooltips-enabled [title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tooltips-enabled [title]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+  z-index: 1000;
+}
+
+/* ========== COLOR ADJUSTMENTS ========== */
+
+.dark-contrast {
+  filter: contrast(150%) brightness(0.8) !important;
+}
+
+.light-contrast {
+  filter: contrast(120%) brightness(1.2) !important;
+}
+
+.invert-colors {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+.change-colors {
+  filter: hue-rotate(180deg) !important;
+}
+
+.high-contrast {
+  filter: contrast(200%) !important;
+}
+
+.high-contrast * {
+  border-color: #000 !important;
+}
+
+.high-saturation {
+  filter: saturate(200%) !important;
+}
+
+.low-saturation {
+  filter: saturate(50%) !important;
+}
+
+.monochrome {
+  filter: grayscale(100%) !important;
+}
+
+/* ========== CURSOR ADJUSTMENTS ========== */
+
+.big-black-cursor,
+.big-black-cursor * {
+  cursor: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L4 28 L12 20 L16 24 L20 20 L12 12 Z" fill="black" stroke="white" stroke-width="1"/></svg>') 4 4, auto !important;
+}
+
+.big-white-cursor,
+.big-white-cursor * {
+  cursor: url('data:image/svg+xml;charset=utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M4 4 L4 28 L12 20 L16 24 L20 20 L12 12 Z" fill="white" stroke="black" stroke-width="1"/></svg>') 4 4, auto !important;
+}
+
+/* ========== READING GUIDES ========== */
+
+:root {
+  --mouse-y: 50vh;
+}
+
+.reading-guide {
+  position: relative;
+}
+
+.reading-guide::before {
+  content: "";
+  position: fixed;
+  top: var(--mouse-y, 50vh);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #ef4444;
+  z-index: 9999;
+  pointer-events: none;
+  transition: top 0.1s ease;
+  transform: translateY(-1px);
+}
+
+.reading-mask {
+  position: relative;
+}
+
+.reading-mask::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.8) calc(var(--mouse-y, 50vh) - 50px),
+    transparent calc(var(--mouse-y, 50vh) - 25px),
+    transparent calc(var(--mouse-y, 50vh) + 25px),
+    rgba(0, 0, 0, 0.8) calc(var(--mouse-y, 50vh) + 50px),
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  z-index: 9998;
+  pointer-events: none;
+  transition: background 0.1s ease;
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+
+@media (max-width: 768px) {
+  .text-large {
+    font-size: 1.125rem !important;
+  }
+  
+  .highlight-headings h1,
+  .highlight-headings h2,
+  .highlight-headings h3,
+  .highlight-headings h4,
+  .highlight-headings h5,
+  .highlight-headings h6 {
+    margin: 4px 0 !important;
+    padding: 2px 4px !important;
+  }
+}
+
+/* ========== FOCUS IMPROVEMENTS ========== */
+
+.highlight-buttons *:focus,
+.highlight-links *:focus {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* ========== PRINT STYLES ========== */
+
+@media print {
+  .hide-images img,
+  .hide-images video,
+  .hide-images svg {
+    display: none !important;
+  }
+  
+  .highlight-headings h1,
+  .highlight-headings h2,
+  .highlight-headings h3,
+  .highlight-headings h4,
+  .highlight-headings h5,
+  .highlight-headings h6 {
+    background-color: transparent !important;
+    border-left: 2px solid #000 !important;
+  }
+}
+
+/* ========== JAVASCRIPT INTERACTION STYLES ========== */
+
+.reading-guide.active::before {
+  display: block;
+}
+
+.reading-mask.active::before {
+  display: block;
+}

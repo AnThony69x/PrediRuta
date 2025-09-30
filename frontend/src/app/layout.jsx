@@ -1,4 +1,6 @@
 import "./globals.css";
+import "../styles/accessibility.css";
+import { AccessibilityWidget } from "../components/ui/accessibility-widget";
 
 export const metadata = {
   title: "PrediRuta",
@@ -8,7 +10,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        {children}
+        <AccessibilityWidget />
+      </body>
     </html>
   );
 }
