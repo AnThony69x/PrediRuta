@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,26 +14,45 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
   fallback = (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-300">Verificando autenticación...</p>
+      </div>
     </div>
   ),
 }) => {
   const { loading, isAuthenticated, checkPermission } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Si ya terminó de cargar y no está autenticado, redirigir al login
+    if (!loading && !isAuthenticated) {
+      console.log('Usuario no autenticado, redirigiendo al login...');
+      router.push('/login');
+    }
+  }, [loading, isAuthenticated, router]);
 
   // Mostrar loading mientras se verifica la autenticación
   if (loading) {
     return <>{fallback}</>;
   }
 
-  // Si no está autenticado, el middleware ya habrá redirigido
+  // Si no está autenticado, mostrar loading mientras redirije
   if (!isAuthenticated) {
     return <>{fallback}</>;
   }
 
   // Si se requiere un rol específico, verificar permisos
   if (requiredRole && !checkPermission(requiredRole)) {
-    return <>{fallback}</>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Acceso denegado</h2>
+          <p className="text-gray-600 dark:text-gray-300">No tienes permisos para acceder a esta página.</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;
