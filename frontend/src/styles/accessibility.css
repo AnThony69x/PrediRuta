@@ -227,6 +227,239 @@
 
 /* ========== COLOR ADJUSTMENTS ========== */
 
+/* Modo oscuro de accesibilidad - se aplica a toda la aplicación */
+.accessibility-dark-mode {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+.accessibility-dark-mode *:not(svg):not(path):not(circle):not(rect):not(line) {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+.accessibility-dark-mode a {
+  color: #60a5fa !important;
+  text-decoration: underline !important;
+}
+
+.accessibility-dark-mode button {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #6b7280 !important;
+}
+
+.accessibility-dark-mode input,
+.accessibility-dark-mode textarea,
+.accessibility-dark-mode select {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.accessibility-dark-mode header,
+.accessibility-dark-mode nav,
+.accessibility-dark-mode main,
+.accessibility-dark-mode section,
+.accessibility-dark-mode footer {
+  background-color: #111827 !important;
+}
+
+.accessibility-dark-mode .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.accessibility-dark-mode .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.accessibility-dark-mode .text-gray-800 {
+  color: #f9fafb !important;
+}
+
+.accessibility-dark-mode .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.accessibility-dark-mode .border-gray-300 {
+  border-color: #374151 !important;
+}
+
+/* Reglas específicas para componentes de UI */
+.accessibility-dark-mode .bg-white,
+.accessibility-dark-mode [class*="bg-white"] {
+  background-color: #1f2937 !important;
+}
+
+.accessibility-dark-mode .bg-gray-50,
+.accessibility-dark-mode [class*="bg-gray-50"] {
+  background-color: #111827 !important;
+}
+
+.accessibility-dark-mode .text-gray-800,
+.accessibility-dark-mode [class*="text-gray-800"] {
+  color: #f9fafb !important;
+}
+
+.accessibility-dark-mode .text-gray-600,
+.accessibility-dark-mode [class*="text-gray-600"] {
+  color: #d1d5db !important;
+}
+
+.accessibility-dark-mode .text-gray-300,
+.accessibility-dark-mode [class*="text-gray-300"] {
+  color: #f3f4f6 !important;
+}
+
+.accessibility-dark-mode .border-gray-700,
+.accessibility-dark-mode [class*="border-gray-700"] {
+  border-color: #374151 !important;
+}
+
+/* Reglas específicas para Cards y formularios */
+.accessibility-dark-mode .card,
+.accessibility-dark-mode [class*="card"],
+.accessibility-dark-mode div[class*="bg-gray-800"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+.accessibility-dark-mode .form-control,
+.accessibility-dark-mode form input,
+.accessibility-dark-mode form textarea,
+.accessibility-dark-mode form select {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+/* Reglas específicas para formularios y labels */
+.accessibility-dark-mode label {
+  color: #f3f4f6 !important;
+}
+
+.accessibility-dark-mode input[type="email"],
+.accessibility-dark-mode input[type="password"],
+.accessibility-dark-mode input[type="text"] {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.accessibility-dark-mode input[type="email"]:focus,
+.accessibility-dark-mode input[type="password"]:focus,
+.accessibility-dark-mode input[type="text"]:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3) !important;
+}
+
+.accessibility-dark-mode input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Reglas específicas para botones */
+.accessibility-dark-mode button[type="submit"] {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+}
+
+.accessibility-dark-mode button[type="submit"]:hover {
+  background-color: #1e40af !important;
+}
+
+/* Reglas específicas para texto de error */
+.accessibility-dark-mode .text-red-600,
+.accessibility-dark-mode [class*="text-red-600"] {
+  color: #fca5a5 !important;
+}
+
+.accessibility-dark-mode .text-red-400,
+.accessibility-dark-mode [class*="text-red-400"] {
+  color: #f87171 !important;
+}
+
+/* Reglas específicas para componentes Alert */
+.accessibility-dark-mode .bg-red-50,
+.accessibility-dark-mode [class*="bg-red-50"] {
+  background-color: rgba(153, 27, 27, 0.2) !important;
+}
+
+.accessibility-dark-mode .bg-green-50,
+.accessibility-dark-mode [class*="bg-green-50"] {
+  background-color: rgba(20, 83, 45, 0.2) !important;
+}
+
+.accessibility-dark-mode .bg-blue-50,
+.accessibility-dark-mode [class*="bg-blue-50"] {
+  background-color: rgba(30, 58, 138, 0.2) !important;
+}
+
+.accessibility-dark-mode .text-red-700,
+.accessibility-dark-mode [class*="text-red-700"] {
+  color: #fca5a5 !important;
+}
+
+.accessibility-dark-mode .text-green-700,
+.accessibility-dark-mode [class*="text-green-700"] {
+  color: #86efac !important;
+}
+
+.accessibility-dark-mode .text-blue-700,
+.accessibility-dark-mode [class*="text-blue-700"] {
+  color: #93c5fd !important;
+}
+
+.accessibility-dark-mode .border-red-200,
+.accessibility-dark-mode [class*="border-red-200"] {
+  border-color: #991b1b !important;
+}
+
+.accessibility-dark-mode .border-green-200,
+.accessibility-dark-mode [class*="border-green-200"] {
+  border-color: #14532d !important;
+}
+
+.accessibility-dark-mode .border-blue-200,
+.accessibility-dark-mode [class*="border-blue-200"] {
+  border-color: #1e3a8a !important;
+}
+
+/* Reglas para focus states y estados interactivos */
+.accessibility-dark-mode *:focus {
+  outline-color: #60a5fa !important;
+}
+
+.accessibility-dark-mode input:focus,
+.accessibility-dark-mode textarea:focus,
+.accessibility-dark-mode select:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Reglas para texto en general */
+.accessibility-dark-mode p,
+.accessibility-dark-mode span,
+.accessibility-dark-mode div {
+  color: #f9fafb !important;
+}
+
+/* Excepciones para iconos y elementos SVG */
+.accessibility-dark-mode svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+.accessibility-dark-mode .text-blue-600,
+.accessibility-dark-mode [class*="text-blue-600"] {
+  color: #60a5fa !important;
+}
+
+.accessibility-dark-mode .text-blue-400,
+.accessibility-dark-mode [class*="text-blue-400"] {
+  color: #93c5fd !important;
+}
+
 .dark-contrast {
   filter: contrast(150%) brightness(0.8) !important;
 }

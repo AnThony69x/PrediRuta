@@ -7,7 +7,7 @@ export const Card = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={clsx(
-      "rounded-lg border border-gray-200 bg-white shadow-sm",
+      "rounded-lg border border-gray-200 bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700",
       className
     )}
   >
@@ -19,14 +19,14 @@ export const CardHeader = ({
   children,
   className
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={clsx("p-4 border-b", className)}>{children}</div>
+  <div className={clsx("p-4 border-b dark:border-gray-600", className)}>{children}</div>
 );
 
 export const CardTitle = ({
   children,
   className
 }: React.HTMLAttributes<HTMLHeadingElement>) => (
-  <h2 className={clsx("text-lg font-semibold", className)}>{children}</h2>
+  <h2 className={clsx("text-lg font-semibold dark:text-white", className)}>{children}</h2>
 );
 
 export const CardContent = ({
@@ -40,5 +40,5 @@ export const CardFooter = ({
   children,
   className
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={clsx("p-4 border-t", className)}>{children}</div>
+  <div className={clsx("p-4 border-t dark:border-gray-600", className)}>{children}</div>
 );

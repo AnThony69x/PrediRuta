@@ -3,6 +3,22 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './button';
 
+// Estilos CSS para el botón de ayuda
+const helpButtonStyles = `
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+  }
+  
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+`;
+
 interface AccessibilitySettings {
   // Content adjustments
   readableFont: boolean;
@@ -23,6 +39,7 @@ interface AccessibilitySettings {
   highSaturation: boolean;
   lowSaturation: boolean;
   monochrome: boolean;
+  accessibilityDarkMode: boolean; // Nuevo: modo oscuro específico de accesibilidad
   
   // Orientation adjustments
   readingGuide: boolean;
@@ -52,6 +69,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       lineHeight: 'large',
       highContrast: true,
       highlightLinks: true,
+      accessibilityDarkMode: true,
     }
   },
   {
@@ -61,6 +79,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       stopAnimations: true,
       lowSaturation: true,
       hideImages: true,
+      accessibilityDarkMode: true,
     }
   },
   {
@@ -70,6 +89,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       changeColors: true,
       highlightLinks: true,
       highlightButtons: true,
+      highContrast: true,
     }
   },
   {
@@ -79,6 +99,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       readingMask: true,
       highlightHeadings: true,
       stopAnimations: true,
+      accessibilityDarkMode: true,
     }
   },
   {
@@ -120,6 +141,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   highSaturation: false,
   lowSaturation: false,
   monochrome: false,
+  accessibilityDarkMode: false,
   readingGuide: false,
   readingMask: false,
   bigBlackCursor: false,
@@ -181,7 +203,7 @@ export function AccessibilityWidget() {
       'highlight-buttons', 'hide-images', 'tooltips-enabled', 'stop-animations',
       'dark-contrast', 'light-contrast', 'invert-colors', 'change-colors',
       'high-contrast', 'high-saturation', 'low-saturation', 'monochrome',
-      'reading-guide', 'reading-mask', 'big-black-cursor', 'big-white-cursor',
+      'accessibility-dark-mode', 'reading-guide', 'reading-mask', 'big-black-cursor', 'big-white-cursor',
       'text-small', 'text-medium', 'text-large',
       'line-height-small', 'line-height-medium', 'line-height-large',
       'spacing-small', 'spacing-medium', 'spacing-large'
@@ -206,6 +228,14 @@ export function AccessibilityWidget() {
     if (newSettings.highSaturation) root.classList.add('high-saturation');
     if (newSettings.lowSaturation) root.classList.add('low-saturation');
     if (newSettings.monochrome) root.classList.add('monochrome');
+    if (newSettings.accessibilityDarkMode) {
+      root.classList.add('accessibility-dark-mode');
+      // También aplicar la clase dark de Tailwind para compatibilidad
+      root.classList.add('dark');
+    } else {
+      // Solo remover si no está activo
+      root.classList.remove('dark');
+    }
 
     // Apply orientation adjustments
     if (newSettings.readingGuide) root.classList.add('reading-guide');
@@ -241,23 +271,44 @@ export function AccessibilityWidget() {
 
   return (
     <>
-      {/* Side Toggle Button */}
+      {/* Estilos CSS para el botón de ayuda */}
+      <style jsx>{helpButtonStyles}</style>
+      
+      {/* Bottom Left Toggle Button */}
       <button
-        className="fixed left-0 top-1/2 transform -translate-y-1/2 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-r-lg shadow-lg transition-all duration-300 hover:pl-4"
+        className="fixed bottom-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Abrir configuración de accesibilidad"
+        aria-label="Abrir ayuda y configuración de accesibilidad"
       >
+        {/* Icono de ayuda/información */}
         <svg
-          width="20"
-          height="20"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          className="transition-transform duration-300"
         >
-          <path
-            d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 7.5V9.5L12.5 8L10 10L8.5 11.5L7 10L4.5 11.5L3 10V12L4.5 13.5L6 12L7.5 13.5L9 12L10.5 13.5L12 12L13.5 13.5L15 12L16.5 13.5L18 12V14L16.5 15.5L15 14V16L21 16.5V14.5L18.5 13L21 11.5V9Z"
-            fill="currentColor"
+          <circle 
+            cx="12" 
+            cy="12" 
+            r="10" 
+            stroke="currentColor" 
+            strokeWidth="2"
+          />
+          <path 
+            d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+          <path 
+            d="M12 17h.01" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
           />
         </svg>
       </button>
@@ -439,6 +490,7 @@ export function AccessibilityWidget() {
                   <h3 className="text-lg font-medium mb-4">Ajustes de Color</h3>
                   <div className="grid grid-cols-1 gap-3">
                     {[
+                      { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: 'Modo oscuro global', icon: '🌚' },
                       { key: 'darkContrast' as keyof AccessibilitySettings, label: 'Contraste oscuro', icon: '🌙' },
                       { key: 'lightContrast' as keyof AccessibilitySettings, label: 'Contraste claro', icon: '☀️' },
                       { key: 'invertColors' as keyof AccessibilitySettings, label: 'Invertir colores', icon: '⚫' },

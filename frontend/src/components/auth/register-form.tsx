@@ -80,10 +80,10 @@ export const RegisterForm = () => {
       </Button>
       <Separator label="o" />
       <OAuthButton provider="google" full />
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-gray-600 dark:text-gray-300">
         ¿Ya tienes cuenta?{" "}
         <Link
-          className="text-blue-600 hover:underline"
+          className="text-blue-600 hover:underline dark:text-blue-400"
           href="/login"
         >
           Inicia sesión
