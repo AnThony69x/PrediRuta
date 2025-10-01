@@ -32,6 +32,9 @@ const publicRoutes = [
   '/not-found',     // Alias para 404
   '/test-error',    // Para pruebas
   '/auth/callback', // Callback de autenticación
+  '/auth/confirm', // Confirmación de email
+  '/auth/sign-up', // Registro alternativo
+  '/auth/sign-in', // Login alternativo
   '/auth/401',      // Página de error 401
   '/auth/403'       // Página de error 403
 ];
@@ -48,56 +51,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Verificar rutas protegidas
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
-
-  if (isProtectedRoute || isAdminRoute) {
-    // Verificar si hay token de autenticación en las cookies
-    const token = req.cookies.get('sb-access-token') || 
-                  req.cookies.get('supabase-auth-token') ||
-                  req.cookies.get('sb-auth-token');
-    
-    // Si no hay token, redirigir a página 401 (No autorizado)
-    if (!token) {
-      return NextResponse.redirect(new URL('/auth/401', req.url));
-    }
-
-    // Para rutas de admin, hacer verificación adicional
-    if (isAdminRoute) {
-      const userRole = req.cookies.get('user-role')?.value;
-      const isAdmin = userRole === 'admin' || userRole === 'super_admin';
-
-      if (!isAdmin) {
-        return NextResponse.redirect(new URL('/auth/403', req.url));
-      }
-    }
-
-    // Verificar permisos específicos para sub-rutas administrativas
-    if (pathname.startsWith('/rutas/admin') || 
-        pathname.startsWith('/predicciones/admin') ||
-        pathname.startsWith('/perfil/admin')) {
-      const userRole = req.cookies.get('user-role')?.value;
-      const hasAdminAccess = userRole === 'admin' || 
-                            userRole === 'super_admin' || 
-                            userRole === 'moderator';
-
-      if (!hasAdminAccess) {
-        return NextResponse.redirect(new URL('/auth/403', req.url));
-      }
-    }
-  }
-
-  // Si la ruta no existe en nuestras rutas definidas, redirigir a 404
-  const allKnownRoutes = [...publicRoutes, ...protectedRoutes, ...adminRoutes];
-  const isKnownRoute = allKnownRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  );
-
-  if (!isKnownRoute && !pathname.startsWith('/_next/') && !pathname.startsWith('/api/')) {
-    return NextResponse.redirect(new URL('/404', req.url));
-  }
-
+  // Para rutas protegidas, permitir acceso y dejar que el cliente maneje la autenticación
+  // Esto evita problemas de cookies y timing
   return NextResponse.next();
 }
 

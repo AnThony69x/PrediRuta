@@ -37,68 +37,6 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {/* Card de Predicciones */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">Predicciones</h3>
-                    <p className="text-blue-100">Predice el tráfico</p>
-                  </div>
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-4 bg-white/20 border-white/30 text-white hover:bg-white/30"
-                  onClick={() => window.location.href = "/predicciones"}
-                >
-                  Ir a Predicciones
-                </Button>
-              </div>
-
-              {/* Card de Rutas */}
-              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">Rutas</h3>
-                    <p className="text-green-100">Optimiza tus rutas</p>
-                  </div>
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-4 bg-white/20 border-white/30 text-white hover:bg-white/30"
-                  onClick={() => window.location.href = "/rutas"}
-                >
-                  Gestionar Rutas
-                </Button>
-              </div>
-
-              {/* Card de Perfil */}
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">Perfil</h3>
-                    <p className="text-purple-100">Configura tu cuenta</p>
-                  </div>
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <Button
-                  variant="outline"
-                  className="mt-4 bg-white/20 border-white/30 text-white hover:bg-white/30"
-                  onClick={() => window.location.href = "/profile"}
-                >
-                  Ver Perfil
-                </Button>
-              </div>
-            </div>
-
             <div className="flex justify-center">
               <Button
                 variant="outline"

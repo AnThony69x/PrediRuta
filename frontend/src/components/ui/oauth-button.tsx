@@ -33,7 +33,7 @@ const GoogleIcon = () => (
 
 export const OAuthButton: React.FC<OAuthButtonProps> = ({
   provider = "google",
-  redirectTo = "/dashboard",
+  redirectTo = "/auth/callback",
   full
 }) => {
   const [loading, setLoading] = useState(false);
