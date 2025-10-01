@@ -53,6 +53,14 @@ export const LoginForm = () => {
       </Button>
       <Separator label="o" />
       <OAuthButton provider="google" full />
+      <div className="text-center">
+        <Link
+          href="/forgot-password"
+          className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
       <p className="text-center text-sm text-gray-600 dark:text-gray-300">
         ¿No tienes cuenta?{" "}
         <Link
