@@ -21,6 +21,8 @@ const publicRoutes = [
   '/',           // Inicio - Introducir el sistema
   '/register',   // Registro - Crear cuenta
   '/login',      // Inicio de Sesión - Autenticar usuario
+  '/forgot-password', // Recuperar contraseña
+  '/reset-password',  // Resetear contraseña
   '/docs',       // Documentación - Acceso a guías
   '/ayuda',      // Ayuda - Resolver dudas
   '/404',        // Error - Página no encontrada
