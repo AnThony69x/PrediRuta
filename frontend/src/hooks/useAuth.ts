@@ -48,6 +48,23 @@ export const useAuth = () => {
           if (session.user.user_metadata?.role) {
             document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
           }
+
+          // Para usuarios de Google OAuth que no tienen full_name en metadata, usar el nombre del proveedor
+          if (!session.user.user_metadata?.full_name && session.user.user_metadata?.full_name !== session.user.user_metadata?.display_name) {
+            const displayName = session.user.user_metadata?.name || 
+                               session.user.user_metadata?.display_name ||
+                               session.user.user_metadata?.full_name;
+            
+            if (displayName && displayName !== session.user.email) {
+              // Actualizar los metadatos del usuario si viene de OAuth y tiene un nombre
+              supabase.auth.updateUser({
+                data: {
+                  full_name: displayName,
+                  display_name: displayName
+                }
+              });
+            }
+          }
           
           setAuthState({
             user: session.user,
@@ -93,6 +110,23 @@ export const useAuth = () => {
           
           if (session.user.user_metadata?.role) {
             document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          }
+
+          // Para usuarios de Google OAuth que no tienen full_name en metadata, usar el nombre del proveedor
+          if (!session.user.user_metadata?.full_name && event === 'SIGNED_IN') {
+            const displayName = session.user.user_metadata?.name || 
+                               session.user.user_metadata?.display_name ||
+                               session.user.user_metadata?.full_name;
+            
+            if (displayName && displayName !== session.user.email) {
+              // Actualizar los metadatos del usuario si viene de OAuth y tiene un nombre
+              supabase.auth.updateUser({
+                data: {
+                  full_name: displayName,
+                  display_name: displayName
+                }
+              });
+            }
           }
 
           setAuthState({

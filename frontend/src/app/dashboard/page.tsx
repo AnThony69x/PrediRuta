@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrafficMap } from "@/components/map/traffic-map";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import { getUserFirstName } from "@/utils/userHelpers";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -59,13 +61,26 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <main className="p-4 md:p-6 space-y-6 min-h-screen bg-gray-50 dark:bg-gray-900">
-        <header className="max-w-7xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-            Dashboard
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            Hola {user?.email}. Aquí tienes una vista general del sistema.
-          </p>
+        <header className="max-w-7xl mx-auto flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              Dashboard
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              Hola {getUserFirstName(user)}. Aquí tienes una vista general del sistema.
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <UserAvatar user={user} size="md" showName />
+            <Button 
+              variant="outline" 
+              onClick={signOut}
+              className="text-sm"
+            >
+              Cerrar sesión
+            </Button>
+          </div>
         </header>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">

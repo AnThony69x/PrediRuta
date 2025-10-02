@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { OAuthButton } from "@/components/ui/oauth-button";
@@ -14,11 +15,41 @@ export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Verificar si hay un mensaje de registro exitoso
+  useEffect(() => {
+    const registrationMessage = sessionStorage.getItem('registrationSuccess');
+    if (registrationMessage) {
+      setSuccessMsg(registrationMessage);
+      // Limpiar el mensaje del sessionStorage después de mostrarlo
+      sessionStorage.removeItem('registrationSuccess');
+    }
+  }, []);
+
+  // Función para validar email
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
+
+    // Validar email
+    if (!validateEmail(email)) {
+      setErr("Por favor ingresa un correo electrónico válido");
+      return;
+    }
+
+    // Validar contraseña
+    if (!password.trim()) {
+      setErr("La contraseña es requerida");
+      return;
+    }
+
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -32,21 +63,23 @@ export const LoginForm = () => {
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       {err && <Alert type="error">{err}</Alert>}
+      {successMsg && <Alert type="success">{successMsg}</Alert>}
       <Input
-        label="Correo"
+        label="Correo electrónico"
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
         autoComplete="email"
+        placeholder="tu-email@ejemplo.com"
       />
-      <Input
+      <PasswordInput
         label="Contraseña"
-        type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
         autoComplete="current-password"
+        placeholder="Ingresa tu contraseña"
       />
       <Button loading={loading} full type="submit">
         Iniciar sesión
