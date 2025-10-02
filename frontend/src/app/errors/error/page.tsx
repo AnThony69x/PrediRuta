@@ -2,20 +2,17 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-interface ErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
-}
-
-export default function Error({ error, reset }: ErrorProps) {
+export default function ErrorPage() {
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-    // Log error for debugging
-    console.error('Error 500:', error);
-  }, [error]);
+    // Simular error para debugging
+    console.error('Error 500: Página de error de demostración');
+  }, []);
 
   if (!mounted) {
     return null;
@@ -66,11 +63,9 @@ export default function Error({ error, reset }: ErrorProps) {
               <br className="hidden sm:block" />
               Nuestro equipo ha sido notificado y está trabajando en una solución.
             </p>
-            {error.digest && (
-              <p className="text-xs text-red-300 opacity-70 mt-2">
-                ID del error: {error.digest}
-              </p>
-            )}
+            <p className="text-xs text-red-300 opacity-70 mt-2">
+              ID del error: ERR-500-DEMO-{new Date().getTime().toString().slice(-6)}
+            </p>
           </div>
 
           {/* Decorative Error Icon */}
@@ -85,7 +80,7 @@ export default function Error({ error, reset }: ErrorProps) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
             <button
-              onClick={reset}
+              onClick={() => window.location.reload()}
               className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-red-500 to-orange-600 text-white font-semibold rounded-full hover:from-red-600 hover:to-orange-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl text-sm sm:text-base"
             >
               <span className="relative z-10 flex items-center gap-2">
