@@ -1,5 +1,6 @@
 import "./globals.css";
 import "../styles/accessibility.css";
+import "leaflet/dist/leaflet.css";
 import { AccessibilityWidget } from "../components/ui/accessibility-widget";
 
 export const metadata = {

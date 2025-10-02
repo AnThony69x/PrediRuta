@@ -11,6 +11,11 @@ type TrafficMapProps = {
   zoom?: number;
   className?: string;
   onReady?: (map: LeafletMap) => void;
+  onViewportChange?: (v: {
+    center: [number, number];
+    zoom: number;
+    bbox: { west: number; south: number; east: number; north: number };
+  }) => void;
 };
 
 export function TrafficMap(props: TrafficMapProps) {
