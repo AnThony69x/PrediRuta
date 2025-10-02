@@ -32,10 +32,21 @@ export const useAuth = () => {
         }
 
         if (session?.user) {
-          // Establecer cookies para el middleware
-          document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600`;
+          // Establecer cookies para el middleware con múltiples nombres para compatibilidad
+          const accessToken = session.access_token;
+          const refreshToken = session.refresh_token;
+          
+          // Configurar cookies con todas las variantes posibles
+          document.cookie = `sb-access-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          document.cookie = `supabase-auth-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          document.cookie = `sb-auth-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          
+          if (refreshToken) {
+            document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          }
+          
           if (session.user.user_metadata?.role) {
-            document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600`;
+            document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
           }
           
           setAuthState({
@@ -46,6 +57,9 @@ export const useAuth = () => {
         } else {
           // Limpiar cookies si no hay sesión
           document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'supabase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'sb-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
           document.cookie = 'user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
           
           setAuthState({ user: null, loading: false, isAuthenticated: false });
@@ -64,10 +78,21 @@ export const useAuth = () => {
         console.log('Auth state changed:', event, session?.user?.id);
 
         if (session?.user) {
-          // Establecer cookies para el middleware
-          document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=3600`;
+          // Establecer cookies para el middleware con múltiples nombres para compatibilidad
+          const accessToken = session.access_token;
+          const refreshToken = session.refresh_token;
+          
+          // Configurar cookies con todas las variantes posibles
+          document.cookie = `sb-access-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          document.cookie = `supabase-auth-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          document.cookie = `sb-auth-token=${accessToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          
+          if (refreshToken) {
+            document.cookie = `sb-refresh-token=${refreshToken}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
+          }
+          
           if (session.user.user_metadata?.role) {
-            document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600`;
+            document.cookie = `user-role=${session.user.user_metadata.role}; path=/; max-age=3600; SameSite=Lax; Secure=${window.location.protocol === 'https:'}`;
           }
 
           setAuthState({
@@ -76,13 +101,18 @@ export const useAuth = () => {
             isAuthenticated: true,
           });
 
-          // Redirigir después del login
+          // Redirigir después del login con un pequeño delay para asegurar que las cookies se establezcan
           if (event === 'SIGNED_IN') {
-            router.push('/dashboard');
+            setTimeout(() => {
+              router.push('/dashboard');
+            }, 100);
           }
         } else {
           // Limpiar cookies si no hay sesión
           document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'supabase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'sb-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+          document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
           document.cookie = 'user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 
           setAuthState({ user: null, loading: false, isAuthenticated: false });

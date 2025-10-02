@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Rutas que requieren autenticación
+// Rutas que requieren autenticación (el middleware será menos agresivo)
 const protectedRoutes = [
-  '/dashboard',
+  // '/dashboard', // Permitir que el dashboard maneje su propia autenticación
   '/rutas',
-  '/predicciones',
+  '/predicciones', 
   '/perfil'
 ];
 
@@ -21,6 +21,7 @@ const publicRoutes = [
   '/',           // Inicio - Introducir el sistema
   '/register',   // Registro - Crear cuenta
   '/login',      // Inicio de Sesión - Autenticar usuario
+  '/dashboard',  // Dashboard - Protegido del lado del cliente
   '/forgot-password', // Recuperar contraseña
   '/reset-password',  // Resetear contraseña
   '/docs',       // Documentación - Acceso a guías
@@ -53,16 +54,21 @@ export async function middleware(req: NextRequest) {
 
   if (isProtectedRoute || isAdminRoute) {
     // Verificar si hay token de autenticación en las cookies
-    const token = req.cookies.get('sb-access-token') || 
-                  req.cookies.get('supabase-auth-token') ||
-                  req.cookies.get('sb-auth-token') ||
-                  req.cookies.get('supabase.auth.token') ||
-                  req.cookies.get('sb-refresh-token');
+    const tokenCookie = req.cookies.get('sb-access-token') || 
+                       req.cookies.get('supabase-auth-token') ||
+                       req.cookies.get('sb-auth-token') ||
+                       req.cookies.get('supabase.auth.token') ||
+                       req.cookies.get('sb-refresh-token');
     
-    // Si no hay token, redirigir a página 401 (No autorizado)
-    if (!token) {
+    const token = tokenCookie?.value;
+    
+    // Si no hay token válido, redirigir a página 401 (No autorizado)
+    if (!token || token.length < 10) {
+      console.log('Middleware: No valid token found, redirecting to unauthorized');
       return NextResponse.redirect(new URL('/errors/unauthorized', req.url));
     }
+
+    console.log('Middleware: Valid token found, allowing access to:', pathname);
 
     // Para rutas de admin, hacer verificación adicional
     if (isAdminRoute) {
