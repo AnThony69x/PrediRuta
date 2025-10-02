@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function NotFound() {
   const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -71,18 +73,55 @@ export default function NotFound() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-center items-center px-4">
-            <Link
-              href="/"
-              className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-pink-500 to-violet-600 text-white font-semibold rounded-full hover:from-pink-600 hover:to-violet-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl text-sm sm:text-base"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Volver al inicio
-              </span>
-            </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
+            {/* Botón principal - Dashboard si está logueado, Inicio si no */}
+            {!loading && (
+              <Link
+                href={isAuthenticated ? '/dashboard' : '/'}
+                className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-pink-500 to-violet-600 text-white font-semibold rounded-full hover:from-pink-600 hover:to-violet-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl text-sm sm:text-base"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {isAuthenticated ? (
+                    <>
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      Ir al Dashboard
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      Volver al inicio
+                    </>
+                  )}
+                </span>
+              </Link>
+            )}
+            
+            {/* Botón secundario - solo si no está logueado */}
+            {!loading && !isAuthenticated && (
+              <Link
+                href="/login"
+                className="group px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20 hover:bg-white/20 transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Iniciar Sesión
+                </span>
+              </Link>
+            )}
+            
+            {/* Loading state */}
+            {loading && (
+              <div className="flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-full border border-white/20">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span className="text-sm sm:text-base">Cargando...</span>
+              </div>
+            )}
           </div>
         </div>
       </main>
