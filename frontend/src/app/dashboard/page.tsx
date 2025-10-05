@@ -73,7 +73,14 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <UserAvatar user={user} size="md" showName />
+            <Link href="/perfil" className="group">
+              <div className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors">
+                <UserAvatar user={user} size="md" showName />
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
             <Button
               variant="outline"
               onClick={signOut}
@@ -138,10 +145,10 @@ export default function DashboardPage() {
                   <p className="text-xs text-sky-800/80 dark:text-sky-200/80">Explora predicciones de tráfico</p>
                 </div>
               </Link>
-              <Link href="/dashboard/configuracion" className="group">
+              <Link href="/perfil" className="group">
                 <div className="rounded-md border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-3 transition-all hover:shadow-md dark:border-purple-900/60 dark:from-purple-950 dark:to-gray-900">
-                  <p className="font-semibold text-purple-700 dark:text-purple-300 group-hover:translate-x-0.5 transition-transform">Configuración</p>
-                  <p className="text-xs text-purple-800/80 dark:text-purple-200/80">Perfil, idioma y preferencias</p>
+                  <p className="font-semibold text-purple-700 dark:text-purple-300 group-hover:translate-x-0.5 transition-transform">Mi Perfil</p>
+                  <p className="text-xs text-purple-800/80 dark:text-purple-200/80">Editar nombre, idioma y preferencias</p>
                 </div>
               </Link>
               <button

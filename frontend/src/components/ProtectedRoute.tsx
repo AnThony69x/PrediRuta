@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
@@ -24,13 +24,27 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { loading, isAuthenticated, checkPermission } = useAuth();
   const router = useRouter();
+  const [shouldRedirect, setShouldRedirect] = React.useState(false);
 
   useEffect(() => {
-    // Si ya terminó de cargar y no está autenticado, redirigir al login
+    // Dar más tiempo antes de redirigir para evitar redirecciones prematuras
+    let redirectTimer: NodeJS.Timeout;
+    
     if (!loading && !isAuthenticated) {
-      console.log('Usuario no autenticado, redirigiendo al login...');
-      router.push('/login');
+      redirectTimer = setTimeout(() => {
+        console.log('Usuario no autenticado después de timeout, redirigiendo al login...');
+        setShouldRedirect(true);
+        router.push('/login');
+      }, 2000); // Esperar 2 segundos antes de redirigir
+    } else if (isAuthenticated) {
+      setShouldRedirect(false);
     }
+    
+    return () => {
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+    };
   }, [loading, isAuthenticated, router]);
 
   // Mostrar loading mientras se verifica la autenticación
@@ -38,9 +52,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <>{fallback}</>;
   }
 
-  // Si no está autenticado, mostrar loading mientras redirije
-  if (!isAuthenticated) {
+  // Si no está autenticado y no se ha decidido redirigir aún, mostrar loading
+  if (!isAuthenticated && !shouldRedirect) {
     return <>{fallback}</>;
+  }
+
+  // Si no está autenticado y ya se decidió redirigir, mostrar mensaje
+  if (!isAuthenticated && shouldRedirect) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Redirigiendo al login...</p>
+        </div>
+      </div>
+    );
   }
 
   // Si se requiere un rol específico, verificar permisos
