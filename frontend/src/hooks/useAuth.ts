@@ -93,7 +93,10 @@ export const useAuth = () => {
     // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
+        // Solo logear eventos importantes, no INITIAL_SESSION
+        if (event !== 'INITIAL_SESSION') {
+          console.log('Auth state changed:', event, session?.user?.id);
+        }
 
         if (session?.user) {
           // Establecer cookies para el middleware con múltiples nombres para compatibilidad

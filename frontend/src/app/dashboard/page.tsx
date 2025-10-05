@@ -7,7 +7,7 @@ import { TrafficMap } from "@/components/map/traffic-map";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { getUserFirstName } from "@/utils/userHelpers";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type TrafficSummary = {
   city?: string;
@@ -20,36 +20,14 @@ type TrafficSummary = {
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
-  const [isFetching, setIsFetching] = useState(false);
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
 
-  const backendUrl = useMemo(() => {
-    return process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
-  }, []);
-
   useEffect(() => {
-    // Intento de obtener un resumen real si el backend expone algo (ej: /health como latido)
-    const fetchSummary = async () => {
-      try {
-        setIsFetching(true);
-        const res = await fetch(`${backendUrl}/health`, { cache: "no-store" });
-        if (res.ok) {
-          const data = await res.json();
-          // No inventamos datos; sólo establecemos marcas temporales para indicar conexión
-          setSummary({
-            updatedAt: new Date().toISOString(),
-          });
-        } else {
-          setSummary(null);
-        }
-      } catch (_e) {
-        setSummary(null);
-      } finally {
-        setIsFetching(false);
-      }
-    };
-    fetchSummary();
-  }, [backendUrl]);
+    // Configurar datos de ejemplo para modo frontend-only
+    setSummary({
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
   if (loading) {
     return (
@@ -112,7 +90,7 @@ export default function DashboardPage() {
                     <li><span className="font-medium">Nivel de congestión:</span> {"".padStart(summary.congestionLevel, "⬤")}<span className="sr-only">{summary.congestionLevel}/5</span></li>
                   )}
                   <li className="text-xs text-gray-500 dark:text-gray-400">
-                    Estado backend: {isFetching ? "consultando..." : summary?.updatedAt ? "conectado" : "no disponible"}
+                    Modo: Frontend Only {summary?.updatedAt ? "✅" : "⚠️"}
                   </li>
                   {viewport && (
                     <li className="text-xs text-gray-500 dark:text-gray-400">
