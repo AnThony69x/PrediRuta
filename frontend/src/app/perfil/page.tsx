@@ -6,7 +6,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Link from "next/link";
 
 function PerfilPageContent() {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut, applyDarkMode } = useAuth();
   const [perfil, setPerfil] = useState<any>(null);
   const [nombre, setNombre] = useState("");
   const [idioma, setIdioma] = useState("es");
@@ -173,15 +173,10 @@ function PerfilPageContent() {
     }
   }, [msg]);
 
-  // Aplicar modo oscuro
+  // Aplicar modo oscuro globalmente
   useEffect(() => {
-    const root = document.documentElement;
-    if (modoOscuro) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [modoOscuro]);
+    applyDarkMode(modoOscuro);
+  }, [modoOscuro, applyDarkMode]);
 
   // Función para subir avatar
   const subirAvatar = async (archivo: File) => {
@@ -360,9 +355,17 @@ function PerfilPageContent() {
         await supabase.auth.updateUser({
           data: { 
             full_name: nombre.trim(),
-            avatar_url: avatar
+            avatar_url: avatar,
+            preferences: {
+              idioma,
+              modo_oscuro: modoOscuro
+            }
           }
         });
+        
+        // Aplicar modo oscuro globalmente después de guardar
+        applyDarkMode(modoOscuro);
+        
       } catch (authError: any) {
         console.warn('No se pudieron actualizar los metadatos de autenticación:', authError);
         // No fallar completamente si los metadatos no se actualizan
@@ -670,7 +673,7 @@ function PerfilPageContent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Modo oscuro</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Usa un tema oscuro para reducir la fatiga visual</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Se aplicará en toda la aplicación al guardar</p>
                   </div>
                   <button
                     type="button"

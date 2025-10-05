@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrafficMap } from "@/components/map/traffic-map";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import { getUserFirstName } from "@/utils/userHelpers";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -51,6 +52,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <DarkModeToggle />
             <Link href="/perfil" className="group">
               <div className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors">
                 <UserAvatar user={user} size="md" showName />

@@ -19,6 +19,32 @@ export const useAuth = () => {
   });
   const router = useRouter();
 
+  // Función para aplicar modo oscuro globalmente
+  const applyDarkMode = (isDark: boolean) => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem('darkMode', 'false');
+    }
+  };
+
+  // Inicializar modo oscuro desde localStorage al cargar
+  useEffect(() => {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+      applyDarkMode(true);
+    } else if (savedDarkMode === 'false') {
+      applyDarkMode(false);
+    } else {
+      // Si no hay preferencia guardada, usar preferencia del sistema
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyDarkMode(prefersDark);
+    }
+  }, []);
+
   useEffect(() => {
     // Obtener sesión inicial
     const getInitialSession = async () => {
@@ -66,12 +92,17 @@ export const useAuth = () => {
               });
             }
           }
-          
+
           setAuthState({
             user: session.user,
             loading: false,
             isAuthenticated: true,
           });
+          
+          // Aplicar preferencias de modo oscuro desde el perfil si están disponibles
+          if (session.user.user_metadata?.preferences?.modo_oscuro !== undefined) {
+            applyDarkMode(session.user.user_metadata.preferences.modo_oscuro);
+          }
         } else {
           // Limpiar cookies si no hay sesión
           document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
@@ -217,5 +248,6 @@ export const useAuth = () => {
     checkPermission,
     requireAuth,
     requirePermission,
+    applyDarkMode, // Nueva función para controlar modo oscuro globalmente
   };
 };
