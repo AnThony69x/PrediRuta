@@ -64,11 +64,10 @@ export async function middleware(req: NextRequest) {
     
     // Si no hay token válido, redirigir a página 401 (No autorizado)
     if (!token || token.length < 10) {
-      console.log('Middleware: No valid token found, redirecting to unauthorized');
       return NextResponse.redirect(new URL('/errors/unauthorized', req.url));
     }
 
-    console.log('Middleware: Valid token found, allowing access to:', pathname);
+    // Token válido encontrado, continuar con la verificación
 
     // Para rutas de admin, hacer verificación adicional
     if (isAdminRoute) {

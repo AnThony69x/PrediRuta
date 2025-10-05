@@ -19,6 +19,31 @@ function PerfilPageContent() {
   const [subiendoAvatar, setSubiendoAvatar] = useState(false);
   const [storageDisponible, setStorageDisponible] = useState(true);
   const [conectado, setConectado] = useState(true);
+  
+  // Estados para detectar cambios
+  const [valoresOriginales, setValoresOriginales] = useState({
+    nombre: '',
+    idioma: 'es',
+    avatar: '',
+    modoOscuro: false
+  });
+  const [hayCambios, setHayCambios] = useState(false);
+
+  // Función para detectar cambios
+  function detectarCambios() {
+    const cambiosDetectados = 
+      nombre !== valoresOriginales.nombre ||
+      idioma !== valoresOriginales.idioma ||
+      avatar !== valoresOriginales.avatar ||
+      modoOscuro !== valoresOriginales.modoOscuro;
+    
+    setHayCambios(cambiosDetectados);
+  }
+
+  // Efecto para detectar cambios cuando cambian los valores
+  useEffect(() => {
+    detectarCambios();
+  }, [nombre, idioma, avatar, modoOscuro, valoresOriginales]);
 
   // Verificar conexión y storage
   useEffect(() => {
@@ -114,13 +139,34 @@ function PerfilPageContent() {
           setIdioma('es');
           setModoOscuro(false);
           
+          // Establecer valores originales
+          setValoresOriginales({
+            nombre: fallbackProfile.full_name,
+            idioma: 'es',
+            avatar: fallbackProfile.avatar_url,
+            modoOscuro: false
+          });
+          
         } else if (data) {
           // Perfil encontrado en la tabla
           setPerfil(data);
-          setNombre(data.full_name || '');
-          setIdioma(data.preferences?.idioma || 'es');
-          setAvatar(data.avatar_url || '');
-          setModoOscuro(data.preferences?.modo_oscuro || false);
+          const nombrePerfil = data.full_name || '';
+          const idiomaPerfil = data.preferences?.idioma || 'es';
+          const avatarPerfil = data.avatar_url || '';
+          const modoOscuroPerfil = data.preferences?.modo_oscuro || false;
+          
+          setNombre(nombrePerfil);
+          setIdioma(idiomaPerfil);
+          setAvatar(avatarPerfil);
+          setModoOscuro(modoOscuroPerfil);
+          
+          // Establecer valores originales
+          setValoresOriginales({
+            nombre: nombrePerfil,
+            idioma: idiomaPerfil,
+            avatar: avatarPerfil,
+            modoOscuro: modoOscuroPerfil
+          });
         } else {
           // No hay perfil en la tabla, usar datos del user
           const profileFromUser = {
@@ -135,6 +181,14 @@ function PerfilPageContent() {
           setAvatar(profileFromUser.avatar_url);
           setIdioma('es');
           setModoOscuro(false);
+          
+          // Establecer valores originales
+          setValoresOriginales({
+            nombre: profileFromUser.full_name,
+            idioma: 'es',
+            avatar: profileFromUser.avatar_url,
+            modoOscuro: false
+          });
         }
       } catch (error: any) {
         console.error('Error inesperado al cargar perfil:', error);
@@ -153,6 +207,14 @@ function PerfilPageContent() {
         setAvatar('');
         setIdioma('es');
         setModoOscuro(false);
+        
+        // Establecer valores originales
+        setValoresOriginales({
+          nombre: '',
+          idioma: 'es',
+          avatar: '',
+          modoOscuro: false
+        });
       } finally {
         setLoading(false);
       }
@@ -372,6 +434,14 @@ function PerfilPageContent() {
       }
       
       setMsg('✅ Perfil actualizado correctamente. Todos los cambios han sido guardados.');
+      
+      // Actualizar valores originales después de guardar
+      setValoresOriginales({
+        nombre: nombre.trim(),
+        idioma,
+        avatar,
+        modoOscuro
+      });
       
     } catch (error: any) {
       console.error('Error al actualizar perfil:', error);
@@ -751,7 +821,7 @@ function PerfilPageContent() {
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 type="submit"
-                disabled={guardando}
+                disabled={guardando || !hayCambios}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg py-3 px-6 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 font-medium shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <span className="flex items-center justify-center">
@@ -762,10 +832,21 @@ function PerfilPageContent() {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Guardar cambios
+                      {hayCambios ? (
+                        <>
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Guardar cambios
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+                          </svg>
+                          Sin cambios
+                        </>
+                      )}
                     </>
                   )}
                 </span>
