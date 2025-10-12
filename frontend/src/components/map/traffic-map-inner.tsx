@@ -1,7 +1,7 @@
 "use client";
-import { MapContainer, TileLayer, ZoomControl, ScaleControl, useMap, LayersControl, useMapEvent } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl, ScaleControl, useMap, LayersControl, useMapEvent, Polyline, CircleMarker } from "react-leaflet";
 import type { Map as LeafletMap } from "leaflet";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 type TrafficMapInnerProps = {
   center?: [number, number];
@@ -13,6 +13,9 @@ type TrafficMapInnerProps = {
     zoom: number;
     bbox: { west: number; south: number; east: number; north: number };
   }) => void;
+  userLocation?: [number, number];
+  segments?: Array<{ coords: [number, number][], level: "free" | "moderate" | "heavy" | "severe" }>;
+  focusCenter?: [number, number];
 };
 
 function FitToLocation() {
@@ -76,7 +79,10 @@ export function TrafficMapInner({
   zoom = 12,
   className,
   onReady,
-  onViewportChange
+  onViewportChange,
+  userLocation,
+  segments,
+  focusCenter
 }: TrafficMapInnerProps) {
   const trafficTileUrl = process.env.NEXT_PUBLIC_TRAFFIC_TILE_URL;
   const trafficAttribution = process.env.NEXT_PUBLIC_TRAFFIC_ATTR || "Datos de tráfico";
@@ -96,6 +102,8 @@ export function TrafficMapInner({
           if (instance && onReady) onReady(instance as unknown as LeafletMap);
         }}
       >
+        {/* Enfocar a centro cuando cambia */}
+        <FocusOnCenter center={focusCenter} />
         <ViewportWatcher onChange={onViewportChange} />
         <LayersControl position="topright">
           <LayersControl.BaseLayer checked name="TomTom Basic">
@@ -125,6 +133,16 @@ export function TrafficMapInner({
         <ScaleControl position="bottomleft" />
         <FitToLocation />
 
+        {/* Marcador de ubicación del usuario como círculo para evitar issues de assets */}
+        {userLocation && (
+          <CircleMarker center={userLocation} radius={8} pathOptions={{ color: "#2563eb", fillColor: "#3b82f6", fillOpacity: 0.9 }} />
+        )}
+
+        {/* Segmentos de tráfico coloreados */}
+        {segments?.map((s, idx) => (
+          <Polyline key={idx} positions={s.coords} pathOptions={{ color: levelToColor(s.level), weight: 6, opacity: 0.9 }} />
+        ))}
+
         {!trafficTileUrl && (
           <div className="absolute left-3 top-3 z-[1000] rounded-md bg-white/90 px-3 py-2 text-xs text-gray-700 shadow dark:bg-gray-800/90 dark:text-gray-100">
             <span className="font-semibold">Capa tráfico</span>: Configura NEXT_PUBLIC_TRAFFIC_TILE_URL para activar. Base Map © TomTom © OpenStreetMap contributors.
@@ -136,3 +154,27 @@ export function TrafficMapInner({
 }
 
 export default TrafficMapInner;
+
+function FocusOnCenter({ center }: { center?: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!center) return;
+    map.setView(center, Math.max(map.getZoom(), 13), { animate: true });
+  }, [center, map]);
+  return null;
+}
+
+function levelToColor(level: "free" | "moderate" | "heavy" | "severe") {
+  switch (level) {
+    case "free":
+      return "#22c55e"; // green-500
+    case "moderate":
+      return "#eab308"; // yellow-500
+    case "heavy":
+      return "#f97316"; // orange-500
+    case "severe":
+      return "#dc2626"; // red-600
+    default:
+      return "#64748b"; // slate-500
+  }
+}

@@ -273,6 +273,43 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- Función RPC para insertar un punto de tráfico (crea geometry desde lat/lon)
+CREATE OR REPLACE FUNCTION public.insert_traffic_point(
+    p_road_segment_id VARCHAR(255),
+    p_lat DOUBLE PRECISION,
+    p_lon DOUBLE PRECISION,
+    p_timestamp TIMESTAMP WITH TIME ZONE,
+    p_speed_kmh DECIMAL(5,2),
+    p_traffic_level INTEGER,
+    p_vehicle_count INTEGER,
+    p_congestion_factor DECIMAL(3,2),
+    p_data_source VARCHAR(50)
+)
+RETURNS TABLE(id UUID) AS $$
+DECLARE
+    v_id UUID;
+BEGIN
+    INSERT INTO public.traffic_data (
+        road_segment_id, location, timestamp, speed_kmh, traffic_level, vehicle_count, congestion_factor, data_source
+    ) VALUES (
+        p_road_segment_id,
+        ST_SetSRID(ST_Point(p_lon, p_lat), 4326),
+        p_timestamp,
+        p_speed_kmh,
+        p_traffic_level,
+        p_vehicle_count,
+        p_congestion_factor,
+        p_data_source
+    ) RETURNING traffic_data.id INTO v_id;
+
+    RETURN QUERY SELECT v_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+GRANT EXECUTE ON FUNCTION public.insert_traffic_point(
+    VARCHAR, DOUBLE PRECISION, DOUBLE PRECISION, TIMESTAMPTZ, DECIMAL, INTEGER, INTEGER, DECIMAL, VARCHAR
+) TO anon, authenticated, service_role;
+
 -- Triggers para updated_at
 CREATE TRIGGER update_user_profiles_updated_at 
     BEFORE UPDATE ON public.user_profiles 

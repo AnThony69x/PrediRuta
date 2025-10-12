@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getBackendUrl } from "@/lib/backend-url";
 
 type Viewport = {
   center: [number, number];
@@ -18,7 +19,7 @@ type Status = {
   updatedAt?: string;
 };
 
-export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | null; backendUrl: string }) {
+export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | null; backendUrl?: string }) {
   const [status, setStatus] = useState<Status | null>(null);
   const [loading, setLoading] = useState(false);
   const timer = useRef<number | undefined>(undefined);
@@ -37,7 +38,8 @@ export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | n
     timer.current = window.setTimeout(async () => {
       try {
         setLoading(true);
-        const url = `${backendUrl.replace(/\/$/, "")}/api/v1/traffic/status?bbox=${encodeURIComponent(bboxStr)}`;
+  const base = (backendUrl || getBackendUrl()).replace(/\/$/, "");
+  const url = `${base}/api/v1/traffic/status?bbox=${encodeURIComponent(bboxStr)}`;
         const res = await fetch(url);
         if (!res.ok) {
           const text = await res.text();

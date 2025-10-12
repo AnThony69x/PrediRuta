@@ -31,28 +31,32 @@ async def get_traffic_status_for_point(lat: float, lon: float) -> Dict[str, Any]
         return cached["v"]
 
     # TomTom Traffic Flow Segment Data API v4
-    # Endpoint de ejemplo: https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json?point={lat},{lon}&unit=KMPH&key=...
-    url = (
-        "https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json"
-    )
-    params = {
-        "point": f"{lat},{lon}",
-        "unit": "KMPH",
-        "key": api_key,
-    }
+    # Intento 1: absolute; Fallback: relative0 si absolute falla (planes que no incluyen absolute)
+    endpoints = [
+        ("absolute", "https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json"),
+        ("relative0", "https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json"),
+    ]
+    params = {"point": f"{lat},{lon}", "unit": "KMPH", "key": api_key}
 
     async with httpx.AsyncClient(timeout=10.0) as client:
-        try:
-            resp = await client.get(url, params=params)
-            if resp.status_code != 200:
-                return {
-                    "status": "unavailable",
-                    "code": resp.status_code,
-                    "message": f"TomTom error {resp.status_code}: {resp.text[:200]}",
-                }
-            data = resp.json()
-        except httpx.RequestError as e:
-            return {"status": "unavailable", "code": 503, "message": f"Error de red: {e}"}
+        last_error = None
+        for mode, url in endpoints:
+            try:
+                resp = await client.get(url, params=params)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    break
+                else:
+                    last_error = {
+                        "status": "unavailable",
+                        "code": resp.status_code,
+                        "message": f"TomTom {mode} error {resp.status_code}: {resp.text[:200]}",
+                    }
+            except httpx.RequestError as e:
+                last_error = {"status": "unavailable", "code": 503, "message": f"Error de red: {e}"}
+        else:
+            # Ningún endpoint funcionó
+            return last_error or {"status": "unavailable", "code": 502, "message": "Proveedor TomTom no disponible"}
 
     # TomTom response shape (simplificado):
     # {

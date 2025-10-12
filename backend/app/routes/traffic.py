@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, Dict, Any, List, Tuple
 import asyncio
+from pydantic import BaseModel, Field
+from app.database import get_supabase
 
 from app.services.traffic_service import get_traffic_status_for_point
 
@@ -62,9 +64,9 @@ async def traffic_status(
 
         valid = [r for r in results if r.get("status") == "ok" and r.get("currentSpeed") is not None and r.get("freeFlowSpeed")]
         if not valid:
-            # Si todos fallan, devolver el primer error
-            first = results[0] if results else {"status": "unavailable", "code": 502, "message": "Sin resultados"}
-            raise HTTPException(status_code=first.get("code", 503), detail=first.get("message", "Proveedor no disponible"))
+            # Si todos fallan, devolver el primer error con mensaje claro
+            first = results[0] if results else {"status": "unavailable", "code": 502, "message": "Sin resultados del proveedor"}
+            raise HTTPException(status_code=first.get("code", 503), detail=f"Proveedor tráfico no disponible: {first.get('message','')} ")
 
         # Agregación: promediar velocidades; nivel por peor ratio
         avg_current = sum(v.get("currentSpeed", 0) for v in valid) / len(valid)
@@ -82,7 +84,7 @@ async def traffic_status(
 
         status = await get_traffic_status_for_point(lat0, lon0)
         if status.get("status") == "unavailable":
-            raise HTTPException(status_code=status.get("code", 503), detail=status.get("message", "Proveedor no disponible"))
+            raise HTTPException(status_code=status.get("code", 503), detail=f"Proveedor tráfico no disponible: {status.get('message','')}")
         current = status.get("currentSpeed")
         freeflow = status.get("freeFlowSpeed")
         conf = status.get("confidence")
@@ -114,3 +116,37 @@ async def traffic_status(
         "congestionLevel": level,
         "bbox": bbox_list,
     }
+
+
+class TrafficInsert(BaseModel):
+    road_segment_id: Optional[str] = None
+    lat: float
+    lon: float
+    timestamp: Optional[str] = None
+    speed_kmh: float = Field(ge=0)
+    traffic_level: int = Field(ge=1, le=5)
+    vehicle_count: int = 0
+    congestion_factor: float = Field(ge=0, le=1)
+    data_source: str = "frontend"
+
+
+@router.post("/data")
+async def insert_traffic_data(payload: TrafficInsert):
+    sb = get_supabase()
+    params = {
+        "p_road_segment_id": payload.road_segment_id,
+        "p_lat": payload.lat,
+        "p_lon": payload.lon,
+        "p_timestamp": payload.timestamp or __import__("datetime").datetime.utcnow().isoformat() + "Z",
+        "p_speed_kmh": payload.speed_kmh,
+        "p_traffic_level": payload.traffic_level,
+        "p_vehicle_count": payload.vehicle_count,
+        "p_congestion_factor": payload.congestion_factor,
+        "p_data_source": payload.data_source,
+    }
+
+    try:
+        res = sb.rpc("insert_traffic_point", params=params).execute()
+        return {"status": "ok", "inserted": res.data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al insertar traffic_data (RPC): {e}")

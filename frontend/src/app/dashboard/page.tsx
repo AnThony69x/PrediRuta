@@ -11,6 +11,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { TrafficStatus } from "@/components/traffic-status";
 import { LegendTraffic } from "@/components/legend-traffic";
+import { TrafficNearby } from "@/components/traffic-nearby";
+import { getBackendUrl } from "@/lib/backend-url";
 
 type TrafficSummary = {
   city?: string;
@@ -24,7 +26,10 @@ export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
+  const backendUrl = getBackendUrl();
+  const [userLoc, setUserLoc] = useState<[number, number] | undefined>(undefined);
+  const [focusCenter, setFocusCenter] = useState<[number, number] | undefined>(undefined);
+  const [segments, setSegments] = useState<Array<{ coords: [number, number][], level: "free" | "moderate" | "heavy" | "severe" }>>([]);
 
   useEffect(() => {
     // Configurar datos de ejemplo para modo frontend-only
@@ -184,6 +189,9 @@ export default function DashboardPage() {
                   onViewportChange={(v) => {
                     setViewport(v);
                   }}
+                  userLocation={userLoc}
+                  focusCenter={focusCenter}
+                  segments={segments}
                 />
                 <div className="absolute right-3 top-3 z-[1100]">
                   <LegendTraffic />
@@ -191,6 +199,26 @@ export default function DashboardPage() {
                 <div className="absolute left-3 bottom-3 right-3 z-[1100] max-w-xl">
                   <TrafficStatus viewport={viewport} backendUrl={backendUrl} />
                 </div>
+              </div>
+              <div className="mt-3">
+                <TrafficNearby
+                  backendUrl={backendUrl}
+                  onUpdate={({ level, flow, lat, lon }) => {
+                    setUserLoc([lat, lon]);
+                    setFocusCenter([lat, lon]);
+                    // Dibujar un pequeño segmento ficticio como indicación de tráfico en el punto (línea corta N-S)
+                    const delta = 0.001; // ~100m dependiendo lat
+                    setSegments([
+                      {
+                        level,
+                        coords: [
+                          [lat - delta, lon],
+                          [lat + delta, lon],
+                        ],
+                      },
+                    ]);
+                  }}
+                />
               </div>
             </CardContent>
           </Card>
