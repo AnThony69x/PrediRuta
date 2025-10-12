@@ -9,6 +9,8 @@ import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import { getUserFirstName } from "@/utils/userHelpers";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { TrafficStatus } from "@/components/traffic-status";
+import { LegendTraffic } from "@/components/legend-traffic";
 
 type TrafficSummary = {
   city?: string;
@@ -22,6 +24,7 @@ export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000";
 
   useEffect(() => {
     // Configurar datos de ejemplo para modo frontend-only
@@ -172,19 +175,22 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-[420px] w-full rounded-lg overflow-hidden ring-1 ring-sky-100 dark:ring-sky-900">
+              <div className="relative h-[420px] w-full rounded-lg overflow-hidden ring-1 ring-sky-100 dark:ring-sky-900">
                 <TrafficMap
                   onReady={(map) => {
                     // Placeholder para futuras capas de tráfico/predicción
-                    // map (Leaflet instance) disponible para integraciones futuras
                   }}
                   className="h-full w-full"
                   onViewportChange={(v) => {
                     setViewport(v);
-                    // Aquí podrás disparar peticiones en tiempo real a tu backend
-                    // ej: fetch(`${backendUrl}/api/v1/traffic?bbox=${v.bbox.west},${v.bbox.south},${v.bbox.east},${v.bbox.north}`)
                   }}
                 />
+                <div className="absolute right-3 top-3 z-[1100]">
+                  <LegendTraffic />
+                </div>
+                <div className="absolute left-3 bottom-3 right-3 z-[1100] max-w-xl">
+                  <TrafficStatus viewport={viewport} backendUrl={backendUrl} />
+                </div>
               </div>
             </CardContent>
           </Card>

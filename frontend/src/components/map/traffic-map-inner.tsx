@@ -80,6 +80,9 @@ export function TrafficMapInner({
 }: TrafficMapInnerProps) {
   const trafficTileUrl = process.env.NEXT_PUBLIC_TRAFFIC_TILE_URL;
   const trafficAttribution = process.env.NEXT_PUBLIC_TRAFFIC_ATTR || "Datos de tráfico";
+  const tomtomBase = process.env.NEXT_PUBLIC_MAP_BASE_URL || "https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png";
+  const tomtomKey = process.env.NEXT_PUBLIC_TOMTOM_MAP_KEY;
+  const tomtomUrl = tomtomKey ? `${tomtomBase}?key=${tomtomKey}` : tomtomBase;
 
   return (
     <div className={className}>
@@ -95,22 +98,16 @@ export function TrafficMapInner({
       >
         <ViewportWatcher onChange={onViewportChange} />
         <LayersControl position="topright">
-          <LayersControl.BaseLayer checked name="Carto Light">
+          <LayersControl.BaseLayer checked name="TomTom Basic">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              attribution='&copy; TomTom &copy; OpenStreetMap contributors'
+              url={tomtomUrl}
             />
           </LayersControl.BaseLayer>
           <LayersControl.BaseLayer name="OSM Standard">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='&copy; OpenStreetMap contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Carto Dark">
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
           </LayersControl.BaseLayer>
 
@@ -130,7 +127,7 @@ export function TrafficMapInner({
 
         {!trafficTileUrl && (
           <div className="absolute left-3 top-3 z-[1000] rounded-md bg-white/90 px-3 py-2 text-xs text-gray-700 shadow dark:bg-gray-800/90 dark:text-gray-100">
-            <span className="font-semibold">Capa tráfico</span>: Configura NEXT_PUBLIC_TRAFFIC_TILE_URL para activar.
+            <span className="font-semibold">Capa tráfico</span>: Configura NEXT_PUBLIC_TRAFFIC_TILE_URL para activar. Base Map © TomTom © OpenStreetMap contributors.
           </div>
         )}
       </MapContainer>
