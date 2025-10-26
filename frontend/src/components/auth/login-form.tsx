@@ -28,9 +28,6 @@ export const LoginForm = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
   const [remainingTime, setRemainingTime] = useState<number>(0);
-  
-  // Estado para términos y condiciones
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   // Verificar si hay un mensaje de registro exitoso y estado de bloqueo
   useEffect(() => {
@@ -127,13 +124,6 @@ export const LoginForm = () => {
       return;
     }
 
-    // Validar aceptación de términos
-    if (!acceptedTerms) {
-      setErr("Debes aceptar los términos y condiciones para continuar");
-      toast.warning("Términos no aceptados", "Debes aceptar los términos y condiciones para continuar.");
-      return;
-    }
-
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -214,37 +204,7 @@ export const LoginForm = () => {
         disabled={isLocked}
       />
 
-      {/* Checkbox de términos y condiciones */}
-      <div className="flex items-start gap-2">
-        <input
-          type="checkbox"
-          id="terms"
-          checked={acceptedTerms}
-          onChange={(e) => setAcceptedTerms(e.target.checked)}
-          disabled={isLocked}
-          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-        <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
-          Acepto los{" "}
-          <Link
-            href="/terminos-y-condiciones"
-            target="_blank"
-            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
-          >
-            Términos y Condiciones
-          </Link>
-          {" "}y la{" "}
-          <Link
-            href="/politica-privacidad"
-            target="_blank"
-            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
-          >
-            Política de Privacidad
-          </Link>
-        </label>
-      </div>
-
-      <Button loading={loading} full type="submit" disabled={isLocked || !acceptedTerms}>
+      <Button loading={loading} full type="submit" disabled={isLocked}>
         {isLocked ? "Cuenta bloqueada" : "Iniciar sesión"}
       </Button>
       <Separator label="o" />
