@@ -7,6 +7,7 @@ interface OAuthButtonProps {
   provider?: "google";
   redirectTo?: string;
   full?: boolean;
+  disabled?: boolean;
 }
 
 // Ícono oficial de Google SVG
@@ -34,11 +35,14 @@ const GoogleIcon = () => (
 export const OAuthButton: React.FC<OAuthButtonProps> = ({
   provider = "google",
   redirectTo = "/callback",
-  full
+  full,
+  disabled = false
 }) => {
   const [loading, setLoading] = useState(false);
 
   const startOAuth = async () => {
+    if (disabled) return;
+    
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -60,8 +64,9 @@ export const OAuthButton: React.FC<OAuthButtonProps> = ({
       type="button"
       onClick={startOAuth}
       loading={loading}
+      disabled={disabled}
       variant="outline"
-      className="relative flex items-center justify-center border-gray-300 hover:bg-gray-50 text-gray-700"
+      className="relative flex items-center justify-center border-gray-300 hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {!loading && provider === "google" && <GoogleIcon />}
       <span className="text-sm font-medium">{label}</span>

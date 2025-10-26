@@ -33,7 +33,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
             ref={ref}
             type={showPassword ? "text" : "password"}
             className={clsx(
-              "w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400",
+              "w-full rounded-md border border-gray-300 bg-white px-3 py-2 pr-10 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-700",
               error && "border-red-500 focus:ring-red-500 dark:border-red-400",
               className
             )}
@@ -41,7 +41,8 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
+            disabled={props.disabled}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             tabIndex={-1}
           >
             {showPassword ? (
