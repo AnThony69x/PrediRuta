@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useToast } from "@/components/ui/toaster";
 import Link from "next/link";
 
 function PerfilPageContent() {
   const { user, loading: authLoading, signOut, applyDarkMode } = useAuth();
+  const toast = useToast();
   const [perfil, setPerfil] = useState<any>(null);
   const [nombre, setNombre] = useState("");
   const [idioma, setIdioma] = useState("es");
@@ -320,6 +322,7 @@ function PerfilPageContent() {
       // Actualizar estado local
       setAvatar(urlData.publicUrl);
       setMsg('✅ Avatar subido correctamente. No olvides guardar los cambios para que sean permanentes.');
+      toast.success("✅ Avatar actualizado", "Imagen subida correctamente. Recuerda guardar los cambios.");
       
       // Limpiar el objeto URL temporal
       URL.revokeObjectURL(img.src);
@@ -434,6 +437,7 @@ function PerfilPageContent() {
       }
       
       setMsg('✅ Perfil actualizado correctamente. Todos los cambios han sido guardados.');
+      toast.success("✅ Perfil actualizado", "Todos tus cambios han sido guardados correctamente.");
       
       // Actualizar valores originales después de guardar
       setValoresOriginales({
@@ -463,18 +467,23 @@ function PerfilPageContent() {
       setErr('');
       setMsg('');
       
+      toast.info("🔓 Cerrando sesión", "Saliendo de tu cuenta de forma segura...");
+      
       await signOut();
       
       // El hook useAuth ya maneja la redirección automáticamente
       setMsg('✅ Sesión cerrada correctamente. Redirigiendo...');
+      toast.security("✅ Sesión cerrada", "Has cerrado sesión correctamente. Redirigiendo...");
       
     } catch (error: any) {
       console.error('Error al cerrar sesión:', error);
       
       if (error.message.includes('Failed to fetch')) {
         setErr('❌ Error de conexión al cerrar sesión. Intenta recargar la página.');
+        toast.error("Error de conexión", "No se pudo cerrar sesión. Verifica tu conexión.");
       } else {
         setErr(`❌ Error al cerrar sesión: ${error.message}`);
+        toast.error("Error al cerrar sesión", error.message);
       }
     } finally {
       setGuardando(false);

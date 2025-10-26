@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { OAuthButton } from "@/components/ui/oauth-button";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/toaster";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +16,7 @@ const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutos en milisegundos
 
 export const LoginForm = () => {
   const router = useRouter();
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -35,6 +37,7 @@ export const LoginForm = () => {
     const registrationMessage = sessionStorage.getItem('registrationSuccess');
     if (registrationMessage) {
       setSuccessMsg(registrationMessage);
+      toast.success("Registro exitoso", registrationMessage);
       // Limpiar el mensaje del sessionStorage después de mostrarlo
       sessionStorage.removeItem('registrationSuccess');
     }
@@ -55,13 +58,14 @@ export const LoginForm = () => {
         setIsLocked(true);
         setLockoutEndTime(lockoutEnd);
         setRemainingTime(Math.ceil((lockoutEnd - now) / 1000));
+        toast.security("🔒 Cuenta bloqueada", "Tu cuenta está temporalmente bloqueada por seguridad. Por favor espera.");
       } else {
         // El bloqueo ha expirado, limpiar
         localStorage.removeItem('loginLockoutEnd');
         localStorage.removeItem('loginFailedAttempts');
       }
     }
-  }, []);
+  }, [toast]);
 
   // Temporizador para el desbloqueo
   useEffect(() => {
@@ -80,13 +84,14 @@ export const LoginForm = () => {
         localStorage.removeItem('loginLockoutEnd');
         localStorage.removeItem('loginFailedAttempts');
         setErr(null);
+        toast.info("✅ Cuenta desbloqueada", "Ya puedes intentar iniciar sesión nuevamente.");
       } else {
         setRemainingTime(timeLeft);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isLocked, lockoutEndTime]);
+  }, [isLocked, lockoutEndTime, toast]);
 
   // Función para validar email
   const validateEmail = (email: string): boolean => {
@@ -102,25 +107,30 @@ export const LoginForm = () => {
     if (isLocked) {
       const minutes = Math.floor(remainingTime / 60);
       const seconds = remainingTime % 60;
-      setErr(`Cuenta bloqueada temporalmente. Intenta de nuevo en ${minutes}:${seconds.toString().padStart(2, '0')}`);
+      const timeMessage = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      setErr(`Cuenta bloqueada temporalmente. Intenta de nuevo en ${timeMessage}`);
+      toast.security("🔒 Cuenta bloqueada", `Por favor espera ${timeMessage} minutos antes de intentar nuevamente.`);
       return;
     }
 
     // Validar email
     if (!validateEmail(email)) {
       setErr("Por favor ingresa un correo electrónico válido");
+      toast.warning("Email inválido", "Por favor ingresa un correo electrónico válido.");
       return;
     }
 
     // Validar contraseña
     if (!password.trim()) {
       setErr("La contraseña es requerida");
+      toast.warning("Contraseña requerida", "Por favor ingresa tu contraseña.");
       return;
     }
 
     // Validar aceptación de términos
     if (!acceptedTerms) {
       setErr("Debes aceptar los términos y condiciones para continuar");
+      toast.warning("Términos no aceptados", "Debes aceptar los términos y condiciones para continuar.");
       return;
     }
 
@@ -144,10 +154,14 @@ export const LoginForm = () => {
         setLockoutEndTime(lockoutEnd);
         setRemainingTime(Math.ceil(LOCKOUT_DURATION / 1000));
         localStorage.setItem('loginLockoutEnd', lockoutEnd.toString());
-        setErr(`Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente por 5 minutos por seguridad.`);
+        const errorMessage = `Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente por 5 minutos por seguridad.`;
+        setErr(errorMessage);
+        toast.security("🔒 Cuenta bloqueada temporalmente", errorMessage);
       } else {
         const attemptsLeft = MAX_ATTEMPTS - newFailedAttempts;
-        setErr(`Credenciales incorrectas. Te quedan ${attemptsLeft} intento${attemptsLeft !== 1 ? 's' : ''}.`);
+        const errorMessage = `Credenciales incorrectas. Te quedan ${attemptsLeft} intento${attemptsLeft !== 1 ? 's' : ''}.`;
+        setErr(errorMessage);
+        toast.error("⚠️ Intento de login fallido", errorMessage);
       }
       return;
     }
@@ -156,6 +170,7 @@ export const LoginForm = () => {
     setFailedAttempts(0);
     localStorage.removeItem('loginFailedAttempts');
     localStorage.removeItem('loginLockoutEnd');
+    toast.success("✅ Inicio de sesión exitoso", "Bienvenido de nuevo a PrediRuta.");
     router.push("/dashboard");
   };
 

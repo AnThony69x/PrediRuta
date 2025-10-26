@@ -2,6 +2,7 @@ import "./globals.css";
 import "../styles/accessibility.css";
 import "leaflet/dist/leaflet.css";
 import { AccessibilityWidget } from "../components/ui/accessibility-widget";
+import { ToasterProvider } from "../components/ui/toaster";
 
 export const metadata = {
   title: "PrediRuta",
@@ -17,8 +18,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body>
-        {children}
-        <AccessibilityWidget />
+        <ToasterProvider>
+          {children}
+          <AccessibilityWidget />
+        </ToasterProvider>
       </body>
     </html>
   );
