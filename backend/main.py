@@ -1,44 +1,16 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.routes import predicciones, rutas
-from app.config import settings
+"""
+Wrapper para exponer app desde app.main si existe.
+Esto evita duplicar configuración y asegura que `uvicorn main:app` funcione.
+"""
 
-# Crear instancia de FastAPI
-app = FastAPI(
-    title="PrediRuta API",
-    description="API para predicción de tráfico vehicular con IA",
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
+try:
+    from app.main import app  # type: ignore
+except Exception as e:
+    # Fallback mínimo si app.main no está disponible
+    from fastapi import FastAPI
 
-# Configurar CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://prediruta.vercel.app"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    app = FastAPI(title="PrediRuta API")
 
-# Incluir rutas
-app.include_router(predicciones.router, prefix="/api/v1", tags=["Predicciones"])
-app.include_router(rutas.router, prefix="/api/v1", tags=["Rutas"])
-
-# Ruta de prueba
-@app.get("/")
-async def root():
-    return {
-        "message": "PrediRuta API funcionando correctamente",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
-
-# Health check
-@app.get("/health")
-async def health_check():
-    return {"status": "OK", "service": "PrediRuta Backend"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    @app.get("/health")
+    async def health_check():
+        return {"status": "OK", "service": "PrediRuta Backend (fallback)"}

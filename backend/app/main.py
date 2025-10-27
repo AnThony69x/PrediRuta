@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, predictions
 from dotenv import load_dotenv
 import os
+
+# Routers opcionales existentes
+try:
+    from app.routes import auth, predictions  # type: ignore
+except Exception:
+    auth = None
+    predictions = None
+
+from app.routes import traffic
 
 # Cargar variables de entorno
 load_dotenv()
@@ -14,17 +22,41 @@ app = FastAPI(
 )
 
 # Configurar CORS
+origins: list[str]
+origins_env = os.getenv("CORS_ORIGINS")
+frontend_origin = os.getenv("FRONTEND_ORIGIN") or "http://localhost:3000"
+if origins_env:
+    # Permitir formato JSON o CSV sencillo
+    try:
+        import json
+        parsed = json.loads(origins_env)
+        if isinstance(parsed, list):
+            origins = [str(x) for x in parsed]
+        else:
+            raise ValueError()
+    except Exception:
+        origins = [x.strip() for x in origins_env.split(",") if x.strip()]
+        if not origins:
+            origins = [frontend_origin]
+else:
+    origins = [frontend_origin]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Incluir rutas
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(predictions.router, prefix="/api", tags=["Predictions"])
+if auth is not None:
+    app.include_router(auth.router, prefix="/auth", tags=["Authentication"])  # type: ignore
+if predictions is not None:
+    app.include_router(predictions.router, prefix="/api", tags=["Predictions"])  # type: ignore
+
+# Tráfico
+app.include_router(traffic.router)
 
 @app.get("/")
 async def root():

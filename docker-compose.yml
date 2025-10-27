@@ -29,6 +29,9 @@ services:
     environment:
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
+      - TRAFFIC_API_KEY=${TRAFFIC_API_KEY}
+      - TRAFFIC_PROVIDER=${TRAFFIC_PROVIDER}
+      - FRONTEND_ORIGIN=${FRONTEND_ORIGIN}
       - PYTHONUNBUFFERED=1
       - ENV=development
     volumes:

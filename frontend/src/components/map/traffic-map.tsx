@@ -16,10 +16,13 @@ type TrafficMapProps = {
     zoom: number;
     bbox: { west: number; south: number; east: number; north: number };
   }) => void;
+  userLocation?: [number, number];
+  segments?: Array<{ coords: [number, number][]; level: "free" | "moderate" | "heavy" | "severe" }>;
+  focusCenter?: [number, number];
 };
 
 export function TrafficMap(props: TrafficMapProps) {
-  return <TrafficMapInner {...props} />;
+  return <TrafficMapInner {...(props as any)} />;
 }
 
 export default TrafficMap;
