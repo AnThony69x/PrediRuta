@@ -11,15 +11,18 @@ import { PasswordStrength } from "@/components/ui/password-strength";
 import { PasswordMatch } from "@/components/ui/password-match";
 import { EmailValidation } from "@/components/ui/email-validation";
 import { NameValidation } from "@/components/ui/name-validation";
+import { useToast } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export const RegisterForm = () => {
   const router = useRouter();
+  const toast = useToast();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [pass1, setPass1] = useState("");
   const [pass2, setPass2] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,16 +61,19 @@ export const RegisterForm = () => {
     // Validar nombre completo
     if (!fullName.trim()) {
       setErr("El nombre completo es requerido");
+      toast.warning("Nombre requerido", "Por favor ingresa tu nombre completo.");
       return;
     }
     if (fullName.trim().length < 2) {
       setErr("El nombre debe tener al menos 2 caracteres");
+      toast.warning("Nombre muy corto", "El nombre debe tener al menos 2 caracteres.");
       return;
     }
 
     // Validar email
     if (!validateEmail(email)) {
       setErr("Por favor ingresa un correo electrónico válido");
+      toast.warning("Email inválido", "Por favor ingresa un correo electrónico válido.");
       return;
     }
 
@@ -75,12 +81,21 @@ export const RegisterForm = () => {
     const passwordValidation = validatePassword(pass1);
     if (!passwordValidation.isValid) {
       setErr(passwordValidation.message || "Contraseña inválida");
+      toast.warning("🔑 Contraseña débil", passwordValidation.message || "La contraseña no cumple con los requisitos de seguridad.");
       return;
     }
 
     // Verificar que las contraseñas coincidan
     if (pass1 !== pass2) {
       setErr("Las contraseñas no coinciden");
+      toast.error("Contraseñas no coinciden", "Las dos contraseñas deben ser idénticas.");
+      return;
+    }
+
+    // Validar aceptación de términos
+    if (!acceptedTerms) {
+      setErr("Debes aceptar los términos y condiciones para registrarte");
+      toast.warning("Términos no aceptados", "Debes aceptar los términos y condiciones para poder registrarte.");
       return;
     }
 
@@ -97,10 +112,15 @@ export const RegisterForm = () => {
       }
     });
     setLoading(false);
-    if (error) return setErr(error.message);
+    if (error) {
+      setErr(error.message);
+      toast.error("Error al registrarse", error.message);
+      return;
+    }
     
     // Mostrar mensaje de éxito
     setMsg("Registro exitoso. Revisa tu correo y confirma para continuar.");
+    toast.success("📧 Verificación de email pendiente", "Registro exitoso. Revisa tu correo y confirma tu cuenta para continuar.");
     
     // Esperar 3 segundos y luego redireccionar al login con el mensaje
     setTimeout(() => {
@@ -118,7 +138,7 @@ export const RegisterForm = () => {
     const passwordValid = validatePassword(pass1).isValid;
     const passwordsMatch = pass1 === pass2 && pass2.length > 0;
     
-    return nameValid && emailValid && passwordValid && passwordsMatch;
+    return nameValid && emailValid && passwordValid && passwordsMatch && acceptedTerms;
   };
 
   return (
@@ -173,10 +193,42 @@ export const RegisterForm = () => {
         />
         <PasswordMatch password={pass1} confirmPassword={pass2} />
       </div>
+      
+      {/* Checkbox de términos y condiciones */}
+      <div className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          id="terms"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+          required
+        />
+        <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
+          Acepto los{" "}
+          <Link
+            href="/terminos-y-condiciones"
+            target="_blank"
+            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+          >
+            Términos y Condiciones
+          </Link>
+          {" "}y la{" "}
+          <Link
+            href="/politica-privacidad"
+            target="_blank"
+            className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
+          >
+            Política de Privacidad
+          </Link>
+        </label>
+      </div>
+      
       <Button 
         loading={loading} 
         full 
         type="submit"
+        disabled={!isFormValid()}
       >
         Crear cuenta
       </Button>

@@ -24,6 +24,8 @@ const publicRoutes = [
   '/dashboard',  // Dashboard - Protegido del lado del cliente
   '/forgot-password', // Recuperar contraseña
   '/reset-password',  // Resetear contraseña
+  '/terminos-y-condiciones', // Términos y Condiciones
+  '/politica-privacidad',    // Política de Privacidad
   '/docs',       // Documentación - Acceso a guías
   '/ayuda',      // Ayuda - Resolver dudas
   '/404',        // Error - Página no encontrada
