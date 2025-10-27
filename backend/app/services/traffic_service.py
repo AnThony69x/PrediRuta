@@ -47,13 +47,17 @@ async def get_traffic_status_for_point(lat: float, lon: float) -> Dict[str, Any]
                     data = resp.json()
                     break
                 else:
+                    error_body = resp.text[:500]  # Más detalle
                     last_error = {
                         "status": "unavailable",
                         "code": resp.status_code,
-                        "message": f"TomTom {mode} error {resp.status_code}: {resp.text[:200]}",
+                        "message": f"TomTom {mode} HTTP {resp.status_code}: {error_body}",
                     }
+                    # Log para debugging
+                    print(f"❌ TomTom {mode} falló: {resp.status_code} - {error_body}")
             except httpx.RequestError as e:
                 last_error = {"status": "unavailable", "code": 503, "message": f"Error de red: {e}"}
+                print(f"❌ Error de red en TomTom {mode}: {e}")
         else:
             # Ningún endpoint funcionó
             return last_error or {"status": "unavailable", "code": 502, "message": "Proveedor TomTom no disponible"}

@@ -19,7 +19,15 @@ type Status = {
   updatedAt?: string;
 };
 
-export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | null; backendUrl?: string }) {
+export function TrafficStatus({ 
+  viewport, 
+  backendUrl,
+  onStatusUpdate 
+}: { 
+  viewport: Viewport | null; 
+  backendUrl?: string;
+  onStatusUpdate?: (status: Status | null) => void;
+}) {
   const [status, setStatus] = useState<Status | null>(null);
   const [loading, setLoading] = useState(false);
   const timer = useRef<number | undefined>(undefined);
@@ -46,7 +54,7 @@ export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | n
           throw new Error(text || `HTTP ${res.status}`);
         }
         const data = await res.json();
-        setStatus({
+        const newStatus = {
           provider: data.provider,
           currentSpeed: data.currentSpeed,
           freeFlowSpeed: data.freeFlowSpeed,
@@ -54,9 +62,13 @@ export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | n
           hasTraffic: data.hasTraffic,
           congestionLevel: data.congestionLevel,
           updatedAt: new Date().toISOString(),
-        });
+        };
+        setStatus(newStatus);
+        onStatusUpdate?.(newStatus);
       } catch (e: any) {
-        setStatus({ error: e?.message || "Error desconocido" });
+        const errorStatus = { error: e?.message || "Error desconocido" };
+        setStatus(errorStatus);
+        onStatusUpdate?.(errorStatus);
       } finally {
         setLoading(false);
       }
@@ -136,8 +148,18 @@ export function TrafficStatus({ viewport, backendUrl }: { viewport: Viewport | n
 
       {/* Error */}
       {!loading && status?.error && (
-        <div className="mt-3 text-sm text-red-600 dark:text-red-400">
-          No se pudo obtener el tráfico actual.
+        <div className="mt-3 text-sm">
+          <div className="text-red-600 dark:text-red-400 font-medium">
+            {status.error.includes('Point too far') || status.error.includes('nearest existing segment') 
+              ? '⚠️ Sin cobertura de tráfico en esta zona' 
+              : 'No se pudo obtener el tráfico actual.'}
+          </div>
+          {(status.error.includes('Point too far') || status.error.includes('nearest existing segment')) && (
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              <p>TomTom no tiene datos de tráfico vehicular en Ecuador.</p>
+              <p className="mt-1">Cobertura disponible en: Europa, USA, Canadá, Brasil (parcial).</p>
+            </div>
+          )}
         </div>
       )}
 

@@ -17,10 +17,23 @@ import { getBackendUrl } from "@/lib/backend-url";
 type TrafficSummary = {
   city?: string;
   updatedAt?: string;
-  segmentsObserved?: number;
-  avgSpeedKmH?: number;
-  congestionLevel?: 1 | 2 | 3 | 4 | 5;
+  currentSpeed?: number;
+  freeFlowSpeed?: number;
+  congestionLevel?: "free" | "moderate" | "heavy" | "severe";
+  hasCoverage?: boolean;
 };
+
+// Ciudades con cobertura de tráfico TomTom
+const CITIES_WITH_COVERAGE = [
+  { name: "Madrid, España", coords: [40.4168, -3.7038] as [number, number], zoom: 13 },
+  { name: "Barcelona, España", coords: [41.3851, 2.1734] as [number, number], zoom: 13 },
+  { name: "París, Francia", coords: [48.8566, 2.3522] as [number, number], zoom: 13 },
+  { name: "Londres, UK", coords: [51.5074, -0.1278] as [number, number], zoom: 13 },
+  { name: "Berlín, Alemania", coords: [52.5200, 13.4050] as [number, number], zoom: 13 },
+  { name: "Nueva York, USA", coords: [40.7128, -74.0060] as [number, number], zoom: 13 },
+  { name: "Los Ángeles, USA", coords: [34.0522, -118.2437] as [number, number], zoom: 13 },
+  { name: "Tokio, Japón", coords: [35.6762, 139.6503] as [number, number], zoom: 13 },
+];
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -28,13 +41,15 @@ export default function DashboardPage() {
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
   const backendUrl = getBackendUrl();
   const [userLoc, setUserLoc] = useState<[number, number] | undefined>(undefined);
-  const [focusCenter, setFocusCenter] = useState<[number, number] | undefined>(undefined);
+  const [focusCenter, setFocusCenter] = useState<[number, number] | undefined>(CITIES_WITH_COVERAGE[0]?.coords);
   const [segments, setSegments] = useState<Array<{ coords: [number, number][], level: "free" | "moderate" | "heavy" | "severe" }>>([]);
+  const [selectedCity, setSelectedCity] = useState(CITIES_WITH_COVERAGE[0]);
 
   useEffect(() => {
-    // Configurar datos de ejemplo para modo frontend-only
+    // Inicializar con datos vacíos
     setSummary({
       updatedAt: new Date().toISOString(),
+      hasCoverage: false,
     });
   }, []);
 
@@ -85,34 +100,78 @@ export default function DashboardPage() {
               <CardTitle className="text-emerald-700 dark:text-emerald-300">Resumen de tráfico</CardTitle>
             </CardHeader>
             <CardContent>
-              {summary ? (
-                <ul className="text-sm text-gray-700 dark:text-gray-200 space-y-1">
-                  {summary.city && (
-                    <li><span className="font-medium">Ciudad:</span> {summary.city}</li>
-                  )}
-                  {typeof summary.segmentsObserved === "number" && (
-                    <li><span className="font-medium">Segmentos observados:</span> {summary.segmentsObserved}</li>
-                  )}
-                  {typeof summary.avgSpeedKmH === "number" && (
-                    <li><span className="font-medium">Velocidad promedio:</span> {summary.avgSpeedKmH} km/h</li>
-                  )}
-                  {summary.congestionLevel && (
-                    <li><span className="font-medium">Nivel de congestión:</span> {"".padStart(summary.congestionLevel, "⬤")}<span className="sr-only">{summary.congestionLevel}/5</span></li>
-                  )}
-                  <li className="text-xs text-gray-500 dark:text-gray-400">
-                    Modo: Frontend Only {summary?.updatedAt ? "✅" : "⚠️"}
-                  </li>
-                  {viewport && (
-                    <li className="text-xs text-gray-500 dark:text-gray-400">
-                      Vista mapa → lat,lng: {viewport.center[0].toFixed(4)}, {viewport.center[1].toFixed(4)} | zoom: {viewport.zoom}
+              <div className="space-y-3">
+                {/* Selector de ciudad */}
+                <div>
+                  <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">
+                    Ciudad con cobertura:
+                  </label>
+                  <select
+                    value={selectedCity?.name || ""}
+                    onChange={(e) => {
+                      const city = CITIES_WITH_COVERAGE.find(c => c.name === e.target.value);
+                      if (city) {
+                        setSelectedCity(city);
+                        setFocusCenter(city.coords);
+                      }
+                    }}
+                    className="w-full text-sm rounded-md border border-gray-300 bg-white px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+                  >
+                    {CITIES_WITH_COVERAGE.map((city) => (
+                      <option key={city.name} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                    ⚠️ Ecuador no tiene cobertura. Selecciona una ciudad con datos de tráfico.
+                  </p>
+                </div>
+
+                {/* Datos de tráfico */}
+                {summary && summary.hasCoverage ? (
+                  <ul className="text-sm text-gray-700 dark:text-gray-200 space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <li>
+                      <span className="font-medium">Ciudad:</span>{" "}
+                      <span className="text-emerald-600 dark:text-emerald-400">{summary.city || selectedCity?.name || "N/D"}</span>
                     </li>
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Aún no hay datos disponibles para mostrar. Conecta el backend de tráfico para ver métricas en tiempo real.
-                </p>
-              )}
+                    {typeof summary.currentSpeed === "number" && (
+                      <li>
+                        <span className="font-medium">Velocidad actual:</span> {summary.currentSpeed.toFixed(0)} km/h
+                      </li>
+                    )}
+                    {typeof summary.freeFlowSpeed === "number" && (
+                      <li>
+                        <span className="font-medium">Flujo libre:</span> {summary.freeFlowSpeed.toFixed(0)} km/h
+                      </li>
+                    )}
+                    {summary.congestionLevel && (
+                      <li>
+                        <span className="font-medium">Congestión:</span>{" "}
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold ${
+                          summary.congestionLevel === "free" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+                          summary.congestionLevel === "moderate" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                          summary.congestionLevel === "heavy" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" :
+                          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                        }`}>
+                          {summary.congestionLevel === "free" ? "🟢 Fluido" :
+                           summary.congestionLevel === "moderate" ? "🟡 Moderado" :
+                           summary.congestionLevel === "heavy" ? "🟠 Pesado" :
+                           "🔴 Severo"}
+                        </span>
+                      </li>
+                    )}
+                    <li className="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                      ✅ Datos en tiempo real de TomTom
+                    </li>
+                  </ul>
+                ) : (
+                  <div className="text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <p className="mb-2">📍 Selecciona una ciudad arriba para ver datos de tráfico vehicular en tiempo real.</p>
+                    <p className="text-xs">El mapa se moverá automáticamente a la ubicación seleccionada.</p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
@@ -197,7 +256,29 @@ export default function DashboardPage() {
                   <LegendTraffic />
                 </div>
                 <div className="absolute left-3 bottom-3 right-3 z-[1100] max-w-xl">
-                  <TrafficStatus viewport={viewport} backendUrl={backendUrl} />
+                  <TrafficStatus 
+                    viewport={viewport} 
+                    backendUrl={backendUrl}
+                    onStatusUpdate={(status) => {
+                      // Actualizar el resumen de tráfico cuando se reciben datos
+                      if (status && !status.error) {
+                        setSummary({
+                          city: selectedCity?.name,
+                          currentSpeed: status.currentSpeed,
+                          freeFlowSpeed: status.freeFlowSpeed,
+                          congestionLevel: status.congestionLevel,
+                          hasCoverage: true,
+                          updatedAt: new Date().toISOString(),
+                        });
+                      } else {
+                        setSummary({
+                          city: selectedCity?.name,
+                          hasCoverage: false,
+                          updatedAt: new Date().toISOString(),
+                        });
+                      }
+                    }}
+                  />
                 </div>
               </div>
               <div className="mt-3">

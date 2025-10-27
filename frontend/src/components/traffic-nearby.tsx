@@ -160,7 +160,19 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
         </div>
       )}
       {!loading && error && (
-        <div className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</div>
+        <div className="mt-3">
+          <div className="text-sm text-red-600 dark:text-red-400 font-medium">
+            {error.includes('Point too far') || error.includes('nearest existing segment')
+              ? '⚠️ Sin cobertura de tráfico en esta zona'
+              : error}
+          </div>
+          {(error.includes('Point too far') || error.includes('nearest existing segment')) && (
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+              <p>TomTom no tiene datos de tráfico vehicular en Ecuador.</p>
+              <p className="mt-1">Prueba con una ubicación en Europa o USA para ver datos en vivo.</p>
+            </div>
+          )}
+        </div>
       )}
       {!loading && !error && (
         <div className="mt-3 space-y-3">

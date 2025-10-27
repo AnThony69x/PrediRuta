@@ -75,7 +75,7 @@ function ViewportWatcher({ onChange }: { onChange?: TrafficMapInnerProps["onView
 }
 
 export function TrafficMapInner({
-  center = [-0.1807, -78.4678],
+  center = [40.4168, -3.7038], // Madrid por defecto en lugar de Quito
   zoom = 12,
   className,
   onReady,
