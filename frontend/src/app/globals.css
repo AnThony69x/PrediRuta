@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fuente predeterminada moderna para toda la aplicación */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Estilos opcionales */
 html, body, #__next {
   height: 100%;

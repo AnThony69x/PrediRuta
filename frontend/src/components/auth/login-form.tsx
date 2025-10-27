@@ -8,6 +8,9 @@ import { Alert } from "@/components/ui/alert";
 import { OAuthButton } from "@/components/ui/oauth-button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/toaster";
+import { Tooltip } from "@/components/ui/tooltip";
+import { FieldHelper } from "@/components/ui/field-helper";
+import { HelpPanel } from "@/components/ui/help-panel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -165,67 +168,101 @@ export const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      {err && <Alert type="error">{err}</Alert>}
-      {successMsg && <Alert type="success">{successMsg}</Alert>}
-      
-      {/* Alerta de bloqueo */}
-      {isLocked && (
-        <Alert type="error">
-          <div className="flex flex-col gap-2">
-            <p className="font-semibold">🔒 Cuenta bloqueada temporalmente</p>
-            <p className="text-sm">
-              Por razones de seguridad, tu cuenta ha sido bloqueada después de {MAX_ATTEMPTS} intentos fallidos.
-            </p>
-            <p className="text-sm font-medium">
-              Tiempo restante: {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')} minutos
-            </p>
+    <>
+      <form onSubmit={onSubmit} className="space-y-5">
+        {err && <Alert type="error">{err}</Alert>}
+        {successMsg && <Alert type="success">{successMsg}</Alert>}
+        
+        {/* Alerta de bloqueo */}
+        {isLocked && (
+          <Alert type="error">
+            <div className="flex flex-col gap-2">
+              <p className="font-semibold">🔒 Cuenta bloqueada temporalmente</p>
+              <p className="text-sm">
+                Por razones de seguridad, tu cuenta ha sido bloqueada después de {MAX_ATTEMPTS} intentos fallidos.
+              </p>
+              <p className="text-sm font-medium">
+                Tiempo restante: {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')} minutos
+              </p>
+            </div>
+          </Alert>
+        )}
+
+        {/* Campo de email con tooltip de ayuda */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Correo electrónico
+            </label>
+            <Tooltip content="Ingresa el correo con el que te registraste en PrediRuta" position="right" />
           </div>
-        </Alert>
-      )}
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            placeholder="tu-email@ejemplo.com"
+            disabled={isLocked}
+          />
+          {!email && (
+            <FieldHelper type="info">
+              Usa el mismo correo electrónico con el que creaste tu cuenta
+            </FieldHelper>
+          )}
+        </div>
 
-      <Input
-        label="Correo electrónico"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        autoComplete="email"
-        placeholder="tu-email@ejemplo.com"
-        disabled={isLocked}
-      />
-      <PasswordInput
-        label="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        autoComplete="current-password"
-        placeholder="Ingresa tu contraseña"
-        disabled={isLocked}
-      />
+        {/* Campo de contraseña con tooltip de ayuda */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              Contraseña
+            </label>
+            <Tooltip content="Ingresa tu contraseña. Si la olvidaste, puedes recuperarla usando el enlace de abajo" position="right" />
+          </div>
+          <PasswordInput
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            placeholder="Ingresa tu contraseña"
+            disabled={isLocked}
+          />
+          {failedAttempts > 0 && !isLocked && (
+            <FieldHelper type="error">
+              Intento fallido. Te quedan {MAX_ATTEMPTS - failedAttempts} intentos
+            </FieldHelper>
+          )}
+        </div>
 
-      <Button loading={loading} full type="submit" disabled={isLocked}>
-        {isLocked ? "Cuenta bloqueada" : "Iniciar sesión"}
-      </Button>
-      <Separator label="o" />
-      <OAuthButton provider="google" full disabled={isLocked} />
-      <div className="text-center">
-        <Link
-          href="/forgot-password"
-          className={`text-sm text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
-        >
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </div>
-      <p className="text-center text-sm text-gray-600 dark:text-gray-300">
-        ¿No tienes cuenta?{" "}
-        <Link
-          className={`text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
-          href="/register"
-        >
-          Regístrate
-        </Link>
-      </p>
-    </form>
+        <Button loading={loading} full type="submit" disabled={isLocked}>
+          {isLocked ? "Cuenta bloqueada" : "Iniciar sesión"}
+        </Button>
+        <Separator label="o" />
+        <OAuthButton provider="google" full disabled={isLocked} />
+        <div className="text-center">
+          <Link
+            href="/forgot-password"
+            className={`text-sm text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+        <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+          ¿No tienes cuenta?{" "}
+          <Link
+            className={`text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
+            href="/register"
+          >
+            Regístrate
+          </Link>
+        </p>
+      </form>
+      
+      {/* Panel de ayuda contextual */}
+      <HelpPanel context="login" />
+    </>
   );
 };

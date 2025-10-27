@@ -243,10 +243,17 @@ export function AccessibilityWidget() {
     if (newSettings.bigBlackCursor) root.classList.add('big-black-cursor');
     if (newSettings.bigWhiteCursor) root.classList.add('big-white-cursor');
 
-    // Apply text adjustments
-    root.classList.add(`text-${newSettings.textSize}`);
-    root.classList.add(`line-height-${newSettings.lineHeight}`);
-    root.classList.add(`spacing-${newSettings.textSpacing}`);
+    // Apply text adjustments - only if NOT default (medium)
+    // This allows the app's default Inter font to work without interference
+    if (newSettings.textSize !== 'medium') {
+      root.classList.add(`text-${newSettings.textSize}`);
+    }
+    if (newSettings.lineHeight !== 'medium') {
+      root.classList.add(`line-height-${newSettings.lineHeight}`);
+    }
+    if (newSettings.textSpacing !== 'medium') {
+      root.classList.add(`spacing-${newSettings.textSpacing}`);
+    }
   };
 
   const toggleSetting = (key: keyof AccessibilitySettings) => {
@@ -280,35 +287,77 @@ export function AccessibilityWidget() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Abrir ayuda y configuración de accesibilidad"
       >
-        {/* Icono de ayuda/información */}
+        {/* Icono de silla de ruedas */}
         <svg
-          width="24"
-          height="24"
+          width="28"
+          height="28"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="transition-transform duration-300"
         >
+          {/* Persona/Cabeza */}
           <circle 
-            cx="12" 
-            cy="12" 
-            r="10" 
-            stroke="currentColor" 
-            strokeWidth="2"
+            cx="16" 
+            cy="4" 
+            r="2" 
+            fill="currentColor"
           />
+          {/* Cuerpo */}
           <path 
-            d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" 
+            d="M14 7.5h3.5l.5 6h-2" 
             stroke="currentColor" 
-            strokeWidth="2" 
+            strokeWidth="1.5" 
             strokeLinecap="round" 
             strokeLinejoin="round"
+            fill="none"
           />
-          <path 
-            d="M12 17h.01" 
+          {/* Rueda grande */}
+          <circle 
+            cx="10" 
+            cy="17" 
+            r="5" 
             stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          {/* Centro de la rueda */}
+          <circle 
+            cx="10" 
+            cy="17" 
+            r="1" 
+            fill="currentColor"
+          />
+          {/* Radio de la rueda */}
+          <line 
+            x1="10" 
+            y1="17" 
+            x2="13.5" 
+            y2="14.5" 
+            stroke="currentColor" 
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          {/* Conexión del cuerpo a la rueda */}
+          <path 
+            d="M14 13.5L10 17" 
+            stroke="currentColor" 
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          {/* Rueda pequeña delantera */}
+          <circle 
+            cx="17" 
+            cy="19.5" 
+            r="1.5" 
+            fill="currentColor"
+          />
+          {/* Conexión a rueda delantera */}
+          <path 
+            d="M16 13.5L17 18" 
+            stroke="currentColor" 
+            strokeWidth="1.5"
+            strokeLinecap="round"
           />
         </svg>
       </button>
