@@ -1,7 +1,12 @@
+'use client';
+
 import Link from "next/link";
 import { Header } from "../components/layout/Header";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Home() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 transition-colors duration-300">
       {/* Header unificado - sin búsqueda ni breadcrumbs en landing */}
@@ -31,11 +36,10 @@ export default function Home() {
           </div>
           
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6 px-4">
-            Optimiza tus rutas con IA
+            {t('landing.hero.title')}
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-            Sistema inteligente de predicción de tráfico y optimización de rutas 
-            que te ayuda a llegar más rápido a tu destino.
+            {t('landing.hero.subtitle')}
           </p>
           
           {/* Botones de acción principales */}
@@ -44,13 +48,13 @@ export default function Home() {
               href="/register" 
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 text-white rounded-full hover:from-blue-700 hover:to-cyan-700 dark:hover:from-blue-600 dark:hover:to-cyan-600 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg font-medium text-center shadow-lg hover:shadow-xl"
             >
-              Comenzar Gratis
+              {t('landing.hero.cta.start')}
             </Link>
             <Link 
               href="/login" 
               className="px-8 py-3 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 border-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 rounded-full hover:from-blue-50 hover:to-cyan-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105 transform transition-all duration-300 text-base sm:text-lg font-medium text-center shadow-md hover:shadow-lg"
             >
-              Iniciar Sesión
+              {t('landing.hero.cta.login')}
             </Link>
           </div>
         </div>
@@ -63,10 +67,9 @@ export default function Home() {
                 <path fillRule="evenodd" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" clipRule="evenodd" />
               </svg>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">Predicción Inteligente</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">{t('landing.features.prediction.title')}</h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              Algoritmos avanzados que predicen el tráfico en tiempo real 
-              para optimizar tus rutas.
+              {t('landing.features.prediction.desc')}
             </p>
           </div>
           
@@ -76,10 +79,9 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
               </svg>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">Rutas Optimizadas</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">{t('landing.features.routes.title')}</h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              Encuentra las mejores rutas considerando tráfico, distancia 
-              y tiempo de viaje.
+              {t('landing.features.routes.desc')}
             </p>
           </div>
           
@@ -89,10 +91,9 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">Dashboard Completo</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-gray-800 dark:text-white">{t('landing.features.dashboard.title')}</h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
-              Visualiza estadísticas detalladas de tus viajes y 
-              mejora tu planificación.
+              {t('landing.features.dashboard.desc')}
             </p>
           </div>
         </div>
@@ -108,11 +109,10 @@ export default function Home() {
                   </svg>
                 </div>
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-6">
-                  Predicción Inteligente de Tráfico
+                  {t('landing.section1.title')}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-                  Nuestros algoritmos de inteligencia artificial analizan patrones de tráfico históricos, 
-                  eventos en tiempo real y condiciones climáticas para predecir el flujo vehicular.
+                  {t('landing.section1.desc')}
                 </p>
                   <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -120,8 +120,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Análisis en Tiempo Real</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Procesamiento continuo de datos de tráfico actuales</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section1.feature1.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section1.feature1.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -129,8 +129,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Aprendizaje Automático</h4>
-                      <p className="text-gray-600 dark:text-gray-300">El sistema mejora sus predicciones con cada viaje</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section1.feature2.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section1.feature2.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -138,8 +138,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Precisión del 95%</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Predicciones altamente confiables para tu planificación</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section1.feature3.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section1.feature3.desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default function Home() {
                     <svg className="w-16 h-16 mx-auto mb-4 text-blue-700 dark:text-blue-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    <p className="text-blue-700 dark:text-blue-300 font-bold text-lg">IA en Acción</p>
+                    <p className="text-blue-700 dark:text-blue-300 font-bold text-lg">{t('landing.section1.badge')}</p>
                   </div>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export default function Home() {
                     <svg className="w-16 h-16 mx-auto mb-4 text-cyan-700 dark:text-cyan-300 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                     </svg>
-                    <p className="text-cyan-700 dark:text-cyan-300 font-bold text-lg">Rutas Inteligentes</p>
+                    <p className="text-cyan-700 dark:text-cyan-300 font-bold text-lg">{t('landing.section2.badge')}</p>
                   </div>
                 </div>
               </div>
@@ -179,11 +179,10 @@ export default function Home() {
                   </svg>
                 </div>
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-6">
-                  Rutas Optimizadas para Cada Situación
+                  {t('landing.section2.title')}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-                  Calculamos múltiples rutas alternativas considerando todos los factores que afectan tu viaje, 
-                  desde el tráfico hasta las preferencias personales.
+                  {t('landing.section2.desc')}
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -191,8 +190,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Múltiples Opciones</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Ruta más rápida, más corta o más económica</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section2.feature1.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section2.feature1.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -200,8 +199,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Evita Congestiones</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Actualización automática ante cambios de tráfico</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section2.feature2.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section2.feature2.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -209,8 +208,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Personalización</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Adapta las rutas según tus preferencias de conducción</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section2.feature3.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section2.feature3.desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -230,11 +229,10 @@ export default function Home() {
                   </svg>
                 </div>
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-6">
-                  Dashboard de Análisis Avanzado
+                  {t('landing.section3.title')}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-                  Obtén insights detallados sobre tus patrones de viaje, ahorra tiempo y combustible 
-                  con estadísticas personalizadas y recomendaciones inteligentes.
+                  {t('landing.section3.desc')}
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -242,8 +240,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Estadísticas Detalladas</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Tiempo ahorrado, combustible y emisiones reducidas</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section3.feature1.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section3.feature1.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -251,8 +249,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Historial de Viajes</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Registro completo con métricas de rendimiento</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section3.feature2.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section3.feature2.desc')}</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -260,8 +258,8 @@ export default function Home() {
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">Reportes Personalizados</h4>
-                      <p className="text-gray-600 dark:text-gray-300">Exporta datos para análisis empresarial o personal</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{t('landing.section3.feature3.title')}</h4>
+                      <p className="text-gray-600 dark:text-gray-300">{t('landing.section3.feature3.desc')}</p>
                     </div>
                   </div>
                 </div>
@@ -272,7 +270,7 @@ export default function Home() {
                     <svg className="w-16 h-16 mx-auto mb-4 text-purple-700 dark:text-purple-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    <p className="text-purple-700 dark:text-purple-300 font-bold text-lg">Analytics Avanzados</p>
+                    <p className="text-purple-700 dark:text-purple-300 font-bold text-lg">{t('landing.section3.badge')}</p>
                   </div>
                 </div>
               </div>
@@ -284,34 +282,34 @@ export default function Home() {
         <section className="py-12 sm:py-16 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-8">
-              Más que una App de Rutas
+              {t('landing.benefits.title')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-6 text-white hover:bg-opacity-20 transform hover:scale-105 transition-all duration-300 shadow-lg">
                 <svg className="w-12 h-12 mx-auto mb-4 text-blue-200 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <h3 className="text-xl font-semibold mb-3 text-blue-200">Velocidad</h3>
+                <h3 className="text-xl font-semibold mb-3 text-blue-200">{t('landing.benefits.speed.title')}</h3>
                 <p className="text-blue-100">
-                  Reduce hasta un 30% el tiempo de viaje con nuestras predicciones inteligentes
+                  {t('landing.benefits.speed.desc')}
                 </p>
               </div>
               <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-6 text-white hover:bg-opacity-20 transform hover:scale-105 transition-all duration-300 shadow-lg">
                 <svg className="w-12 h-12 mx-auto mb-4 text-cyan-200 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
-                <h3 className="text-xl font-semibold mb-3 text-cyan-200">Ahorro</h3>
+                <h3 className="text-xl font-semibold mb-3 text-cyan-200">{t('landing.benefits.savings.title')}</h3>
                 <p className="text-blue-100">
-                  Optimiza el consumo de combustible y reduce costos operativos
+                  {t('landing.benefits.savings.desc')}
                 </p>
               </div>
               <div className="bg-white bg-opacity-15 backdrop-blur-md rounded-xl p-6 text-white hover:bg-opacity-20 transform hover:scale-105 transition-all duration-300 shadow-lg">
                 <svg className="w-12 h-12 mx-auto mb-4 text-blue-200 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                <h3 className="text-xl font-semibold mb-3 text-blue-200">Sostenibilidad</h3>
+                <h3 className="text-xl font-semibold mb-3 text-blue-200">{t('landing.benefits.sustainability.title')}</h3>
                 <p className="text-blue-100">
-                  Contribuye al medio ambiente reduciendo emisiones de CO₂
+                  {t('landing.benefits.sustainability.desc')}
                 </p>
               </div>
             </div>
@@ -322,24 +320,23 @@ export default function Home() {
         <section className="py-12 sm:py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 dark:text-white mb-6">
-              ¿Listo para Optimizar tus Rutas?
+              {t('landing.cta.title')}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-              Únete a miles de usuarios que ya están ahorrando tiempo y dinero 
-              con PrediRuta. Comienza tu prueba gratuita hoy mismo.
+              {t('landing.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/register" 
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-700 dark:via-indigo-700 dark:to-purple-700 text-white rounded-full hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:via-indigo-600 dark:hover:to-purple-600 hover:scale-105 transform transition-all duration-300 text-lg font-medium shadow-lg hover:shadow-xl"
               >
-                Comenzar Ahora - Gratis
+                {t('landing.cta.start')}
               </Link>
               <Link 
                 href="/login" 
                 className="px-8 py-4 bg-gradient-to-r from-white to-blue-50 dark:from-gray-800 dark:to-gray-700 border-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400 rounded-full hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:scale-105 transform transition-all duration-300 text-lg font-medium shadow-md hover:shadow-lg"
               >
-                Ver Demo
+                {t('landing.cta.demo')}
               </Link>
             </div>
           </div>
