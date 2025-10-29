@@ -4,8 +4,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrafficMap } from "@/components/map/traffic-map";
-import { UserAvatar } from "@/components/ui/user-avatar";
-import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import { getUserFirstName } from "@/utils/userHelpers";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -13,6 +11,7 @@ import { TrafficStatus } from "@/components/traffic-status";
 import { LegendTraffic } from "@/components/legend-traffic";
 import { TrafficNearby } from "@/components/traffic-nearby";
 import { getBackendUrl } from "@/lib/backend-url";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 type TrafficSummary = {
   city?: string;
@@ -35,8 +34,16 @@ const CITIES_WITH_COVERAGE = [
   { name: "Tokio, Japón", coords: [35.6762, 139.6503] as [number, number], zoom: 13 },
 ];
 
+// Función auxiliar para obtener saludo según hora del día
+function getGreeting(name: string): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return `Buenos días, ${name}`;
+  if (hour < 19) return `Buenas tardes, ${name}`;
+  return `Buenas noches, ${name}`;
+}
+
 export default function DashboardPage() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
   const backendUrl = getBackendUrl();
@@ -63,43 +70,24 @@ export default function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <main className="p-4 md:p-6 space-y-6 min-h-screen bg-gradient-to-b from-white via-sky-50 to-purple-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
-        <header className="max-w-7xl mx-auto flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 via-sky-600 to-purple-600 bg-clip-text text-transparent animate-[gradient_6s_ease_infinite] [background-size:200%_auto]">
+      <AppLayout>
+        <div className="p-4 md:p-6 space-y-6 min-h-screen bg-gradient-to-b from-white via-sky-50 to-purple-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
+          {/* Header de bienvenida personalizado */}
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 via-sky-600 to-purple-600 bg-clip-text text-transparent">
               Dashboard
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              Hola {getUserFirstName(user)}. Aquí tienes una vista general del sistema.
+              {getGreeting(getUserFirstName(user))}. Aquí tienes una vista general del sistema.
             </p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <DarkModeToggle />
-            <Link href="/perfil" className="group">
-              <div className="flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors">
-                <UserAvatar user={user} size="md" showName />
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </Link>
-            <Button
-              variant="outline"
-              onClick={signOut}
-              className="text-sm border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
-            >
-              Cerrar sesión
-            </Button>
-          </div>
-        </header>
-
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-          <Card className="col-span-1 border-emerald-100/80 dark:border-emerald-900/50">
-            <CardHeader>
-              <CardTitle className="text-emerald-700 dark:text-emerald-300">Resumen de tráfico</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+            <Card className="col-span-1 border-emerald-100/80 dark:border-emerald-900/50">
+              <CardHeader>
+                <CardTitle className="text-emerald-700 dark:text-emerald-300">Resumen de tráfico</CardTitle>
+              </CardHeader>
+              <CardContent>
               <div className="space-y-3">
                 {/* Selector de ciudad */}
                 <div>
@@ -209,25 +197,6 @@ export default function DashboardPage() {
               </button>
             </CardContent>
           </Card>
-
-          <Card className="col-span-1 border-purple-100/80 dark:border-purple-900/50">
-            <CardHeader>
-              <CardTitle className="text-purple-700 dark:text-purple-300">Preferencias</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700 dark:text-gray-200">Modo oscuro</span>
-                <ThemeToggle />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700 dark:text-gray-200">Idioma</span>
-                <LanguageSelect />
-              </div>
-              <div className="pt-2">
-                <Button variant="outline" className="w-full" onClick={signOut}>Cerrar sesión</Button>
-              </div>
-            </CardContent>
-          </Card>
         </section>
 
         <section className="max-w-7xl mx-auto">
@@ -304,7 +273,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </section>
-      </main>
+        </div>
+      </AppLayout>
     </ProtectedRoute>
   );
 }

@@ -61,6 +61,38 @@ export default function RootLayout({ children }) {
         ` }} />
       </head>
       <body>
+        {/* Skip Links para accesibilidad (WCAG 2.2 - Criterio 2.4.1) */}
+        <a
+          href="#main-content"
+          className="
+            sr-only focus:not-sr-only 
+            focus:fixed focus:top-4 focus:left-4 
+            bg-blue-600 text-white 
+            px-6 py-3 rounded-lg 
+            z-[9999] 
+            font-medium
+            focus:outline-none focus:ring-4 focus:ring-blue-300
+            shadow-lg
+          "
+        >
+          Saltar al contenido principal
+        </a>
+        <a
+          href="#navigation"
+          className="
+            sr-only focus:not-sr-only 
+            focus:fixed focus:top-4 focus:left-52
+            bg-cyan-600 text-white 
+            px-6 py-3 rounded-lg 
+            z-[9999] 
+            font-medium
+            focus:outline-none focus:ring-4 focus:ring-cyan-300
+            shadow-lg
+          "
+        >
+          Ir al menú de navegación
+        </a>
+
         <ToasterProvider>
           {children}
           <AccessibilityWidget />

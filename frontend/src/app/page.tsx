@@ -1,33 +1,14 @@
-  import Link from "next/link";
-import { ThemeToggle } from "../components/ThemeToggle";
+import Link from "next/link";
+import { Header } from "../components/layout/Header";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 transition-colors duration-300">
-      {/* Header con navegación */}
-      <header className="bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 dark:from-blue-800 dark:via-cyan-800 dark:to-indigo-800 shadow-lg">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-white">PrediRuta</h1>
-          <div className="flex flex-row gap-3 sm:gap-4 items-center">
-            <ThemeToggle />
-            <Link 
-              href="/login" 
-              className="px-4 py-2 text-sm font-medium text-white hover:text-cyan-200 dark:hover:text-cyan-300 hover:scale-105 transition-all duration-300"
-            >
-              Inicia sesión
-            </Link>
-            <Link 
-              href="/register" 
-              className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 rounded-full hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:text-blue-700 dark:hover:text-blue-300 hover:scale-105 transform transition-all duration-300 shadow-md"
-            >
-              Regístrate
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Header unificado - sin búsqueda ni breadcrumbs en landing */}
+      <Header showSearch={false} showBreadcrumbs={false} />
 
       {/* Contenido principal */}
-      <main className="container mx-auto px-4 py-8 sm:py-12">
+      <main id="main-content" className="container mx-auto px-4 py-8 sm:py-12">
         <div className="text-center mb-8 sm:mb-12">
           {/* Ícono de carro con IA */}
           <div className="flex justify-center mb-6">
