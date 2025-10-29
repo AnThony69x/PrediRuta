@@ -1,18 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Home, 
   Map, 
   TrendingUp, 
-  User, 
+  Clock, 
   Settings,
   ChevronLeft,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Bot
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface MenuItem {
   id: number;
@@ -23,49 +25,6 @@ interface MenuItem {
   description?: string;
 }
 
-const MENU_ITEMS: MenuItem[] = [
-  { 
-    id: 1, 
-    label: 'Dashboard', 
-    href: '/dashboard', 
-    icon: Home, 
-    shortcut: '1',
-    description: 'Panel principal'
-  },
-  { 
-    id: 2, 
-    label: 'Rutas', 
-    href: '/rutas', 
-    icon: Map, 
-    shortcut: '2',
-    description: 'Planificar rutas'
-  },
-  { 
-    id: 3, 
-    label: 'Predicciones', 
-    href: '/predicciones', 
-    icon: TrendingUp, 
-    shortcut: '3',
-    description: 'Análisis de tráfico'
-  },
-  { 
-    id: 4, 
-    label: 'Perfil', 
-    href: '/perfil', 
-    icon: User, 
-    shortcut: '4',
-    description: 'Mi cuenta'
-  },
-  { 
-    id: 5, 
-    label: 'Configuración', 
-    href: '/configuracion', 
-    icon: Settings, 
-    shortcut: '5',
-    description: 'Ajustes del sistema'
-  },
-];
-
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
@@ -74,6 +33,60 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  // Ítems del menú con traducciones dinámicas
+  const MENU_ITEMS: MenuItem[] = [
+    { 
+      id: 1, 
+      label: t('sidebar.dashboard'), 
+      href: '/dashboard', 
+      icon: Home, 
+      shortcut: '1',
+      description: t('sidebar.dashboard.desc')
+    },
+    { 
+      id: 2, 
+      label: t('sidebar.routes'), 
+      href: '/rutas', 
+      icon: Map, 
+      shortcut: '2',
+      description: t('sidebar.routes.desc')
+    },
+    { 
+      id: 3, 
+      label: t('sidebar.predictions'), 
+      href: '/predicciones', 
+      icon: TrendingUp, 
+      shortcut: '3',
+      description: t('sidebar.predictions.desc')
+    },
+    { 
+      id: 4, 
+      label: t('sidebar.history'), 
+      href: '/historial', 
+      icon: Clock, 
+      shortcut: '4',
+      description: t('sidebar.history.desc')
+    },
+    { 
+      id: 5, 
+      label: t('sidebar.settings'), 
+      href: '/configuracion', 
+      icon: Settings, 
+      shortcut: '5',
+      description: t('sidebar.settings.desc')
+    },
+    { 
+      id: 6, 
+      label: t('sidebar.assistant'), 
+      href: '#', 
+      icon: Bot, 
+      shortcut: '6',
+      description: t('sidebar.assistant.desc')
+    },
+  ];
 
   // Atajos de teclado
   useEffect(() => {
@@ -84,19 +97,24 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
         onToggle();
       }
       
-      // Alt+1-5: Navegar directamente a secciones
-      if (e.altKey && /^[1-5]$/.test(e.key)) {
+      // Alt+1-6: Navegar directamente a secciones
+      if (e.altKey && /^[1-6]$/.test(e.key)) {
         e.preventDefault();
         const item = MENU_ITEMS.find(i => i.shortcut === e.key);
         if (item) {
-          window.location.href = item.href;
+          if (item.href === '#') {
+            // Asistente Virtual - mostrar alerta temporal
+            alert('El asistente virtual se integrará próximamente con IA avanzada.');
+          } else {
+            router.push(item.href);
+          }
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onToggle]);
+  }, [onToggle, router]);
 
   return (
     <>
@@ -134,66 +152,120 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               
               return (
                 <li key={item.id} role="none">
-                  <Link
-                    href={item.href}
-                    role="menuitem"
-                    className={`
-                      flex items-center gap-3 px-3 py-2.5 rounded-lg 
-                      transition-all duration-200
-                      group relative
-                      ${isActive 
-                        ? 'bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50 text-blue-700 dark:text-blue-300 shadow-sm' 
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }
-                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                    `}
-                    title={`${item.label} (Alt+${item.shortcut})`}
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    {/* Icono */}
-                    <Icon 
+                  {item.href === '#' ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        alert('El asistente virtual se integrará próximamente con IA avanzada.');
+                      }}
+                      role="menuitem"
                       className={`
-                        w-5 h-5 shrink-0
-                        ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}
+                        flex items-center gap-3 px-3 py-2.5 rounded-lg 
+                        transition-all duration-200
+                        group relative w-full text-left
+                        text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                       `}
-                      aria-hidden="true"
-                    />
-                    
-                    {/* Texto y atajo (visible cuando está expandido) */}
-                    {isOpen && (
-                      <>
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-medium truncate ${isActive ? 'text-blue-700 dark:text-blue-300' : ''}`}>
-                            {item.label}
-                          </p>
-                          {item.description && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                              {item.description}
+                      title={`${item.label} (Alt+${item.shortcut})`}
+                    >
+                      {/* Icono */}
+                      <Icon 
+                        className="w-5 h-5 shrink-0 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                      />
+                      
+                      {/* Texto y atajo (visible cuando está expandido) */}
+                      {isOpen && (
+                        <>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">
+                              {item.label}
                             </p>
-                          )}
-                        </div>
-                        <kbd 
-                          className="
-                            hidden lg:inline-flex items-center justify-center
-                            px-1.5 py-0.5 
-                            text-xs font-mono 
-                            bg-gray-200 dark:bg-gray-700 
-                            text-gray-600 dark:text-gray-300
-                            rounded
-                            opacity-0 group-hover:opacity-100
-                            transition-opacity
-                          "
-                        >
-                          Alt+{item.shortcut}
-                        </kbd>
-                      </>
-                    )}
+                            {item.description && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          <kbd 
+                            className="
+                              hidden lg:inline-flex items-center justify-center
+                              px-1.5 py-0.5 
+                              text-xs font-mono 
+                              bg-gray-200 dark:bg-gray-700 
+                              text-gray-600 dark:text-gray-300
+                              rounded
+                              opacity-0 group-hover:opacity-100
+                              transition-opacity
+                            "
+                          >
+                            Alt+{item.shortcut}
+                          </kbd>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      role="menuitem"
+                      className={`
+                        flex items-center gap-3 px-3 py-2.5 rounded-lg 
+                        transition-all duration-200
+                        group relative
+                        ${isActive 
+                          ? 'bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50 text-blue-700 dark:text-blue-300 shadow-sm' 
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        }
+                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                      `}
+                      title={`${item.label} (Alt+${item.shortcut})`}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {/* Icono */}
+                      <Icon 
+                        className={`
+                          w-5 h-5 shrink-0
+                          ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}
+                        `}
+                        aria-hidden="true"
+                      />
+                      
+                      {/* Texto y atajo (visible cuando está expandido) */}
+                      {isOpen && (
+                        <>
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-medium truncate ${isActive ? 'text-blue-700 dark:text-blue-300' : ''}`}>
+                              {item.label}
+                            </p>
+                            {item.description && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          <kbd 
+                            className="
+                              hidden lg:inline-flex items-center justify-center
+                              px-1.5 py-0.5 
+                              text-xs font-mono 
+                              bg-gray-200 dark:bg-gray-700 
+                              text-gray-600 dark:text-gray-300
+                              rounded
+                              opacity-0 group-hover:opacity-100
+                              transition-opacity
+                            "
+                          >
+                            Alt+{item.shortcut}
+                          </kbd>
+                        </>
+                      )}
 
-                    {/* Indicador de activo */}
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 dark:bg-blue-400 rounded-r" />
-                    )}
-                  </Link>
+                      {/* Indicador de activo */}
+                      {isActive && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 dark:bg-blue-400 rounded-r" />
+                      )}
+                    </Link>
+                  )}
                 </li>
               );
             })}
@@ -212,7 +284,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               "
             >
               <HelpCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
-              {isOpen && <span className="text-sm">Ayuda y soporte</span>}
+              {isOpen && <span className="text-sm">{t('sidebar.help')}</span>}
             </Link>
           </div>
         </nav>
@@ -251,7 +323,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               <p className="font-semibold mb-2">Atajos de teclado:</p>
               <ul className="space-y-1">
                 <li><kbd className="bg-gray-700 px-1 rounded">Alt+S</kbd> Toggle menú</li>
-                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-5</kbd> Navegación rápida</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-6</kbd> Navegación rápida</li>
               </ul>
             </div>
           </div>

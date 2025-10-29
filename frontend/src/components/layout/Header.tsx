@@ -6,6 +6,7 @@ import { LanguageSelector } from './LanguageSelector';
 import { Breadcrumbs } from './Breadcrumbs';
 import { ThemeToggle } from '../ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from '@/hooks/useTranslation';
 import { UserAvatar } from '../ui/user-avatar';
 import { Button } from '../ui/button';
 import Link from 'next/link';
@@ -23,6 +24,7 @@ export function Header({
   showBreadcrumbs = true 
 }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 dark:from-blue-800 dark:via-cyan-800 dark:to-indigo-800 shadow-lg">
@@ -87,12 +89,17 @@ export function Header({
                   onClick={signOut}
                   className="
                     hidden sm:flex
-                    border-white/30 text-white 
-                    hover:bg-white/10 hover:border-white/50
+                    border-white/30 dark:border-white/30 
+                    bg-white/10 dark:bg-white/10
+                    text-white dark:text-white 
+                    hover:bg-white/20 dark:hover:bg-white/20 
+                    hover:border-white/50 dark:hover:border-white/50
                     text-xs px-3 py-1
+                    font-medium
+                    shadow-sm
                   "
                 >
-                  Salir
+                  {t('header.logout')}
                 </Button>
 
                 {/* Menú móvil simple */}
@@ -111,7 +118,7 @@ export function Header({
                     hidden sm:block
                   "
                 >
-                  Iniciar sesión
+                  {t('header.login')}
                 </Link>
                 <Link 
                   href="/register" 
@@ -127,7 +134,7 @@ export function Header({
                     shadow-md
                   "
                 >
-                  Registrarse
+                  {t('header.register')}
                 </Link>
               </div>
             )}

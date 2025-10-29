@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 // Tipos de datos (luego se moverán a un archivo types separado)
 interface VelocidadData {
@@ -82,10 +83,10 @@ function getVelocidadColor(velocidad: number): string {
 function LineChart({ data, title = "Análisis de Velocidades" }: { data: VelocidadData[], title?: string }) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
-        <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">No hay datos disponibles</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">{title}</h2>
+        <div className="flex items-center justify-center h-40 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <p className="text-gray-500 dark:text-gray-400">No hay datos disponibles</p>
         </div>
       </div>
     );
@@ -94,18 +95,18 @@ function LineChart({ data, title = "Análisis de Velocidades" }: { data: Velocid
   const maxVelocidad = Math.max(...data.map(d => d.velocidad));
   
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">{title}</h2>
       
       {/* Gráfico de barras */}
-      <div className="flex items-end justify-between h-48 bg-gradient-to-t from-gray-50 to-white p-4 rounded-lg mb-4">
+      <div className="flex items-end justify-between h-48 bg-gradient-to-t from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-4 rounded-lg mb-4">
         {data.map((item, index) => {
           const altura = maxVelocidad > 0 ? Math.max(8, (item.velocidad / maxVelocidad) * 160) : 8;
           
           return (
             <div key={index} className="flex flex-col items-center group relative">
               {/* Tooltip */}
-              <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+              <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
                 <div>{item.velocidad} km/h</div>
                 <div>Confianza: {(item.confianza * 100).toFixed(0)}%</div>
               </div>
@@ -121,7 +122,7 @@ function LineChart({ data, title = "Análisis de Velocidades" }: { data: Velocid
               ></div>
               
               {/* Etiqueta */}
-              <span className="text-xs mt-2 text-gray-600 font-medium">
+              <span className="text-xs mt-2 text-gray-600 dark:text-gray-400 font-medium">
                 {item.hora}
               </span>
             </div>
@@ -133,15 +134,15 @@ function LineChart({ data, title = "Análisis de Velocidades" }: { data: Velocid
       <div className="flex justify-center space-x-6 text-sm">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-green-500 rounded"></div>
-          <span className="text-gray-600">Fluido (&gt;50 km/h)</span>
+          <span className="text-gray-600 dark:text-gray-400">Fluido (&gt;50 km/h)</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-          <span className="text-gray-600">Moderado (30-50 km/h)</span>
+          <span className="text-gray-600 dark:text-gray-400">Moderado (30-50 km/h)</span>
         </div>
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 bg-red-500 rounded"></div>
-          <span className="text-gray-600">Congestionado (&lt;30 km/h)</span>
+          <span className="text-gray-600 dark:text-gray-400">Congestionado (&lt;30 km/h)</span>
         </div>
       </div>
     </div>
@@ -152,27 +153,27 @@ function LineChart({ data, title = "Análisis de Velocidades" }: { data: Velocid
 function BarChart({ data, title = "Niveles de Congestión" }: { data: CongestionData[], title?: string }) {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
-        <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg">
-          <p className="text-gray-500">No hay datos disponibles</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">{title}</h2>
+        <div className="flex items-center justify-center h-40 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <p className="text-gray-500 dark:text-gray-400">No hay datos disponibles</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">{title}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">{title}</h2>
       
       <div className="space-y-4">
         {data.map((item, index) => (
           <div key={index} className="flex items-center space-x-4">
-            <div className="w-16 text-sm font-medium text-gray-700">
+            <div className="w-16 text-sm font-medium text-gray-700 dark:text-gray-300">
               {item.zona}
             </div>
             
-            <div className="flex-1 bg-gray-200 rounded-full h-6 relative overflow-hidden">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 relative overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ${
                   item.congestion >= 0.7 ? 'bg-red-500' :
@@ -181,7 +182,7 @@ function BarChart({ data, title = "Niveles de Congestión" }: { data: Congestion
                 style={{ width: `${item.congestion * 100}%` }}
               ></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-medium text-gray-700">
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                   {(item.congestion * 100).toFixed(0)}%
                 </span>
               </div>
@@ -206,14 +207,14 @@ function BarChart({ data, title = "Niveles de Congestión" }: { data: Congestion
 function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
   if (!data) {
     return (
-      <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
-        <div className="text-gray-400 mb-4">
+      <div className="bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center">
+        <div className="text-gray-400 dark:text-gray-500 mb-4">
           <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Sin predicción</h3>
-        <p className="text-gray-500">Selecciona una zona, fecha y hora para ver la predicción</p>
+        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Sin predicción</h3>
+        <p className="text-gray-500 dark:text-gray-400">Selecciona una zona, fecha y hora para ver la predicción</p>
       </div>
     );
   }
@@ -222,7 +223,7 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
   const congestionZona = data.congestion.find(c => c.zona === data.zona);
   
   return (
-    <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
         <h2 className="text-xl font-bold text-white flex items-center">
@@ -327,29 +328,30 @@ export default function PrediccionesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <AppLayout>
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-purple-950 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
             Predicciones de Tráfico
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Obtén predicciones precisas del tráfico en tiempo real para planificar mejor tus rutas
           </p>
         </div>
 
         {/* Formulario de filtros */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <form onSubmit={consultarPrediccion} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Zona
               </label>
               <select 
                 value={zona} 
                 onChange={e => setZona(e.target.value)} 
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 disabled={loading}
               >
                 <option value="Centro">Centro</option>
@@ -361,27 +363,27 @@ export default function PrediccionesPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Fecha
               </label>
               <input 
                 type="date" 
                 value={fecha} 
                 onChange={e => setFecha(e.target.value)} 
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 disabled={loading}
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Hora
               </label>
               <input 
                 type="time" 
                 value={hora} 
                 onChange={e => setHora(e.target.value)} 
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 disabled={loading}
               />
             </div>
@@ -460,18 +462,19 @@ export default function PrediccionesPage() {
         {/* Estado inicial */}
         {!prediccionData && !loading && !error && (
           <div className="text-center py-12">
-            <svg className="mx-auto h-24 w-24 text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="mx-auto h-24 w-24 text-gray-400 dark:text-gray-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-700 mb-3">
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Comienza tu consulta
             </h3>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
               Selecciona una zona, fecha y hora en el formulario de arriba para obtener predicciones de tráfico precisas y actualizadas.
             </p>
           </div>
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </AppLayout>
   );
 }

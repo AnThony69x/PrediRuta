@@ -281,9 +281,9 @@ export function AccessibilityWidget() {
       {/* Estilos CSS para el botón de ayuda */}
       <style jsx>{helpButtonStyles}</style>
       
-      {/* Bottom Left Toggle Button */}
+      {/* Bottom Right Toggle Button */}
       <button
-        className="fixed bottom-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
+        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Abrir ayuda y configuración de accesibilidad"
       >

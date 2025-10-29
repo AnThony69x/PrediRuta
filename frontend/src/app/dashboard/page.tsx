@@ -1,6 +1,7 @@
 "use client";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrafficMap } from "@/components/map/traffic-map";
@@ -35,15 +36,16 @@ const CITIES_WITH_COVERAGE = [
 ];
 
 // Función auxiliar para obtener saludo según hora del día
-function getGreeting(name: string): string {
+function getGreeting(name: string, t: (key: string) => string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return `Buenos días, ${name}`;
-  if (hour < 19) return `Buenas tardes, ${name}`;
-  return `Buenas noches, ${name}`;
+  if (hour < 12) return `${t('dashboard.greeting.morning')}, ${name}`;
+  if (hour < 19) return `${t('dashboard.greeting.afternoon')}, ${name}`;
+  return `${t('dashboard.greeting.evening')}, ${name}`;
 }
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const [summary, setSummary] = useState<TrafficSummary | null>(null);
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
   const backendUrl = getBackendUrl();
@@ -75,17 +77,17 @@ export default function DashboardPage() {
           {/* Header de bienvenida personalizado */}
           <div className="max-w-7xl mx-auto">
             <h1 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-emerald-600 via-sky-600 to-purple-600 bg-clip-text text-transparent">
-              Dashboard
+              {t('dashboard.title')}
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {getGreeting(getUserFirstName(user))}. Aquí tienes una vista general del sistema.
+              {getGreeting(getUserFirstName(user), t)}. {t('dashboard.subtitle')}
             </p>
           </div>
 
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-            <Card className="col-span-1 border-emerald-100/80 dark:border-emerald-900/50">
+          <section className="grid grid-cols-1 gap-4 max-w-7xl mx-auto">
+            <Card className="border-emerald-100/80 dark:border-emerald-900/50">
               <CardHeader>
-                <CardTitle className="text-emerald-700 dark:text-emerald-300">Resumen de tráfico</CardTitle>
+                <CardTitle className="text-emerald-700 dark:text-emerald-300">{t('dashboard.traffic.summary')}</CardTitle>
               </CardHeader>
               <CardContent>
               <div className="space-y-3">
@@ -162,49 +164,14 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="col-span-1 border-sky-100/80 dark:border-sky-900/50">
-            <CardHeader>
-              <CardTitle className="text-sky-700 dark:text-sky-300">Acceso rápido</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Link href="/rutas" className="group">
-                <div className="rounded-md border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-3 transition-all hover:shadow-md dark:border-emerald-900/60 dark:from-emerald-950 dark:to-gray-900">
-                  <p className="font-semibold text-emerald-700 dark:text-emerald-300 group-hover:translate-x-0.5 transition-transform">Rutas</p>
-                  <p className="text-xs text-emerald-800/80 dark:text-emerald-200/80">Planifica y consulta rutas óptimas</p>
-                </div>
-              </Link>
-              <Link href="/predicciones" className="group">
-                <div className="rounded-md border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-3 transition-all hover:shadow-md dark:border-sky-900/60 dark:from-sky-950 dark:to-gray-900">
-                  <p className="font-semibold text-sky-700 dark:text-sky-300 group-hover:translate-x-0.5 transition-transform">Predicciones</p>
-                  <p className="text-xs text-sky-800/80 dark:text-sky-200/80">Explora predicciones de tráfico</p>
-                </div>
-              </Link>
-              <Link href="/perfil" className="group">
-                <div className="rounded-md border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-3 transition-all hover:shadow-md dark:border-purple-900/60 dark:from-purple-950 dark:to-gray-900">
-                  <p className="font-semibold text-purple-700 dark:text-purple-300 group-hover:translate-x-0.5 transition-transform">Mi Perfil</p>
-                  <p className="text-xs text-purple-800/80 dark:text-purple-200/80">Editar nombre, idioma y preferencias</p>
-                </div>
-              </Link>
-              <button
-                type="button"
-                className="text-left rounded-md border border-indigo-200 bg-gradient-to-br from-indigo-50 to-white p-3 transition-all hover:shadow-md dark:border-indigo-900/60 dark:from-indigo-950 dark:to-gray-900"
-                aria-label="Asistente virtual"
-                onClick={() => alert("El asistente virtual se integrará próximamente.")}
-              >
-                <p className="font-semibold text-indigo-700 dark:text-indigo-300">Asistente Virtual</p>
-                <p className="text-xs text-indigo-800/80 dark:text-indigo-200/80">Pregúntale sobre el tráfico y rutas</p>
-              </button>
-            </CardContent>
-          </Card>
         </section>
 
         <section className="max-w-7xl mx-auto">
           <Card className="border-sky-100/80 dark:border-sky-900/50">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sky-700 dark:text-sky-300">Mapa de tráfico</CardTitle>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Usa "Mi ubicación" para centrar el mapa</p>
+                <CardTitle className="text-sky-700 dark:text-sky-300">{t('dashboard.traffic.map')}</CardTitle>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.traffic.map.hint')}</p>
               </div>
             </CardHeader>
             <CardContent>

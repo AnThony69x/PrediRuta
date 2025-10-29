@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import { Footer } from './Footer';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export function AppLayout({
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Header */}
       <Header 
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
@@ -28,7 +29,7 @@ export function AppLayout({
         showBreadcrumbs={showBreadcrumbs}
       />
 
-      <div className="flex">
+      <div className="flex flex-1">
         {/* Sidebar */}
         {showSidebar && (
           <Sidebar 
@@ -40,10 +41,14 @@ export function AppLayout({
         {/* Main content */}
         <main 
           id="main-content" 
-          className="flex-1 transition-all duration-300"
+          className="flex-1 transition-all duration-300 flex flex-col"
           tabIndex={-1}
         >
-          {children}
+          <div className="flex-1">
+            {children}
+          </div>
+          {/* Footer */}
+          <Footer />
         </main>
       </div>
     </div>
