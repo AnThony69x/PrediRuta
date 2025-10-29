@@ -46,6 +46,21 @@ const publicRoutes = [
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
+  // Verificar si hay token de autenticación
+  const tokenCookie = req.cookies.get('sb-access-token') || 
+                     req.cookies.get('supabase-auth-token') ||
+                     req.cookies.get('sb-auth-token') ||
+                     req.cookies.get('supabase.auth.token') ||
+                     req.cookies.get('sb-refresh-token');
+  
+  const token = tokenCookie?.value;
+  const isAuthenticated = token && token.length >= 10;
+
+  // Si el usuario está autenticado y accede a la página de inicio, redirigir al dashboard
+  if (pathname === '/' && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+
   // Si es una ruta pública, de sistema o archivos estáticos, permitir acceso
   if (publicRoutes.includes(pathname) || 
       pathname.startsWith('/_next/') || 
@@ -60,17 +75,8 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
 
   if (isProtectedRoute || isAdminRoute) {
-    // Verificar si hay token de autenticación en las cookies
-    const tokenCookie = req.cookies.get('sb-access-token') || 
-                       req.cookies.get('supabase-auth-token') ||
-                       req.cookies.get('sb-auth-token') ||
-                       req.cookies.get('supabase.auth.token') ||
-                       req.cookies.get('sb-refresh-token');
-    
-    const token = tokenCookie?.value;
-    
     // Si no hay token válido, redirigir a página 401 (No autorizado)
-    if (!token || token.length < 10) {
+    if (!isAuthenticated) {
       return NextResponse.redirect(new URL('/errors/unauthorized', req.url));
     }
 
