@@ -134,63 +134,87 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
   }, [flow]);
 
   return (
-    <div className={`rounded-2xl shadow-md p-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm text-gray-800 dark:text-gray-100 transition-all ${
-      level === "severe" ? "ring-2 ring-red-500 animate-[pulse_2s_ease-in-out_infinite]" : "ring-1 ring-gray-200 dark:ring-gray-700"
+    <div className={`rounded-xl shadow-lg p-5 bg-white dark:bg-gray-800 border-2 transition-all ${
+      level === "severe" 
+        ? "border-red-500 dark:border-red-400 animate-[pulse_2s_ease-in-out_infinite]" 
+        : "border-gray-200 dark:border-gray-700"
     }`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold">Tráfico cercano</span>
-          <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold bg-gray-100 dark:bg-gray-800`}>
-            <span className={`inline-block h-2.5 w-2.5 rounded-full ${info.color}`}></span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">🚦 Tráfico cercano</h3>
+          <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm ${
+            level === "free" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" :
+            level === "moderate" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" :
+            level === "heavy" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300" :
+            "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+          }`}>
+            <span className={`inline-block h-2.5 w-2.5 rounded-full ${info.color} shadow-sm`}></span>
             {info.label}
           </span>
         </div>
         <button
           onClick={() => coords && fetchFlow(coords.lat, coords.lon)}
-          className="text-[11px] px-2 py-1 rounded-md border border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+          className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-sm"
+          disabled={loading}
         >
-          Actualizar
+          {loading ? "..." : "Actualizar"}
         </button>
       </div>
 
       {loading && (
-        <div className="mt-3 animate-pulse space-y-2">
-          <div className="h-3 rounded bg-gray-200 dark:bg-gray-700 w-2/3"></div>
-          <div className="h-2.5 rounded bg-gray-200 dark:bg-gray-700 w-full"></div>
+        <div className="mt-3 animate-pulse space-y-3">
+          <div className="h-4 rounded-lg bg-gray-200 dark:bg-gray-700 w-2/3"></div>
+          <div className="h-3 rounded-lg bg-gray-200 dark:bg-gray-700 w-full"></div>
+          <div className="h-3 rounded-lg bg-gray-200 dark:bg-gray-700 w-4/5"></div>
         </div>
       )}
       {!loading && error && (
-        <div className="mt-3">
-          <div className="text-sm text-red-600 dark:text-red-400 font-medium">
-            {error.includes('Point too far') || error.includes('nearest existing segment')
-              ? '⚠️ Sin cobertura de tráfico en esta zona'
-              : error}
+        <div className="mt-3 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+          <div className="text-sm text-red-700 dark:text-red-300 font-semibold flex items-start gap-2">
+            <span className="text-lg">⚠️</span>
+            <span>
+              {error.includes('Point too far') || error.includes('nearest existing segment')
+                ? 'Sin cobertura de tráfico en esta zona'
+                : error}
+            </span>
           </div>
           {(error.includes('Point too far') || error.includes('nearest existing segment')) && (
-            <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-              <p>TomTom no tiene datos de tráfico vehicular en Ecuador.</p>
-              <p className="mt-1">Prueba con una ubicación en Europa o USA para ver datos en vivo.</p>
+            <div className="mt-3 text-xs text-red-600 dark:text-red-400 space-y-1 pl-7">
+              <p>• TomTom no tiene datos de tráfico vehicular en Ecuador.</p>
+              <p>• Prueba con una ubicación en Europa o USA para ver datos en vivo.</p>
             </div>
           )}
         </div>
       )}
       {!loading && !error && (
-        <div className="mt-3 space-y-3">
-          <div className="flex justify-between text-[11px] text-gray-500">
-            <span>Velocidad</span>
-            <span>
-              {flow?.currentSpeed?.toFixed?.(0)} / {flow?.freeFlowSpeed?.toFixed?.(0)} km/h
-            </span>
-          </div>
-          <div className="mt-1 h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-            <div className={`h-full ${info.color} transition-all duration-700 ease-out`} style={{ width: `${speedPct}%` }} />
+        <div className="mt-4 space-y-4">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
+            <div className="flex justify-between items-center text-sm mb-2">
+              <span className="font-medium text-gray-700 dark:text-gray-300">Velocidad actual</span>
+              <span className="font-bold text-gray-900 dark:text-gray-100">
+                {flow?.currentSpeed?.toFixed?.(0)} km/h
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+              <span>Flujo libre</span>
+              <span>{flow?.freeFlowSpeed?.toFixed?.(0)} km/h</span>
+            </div>
+            <div className="mt-3 h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden shadow-inner">
+              <div 
+                className={`h-full ${info.color} transition-all duration-700 ease-out shadow-sm`} 
+                style={{ width: `${speedPct}%` }} 
+              />
+            </div>
+            <div className="mt-2 text-center text-xs font-semibold text-gray-600 dark:text-gray-400">
+              {speedPct}% del flujo libre
+            </div>
           </div>
 
-          <div className="flex justify-between items-center text-[11px] text-gray-500">
-            <span>
-              Última actualización: {updatedAt ? new Date(updatedAt).toLocaleTimeString() : "—"}
+          <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              🕐 Actualizado: {updatedAt ? new Date(updatedAt).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : "—"}
             </span>
-            <span className="opacity-80">© TomTom © OpenStreetMap contributors</span>
+            <span className="text-[10px] text-gray-400 dark:text-gray-500">© TomTom © OSM</span>
           </div>
         </div>
       )}

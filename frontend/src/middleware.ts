@@ -3,10 +3,12 @@ import type { NextRequest } from 'next/server';
 
 // Rutas que requieren autenticación (el middleware será menos agresivo)
 const protectedRoutes = [
-  // '/dashboard', // Permitir que el dashboard maneje su propia autenticación
   '/rutas',
   '/predicciones', 
-  '/perfil'
+  '/perfil',
+  '/configuracion',
+  '/historial',
+  '/notificaciones'
 ];
 
 // Rutas que requieren permisos especiales (admin, etc.)
@@ -26,8 +28,11 @@ const publicRoutes = [
   '/reset-password',  // Resetear contraseña
   '/terminos-y-condiciones', // Términos y Condiciones
   '/politica-privacidad',    // Política de Privacidad
+  '/terminos',   // Alias de términos
+  '/privacidad', // Alias de privacidad
   '/docs',       // Documentación - Acceso a guías
   '/ayuda',      // Ayuda - Resolver dudas
+  '/contacto',   // Contacto
   '/404',        // Error - Página no encontrada
   '/500',        // Error interno del servidor
   '/callback',      // Callback de autenticación en (auth)

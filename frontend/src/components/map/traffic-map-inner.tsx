@@ -40,7 +40,7 @@ function FitToLocation() {
     <button
       aria-label="Usar mi ubicación"
       onClick={handleClick}
-      className="absolute z-[1000] right-3 bottom-24 md:bottom-28 rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800/90 dark:text-gray-100"
+      className="absolute z-[1000] right-3 bottom-3 rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800/90 dark:text-gray-100"
     >
       Mi ubicación
     </button>
@@ -129,7 +129,7 @@ export function TrafficMapInner({
             </LayersControl.Overlay>
           )}
         </LayersControl>
-        <ZoomControl position="bottomright" />
+        <ZoomControl position="topleft" />
         <ScaleControl position="bottomleft" />
         <FitToLocation />
 

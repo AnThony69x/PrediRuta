@@ -281,9 +281,9 @@ export function AccessibilityWidget() {
       {/* Estilos CSS para el botón de ayuda */}
       <style jsx>{helpButtonStyles}</style>
       
-      {/* Bottom Left Toggle Button */}
+      {/* Bottom Right Toggle Button */}
       <button
-        className="fixed bottom-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
+        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Abrir ayuda y configuración de accesibilidad"
       >
@@ -365,20 +365,20 @@ export function AccessibilityWidget() {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300"
+          className="fixed inset-0 z-[9998] bg-black bg-opacity-50 transition-opacity duration-300"
           onClick={closeWidget}
         />
       )}
 
       {/* Side Panel */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="h-full overflow-y-auto accessibility-menu">
           <div className="p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Accesibilidad</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Accesibilidad</h2>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -409,8 +409,8 @@ export function AccessibilityWidget() {
                   key={tab.key}
                   className={`w-full text-left px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                     activeSection === tab.key
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800'
                   }`}
                   onClick={() => setActiveSection(tab.key as any)}
                 >
@@ -423,17 +423,17 @@ export function AccessibilityWidget() {
             <div className="space-y-4">
               {activeSection === 'profiles' && (
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Perfiles de Accesibilidad</h3>
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Perfiles de Accesibilidad</h3>
                   <div className="grid grid-cols-1 gap-3">
                     {ACCESSIBILITY_PROFILES.map((profile) => (
                       <button
                         key={profile.name}
-                        className="p-4 text-left border rounded-lg hover:bg-gray-50 transition-colors"
+                        className="p-4 text-left border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                         onClick={() => applyProfile(profile)}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{profile.icon}</span>
-                          <span className="font-medium text-sm">{profile.name}</span>
+                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{profile.name}</span>
                         </div>
                       </button>
                     ))}
@@ -443,7 +443,7 @@ export function AccessibilityWidget() {
 
               {activeSection === 'content' && (
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Ajustes de Contenido</h3>
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Contenido</h3>
                   <div className="grid grid-cols-1 gap-3">
                     {[
                       { key: 'readableFont' as keyof AccessibilitySettings, label: 'Fuente legible', icon: 'A' },
@@ -459,14 +459,14 @@ export function AccessibilityWidget() {
                         key={option.key}
                         className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
                           settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 active' 
-                            : 'hover:bg-gray-50'
+                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
                         onClick={() => toggleSetting(option.key)}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm">{option.label}</span>
+                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
                         </div>
                       </button>
                     ))}
@@ -475,15 +475,15 @@ export function AccessibilityWidget() {
                   {/* Text Size Controls */}
                   <div className="mt-6 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Tamaño de texto</label>
+                      <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Tamaño de texto</label>
                       <div className="flex gap-2">
                         {['small', 'medium', 'large'].map((size) => (
                           <button
                             key={size}
                             className={`px-4 py-2 border rounded transition-colors text-sm ${
                               settings.textSize === size
-                                ? 'bg-blue-100 border-blue-300'
-                                : 'hover:bg-gray-50'
+                                ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                                : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
                             }`}
                             onClick={() => updateSetting('textSize', size)}
                           >
@@ -494,15 +494,15 @@ export function AccessibilityWidget() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Altura de línea</label>
+                      <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Altura de línea</label>
                       <div className="flex gap-2">
                         {['small', 'medium', 'large'].map((height) => (
                           <button
                             key={height}
                             className={`px-4 py-2 border rounded transition-colors text-sm ${
                               settings.lineHeight === height
-                                ? 'bg-blue-100 border-blue-300'
-                                : 'hover:bg-gray-50'
+                                ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                                : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
                             }`}
                             onClick={() => updateSetting('lineHeight', height)}
                           >
@@ -536,7 +536,7 @@ export function AccessibilityWidget() {
 
               {activeSection === 'colors' && (
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Ajustes de Color</h3>
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Color</h3>
                   <div className="grid grid-cols-1 gap-3">
                     {[
                       { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: 'Modo oscuro global', icon: '🌚' },
@@ -553,14 +553,14 @@ export function AccessibilityWidget() {
                         key={option.key}
                         className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
                           settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 active' 
-                            : 'hover:bg-gray-50'
+                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
                         onClick={() => toggleSetting(option.key)}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm">{option.label}</span>
+                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
                         </div>
                       </button>
                     ))}
@@ -570,7 +570,7 @@ export function AccessibilityWidget() {
 
               {activeSection === 'orientation' && (
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Ajustes de Orientación</h3>
+                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Orientación</h3>
                   <div className="grid grid-cols-1 gap-3">
                     {[
                       { key: 'readingGuide' as keyof AccessibilitySettings, label: 'Guía de lectura', icon: '—' },
@@ -582,14 +582,14 @@ export function AccessibilityWidget() {
                         key={option.key}
                         className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
                           settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 active' 
-                            : 'hover:bg-gray-50'
+                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
                         onClick={() => toggleSetting(option.key)}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm">{option.label}</span>
+                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
                         </div>
                       </button>
                     ))}
