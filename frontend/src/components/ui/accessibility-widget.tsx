@@ -39,7 +39,7 @@ interface AccessibilitySettings {
   highSaturation: boolean;
   lowSaturation: boolean;
   monochrome: boolean;
-  accessibilityDarkMode: boolean; // Nuevo: modo oscuro específico de accesibilidad
+  accessibilityDarkMode: boolean;
   
   // Orientation adjustments
   readingGuide: boolean;
@@ -47,10 +47,19 @@ interface AccessibilitySettings {
   bigBlackCursor: boolean;
   bigWhiteCursor: boolean;
   
+  // Motor adjustments (Nuevo: Accesibilidad Motriz)
+  keyboardNavigation: boolean;
+  largeButtons: boolean;
+  customKeyboardShortcuts: boolean;
+  voiceControl: boolean;
+  blockAutoScroll: boolean;
+  visibleFocus: boolean;
+  
   // Text adjustments
   textSize: 'small' | 'medium' | 'large';
   lineHeight: 'small' | 'medium' | 'large';
   textSpacing: 'small' | 'medium' | 'large';
+  buttonSize: 'small' | 'medium' | 'large';
 }
 
 interface AccessibilityProfile {
@@ -146,15 +155,23 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   readingMask: false,
   bigBlackCursor: false,
   bigWhiteCursor: false,
+  keyboardNavigation: false,
+  largeButtons: false,
+  customKeyboardShortcuts: false,
+  voiceControl: false,
+  blockAutoScroll: false,
+  visibleFocus: false,
   textSize: 'medium',
   lineHeight: 'medium',
   textSpacing: 'medium',
+  buttonSize: 'medium',
 };
 
 export function AccessibilityWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_SETTINGS);
   const [activeSection, setActiveSection] = useState<'profiles' | 'content' | 'colors' | 'orientation'>('profiles');
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set()); // Todos los acordeones cerrados por defecto
 
   // Load settings from localStorage
   useEffect(() => {
@@ -194,6 +211,44 @@ export function AccessibilityWidget() {
     }
   }, [settings.readingGuide, settings.readingMask]);
 
+  // Block autoplay when blockAutoScroll is enabled
+  useEffect(() => {
+    if (settings.blockAutoScroll) {
+      // Detener videos con autoplay
+      const videos = document.querySelectorAll('video[autoplay]');
+      videos.forEach(video => {
+        (video as HTMLVideoElement).pause();
+        video.removeAttribute('autoplay');
+      });
+
+      // Prevenir scroll automático
+      const preventAutoScroll = (e: Event) => {
+        if ((e.target as HTMLElement).hasAttribute('data-autoscroll')) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      };
+
+      window.addEventListener('scroll', preventAutoScroll, { passive: false });
+      return () => window.removeEventListener('scroll', preventAutoScroll);
+    }
+  }, [settings.blockAutoScroll]);
+
+  // Keyboard navigation enhancement
+  useEffect(() => {
+    if (settings.keyboardNavigation) {
+      const handleKeyPress = (e: KeyboardEvent) => {
+        // Esc para cerrar modales o menús
+        if (e.key === 'Escape' && isOpen) {
+          closeWidget();
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyPress);
+      return () => document.removeEventListener('keydown', handleKeyPress);
+    }
+  }, [settings.keyboardNavigation, isOpen]);
+
   const applySettings = (newSettings: AccessibilitySettings) => {
     const root = document.documentElement;
     
@@ -204,9 +259,11 @@ export function AccessibilityWidget() {
       'dark-contrast', 'light-contrast', 'invert-colors', 'change-colors',
       'high-contrast', 'high-saturation', 'low-saturation', 'monochrome',
       'accessibility-dark-mode', 'reading-guide', 'reading-mask', 'big-black-cursor', 'big-white-cursor',
+      'keyboard-navigation', 'large-buttons', 'custom-shortcuts', 'voice-control', 'block-auto-scroll', 'visible-focus',
       'text-small', 'text-medium', 'text-large',
       'line-height-small', 'line-height-medium', 'line-height-large',
-      'spacing-small', 'spacing-medium', 'spacing-large'
+      'spacing-small', 'spacing-medium', 'spacing-large',
+      'button-small', 'button-medium', 'button-large'
     );
 
     // Apply content adjustments
@@ -230,10 +287,8 @@ export function AccessibilityWidget() {
     if (newSettings.monochrome) root.classList.add('monochrome');
     if (newSettings.accessibilityDarkMode) {
       root.classList.add('accessibility-dark-mode');
-      // También aplicar la clase dark de Tailwind para compatibilidad
       root.classList.add('dark');
     } else {
-      // Solo remover si no está activo
       root.classList.remove('dark');
     }
 
@@ -243,8 +298,15 @@ export function AccessibilityWidget() {
     if (newSettings.bigBlackCursor) root.classList.add('big-black-cursor');
     if (newSettings.bigWhiteCursor) root.classList.add('big-white-cursor');
 
-    // Apply text adjustments - only if NOT default (medium)
-    // This allows the app's default Inter font to work without interference
+    // Apply motor adjustments
+    if (newSettings.keyboardNavigation) root.classList.add('keyboard-navigation');
+    if (newSettings.largeButtons) root.classList.add('large-buttons');
+    if (newSettings.customKeyboardShortcuts) root.classList.add('custom-shortcuts');
+    if (newSettings.voiceControl) root.classList.add('voice-control');
+    if (newSettings.blockAutoScroll) root.classList.add('block-auto-scroll');
+    if (newSettings.visibleFocus) root.classList.add('visible-focus');
+
+    // Apply text adjustments
     if (newSettings.textSize !== 'medium') {
       root.classList.add(`text-${newSettings.textSize}`);
     }
@@ -253,6 +315,9 @@ export function AccessibilityWidget() {
     }
     if (newSettings.textSpacing !== 'medium') {
       root.classList.add(`spacing-${newSettings.textSpacing}`);
+    }
+    if (newSettings.buttonSize !== 'medium') {
+      root.classList.add(`button-${newSettings.buttonSize}`);
     }
   };
 
@@ -265,7 +330,24 @@ export function AccessibilityWidget() {
   };
 
   const applyProfile = (profile: AccessibilityProfile) => {
-    setSettings(prev => ({ ...prev, ...profile.settings }));
+    // Verificar si el perfil ya está activo
+    const isActive = Object.entries(profile.settings).every(
+      ([key, value]) => settings[key as keyof AccessibilitySettings] === value
+    );
+
+    if (isActive) {
+      // Si el perfil está activo, desactivar todas sus configuraciones
+      const resetProfile: Partial<AccessibilitySettings> = {};
+      Object.keys(profile.settings).forEach(key => {
+        const settingKey = key as keyof AccessibilitySettings;
+        const defaultValue = DEFAULT_SETTINGS[settingKey];
+        resetProfile[settingKey] = defaultValue as any;
+      });
+      setSettings(prev => ({ ...prev, ...resetProfile }));
+    } else {
+      // Si no está activo, aplicar el perfil
+      setSettings(prev => ({ ...prev, ...profile.settings }));
+    }
   };
 
   const resetSettings = () => {
@@ -274,6 +356,24 @@ export function AccessibilityWidget() {
 
   const closeWidget = () => {
     setIsOpen(false);
+  };
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
+  };
+
+  const isProfileActive = (profile: AccessibilityProfile) => {
+    return Object.entries(profile.settings).every(
+      ([key, value]) => settings[key as keyof AccessibilitySettings] === value
+    );
   };
 
   return (
@@ -371,8 +471,8 @@ export function AccessibilityWidget() {
       )}
 
       {/* Side Panel */}
-      <div className={`fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         <div className="h-full overflow-y-auto accessibility-menu">
           <div className="p-6">
@@ -399,203 +499,336 @@ export function AccessibilityWidget() {
 
             {/* Navigation Tabs */}
             <div className="flex flex-col gap-2 mb-6">
-              {[
-                { key: 'profiles', label: 'Perfiles', icon: '👤' },
-                { key: 'content', label: 'Contenido', icon: '📝' },
-                { key: 'colors', label: 'Colores', icon: '🎨' },
-                { key: 'orientation', label: 'Orientación', icon: '🧭' },
-              ].map((tab) => (
+              {/* Encabezado: Accesibilidad Visual */}
+              <div className="px-2 py-2 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-l-4 border-blue-500">
+                <h3 className="text-sm font-bold text-blue-700 dark:text-blue-300">👁️ ACCESIBILIDAD VISUAL</h3>
+              </div>
+
+              {/* Sección: Perfiles */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <button
-                  key={tab.key}
-                  className={`w-full text-left px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    activeSection === tab.key
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-100 dark:hover:bg-gray-800'
-                  }`}
-                  onClick={() => setActiveSection(tab.key as any)}
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('profiles')}
                 >
-                  {tab.icon} {tab.label}
+                  <span className="text-gray-900 dark:text-gray-100">👤 Perfiles</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('profiles') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
                 </button>
-              ))}
-            </div>
-
-            {/* Content */}
-            <div className="space-y-4">
-              {activeSection === 'profiles' && (
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Perfiles de Accesibilidad</h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {ACCESSIBILITY_PROFILES.map((profile) => (
-                      <button
-                        key={profile.name}
-                        className="p-4 text-left border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        onClick={() => applyProfile(profile)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{profile.icon}</span>
-                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{profile.name}</span>
-                        </div>
-                      </button>
-                    ))}
+                {expandedSections.has('profiles') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Perfiles de Accesibilidad</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {ACCESSIBILITY_PROFILES.map((profile) => {
+                        const isActive = isProfileActive(profile);
+                        return (
+                          <button
+                            key={profile.name}
+                            className={`p-3 text-left border rounded-lg transition-all ${
+                              isActive
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400'
+                                : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                            }`}
+                            onClick={() => applyProfile(profile)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-xl">{profile.icon}</span>
+                              <span className={`font-medium text-xs ${
+                                isActive 
+                                  ? 'text-blue-700 dark:text-blue-300' 
+                                  : 'text-gray-900 dark:text-gray-100'
+                              }`}>
+                                {profile.name}
+                              </span>
+                              {isActive && (
+                                <span className="ml-auto text-blue-500 dark:text-blue-400">✓</span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {activeSection === 'content' && (
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Contenido</h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {[
-                      { key: 'readableFont' as keyof AccessibilitySettings, label: 'Fuente legible', icon: 'A' },
-                      { key: 'dyslexiaFont' as keyof AccessibilitySettings, label: 'Fuente dislexia', icon: 'Aa' },
-                      { key: 'highlightHeadings' as keyof AccessibilitySettings, label: 'Resaltar títulos', icon: 'H' },
-                      { key: 'highlightLinks' as keyof AccessibilitySettings, label: 'Resaltar enlaces', icon: '🔗' },
-                      { key: 'highlightButtons' as keyof AccessibilitySettings, label: 'Resaltar botones', icon: '⭕' },
-                      { key: 'hideImages' as keyof AccessibilitySettings, label: 'Ocultar imágenes', icon: '🖼️' },
-                      { key: 'tooltips' as keyof AccessibilitySettings, label: 'Tooltips', icon: '💭' },
-                      { key: 'stopAnimations' as keyof AccessibilitySettings, label: 'Sin animaciones', icon: '⏸️' },
-                    ].map((option) => (
-                      <button
-                        key={option.key}
-                        className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
-                          settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
-                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
-                        }`}
-                        onClick={() => toggleSetting(option.key)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
+              {/* Sección: Contenido */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('content')}
+                >
+                  <span className="text-gray-900 dark:text-gray-100">📝 Contenido</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('content') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+                {expandedSections.has('content') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Contenido</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { key: 'readableFont' as keyof AccessibilitySettings, label: 'Fuente legible', icon: 'A' },
+                        { key: 'dyslexiaFont' as keyof AccessibilitySettings, label: 'Fuente dislexia', icon: 'Aa' },
+                        { key: 'highlightHeadings' as keyof AccessibilitySettings, label: 'Resaltar títulos', icon: 'H' },
+                        { key: 'highlightLinks' as keyof AccessibilitySettings, label: 'Resaltar enlaces', icon: '🔗' },
+                        { key: 'highlightButtons' as keyof AccessibilitySettings, label: 'Resaltar botones', icon: '⭕' },
+                        { key: 'hideImages' as keyof AccessibilitySettings, label: 'Ocultar imágenes', icon: '🖼️' },
+                        { key: 'tooltips' as keyof AccessibilitySettings, label: 'Tooltips', icon: '💭' },
+                        { key: 'stopAnimations' as keyof AccessibilitySettings, label: 'Sin animaciones', icon: '⏸️' },
+                      ].map((option) => (
+                        <button
+                          key={option.key}
+                          className={`accessibility-option p-2 border rounded-lg text-left transition-colors ${
+                            settings[option.key] 
+                              ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                              : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          }`}
+                          onClick={() => toggleSetting(option.key)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{option.icon}</span>
+                            <span className="font-medium text-xs text-gray-900 dark:text-gray-100">{option.label}</span>
+                            {settings[option.key] && (
+                              <span className="ml-auto text-blue-500 dark:text-blue-400">✓</span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Text Size Controls */}
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Tamaño de texto</label>
+                        <div className="flex gap-2">
+                          {['small', 'medium', 'large'].map((size) => (
+                            <button
+                              key={size}
+                              className={`flex-1 px-3 py-2 border rounded transition-colors text-xs ${
+                                settings.textSize === size
+                                  ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                                  : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
+                              }`}
+                              onClick={() => updateSetting('textSize', size)}
+                            >
+                              {size === 'small' ? '+' : size === 'medium' ? '++' : '+++'}
+                            </button>
+                          ))}
                         </div>
-                      </button>
-                    ))}
-                  </div>
+                      </div>
 
-                  {/* Text Size Controls */}
-                  <div className="mt-6 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Tamaño de texto</label>
+                      <div>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Altura de línea</label>
+                        <div className="flex gap-2">
+                          {['small', 'medium', 'large'].map((height) => (
+                            <button
+                              key={height}
+                              className={`flex-1 px-3 py-2 border rounded transition-colors text-xs ${
+                                settings.lineHeight === height
+                                  ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                                  : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
+                              }`}
+                              onClick={() => updateSetting('lineHeight', height)}
+                            >
+                              {height === 'small' ? '+' : height === 'medium' ? '++' : '+++'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Espaciado</label>
+                        <div className="flex gap-2">
+                          {['small', 'medium', 'large'].map((spacing) => (
+                            <button
+                              key={spacing}
+                              className={`flex-1 px-3 py-2 border rounded transition-colors text-xs ${
+                                settings.textSpacing === spacing
+                                  ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                                  : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
+                              }`}
+                              onClick={() => updateSetting('textSpacing', spacing)}
+                            >
+                              {spacing === 'small' ? '+' : spacing === 'medium' ? '++' : '+++'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Sección: Colores */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('colors')}
+                >
+                  <span className="text-gray-900 dark:text-gray-100">🎨 Colores</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('colors') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+                {expandedSections.has('colors') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Color</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: 'Modo oscuro global', icon: '🌚' },
+                        { key: 'darkContrast' as keyof AccessibilitySettings, label: 'Contraste oscuro', icon: '🌙' },
+                        { key: 'lightContrast' as keyof AccessibilitySettings, label: 'Contraste claro', icon: '☀️' },
+                        { key: 'invertColors' as keyof AccessibilitySettings, label: 'Invertir colores', icon: '⚫' },
+                        { key: 'changeColors' as keyof AccessibilitySettings, label: 'Cambiar colores', icon: '🎨' },
+                        { key: 'highContrast' as keyof AccessibilitySettings, label: 'Alto contraste', icon: '⚫' },
+                        { key: 'highSaturation' as keyof AccessibilitySettings, label: 'Alta saturación', icon: '♦️' },
+                        { key: 'lowSaturation' as keyof AccessibilitySettings, label: 'Baja saturación', icon: '💧' },
+                        { key: 'monochrome' as keyof AccessibilitySettings, label: 'Monocromo', icon: '♠️' },
+                      ].map((option) => (
+                        <button
+                          key={option.key}
+                          className={`accessibility-option p-2 border rounded-lg text-left transition-colors ${
+                            settings[option.key] 
+                              ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                              : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          }`}
+                          onClick={() => toggleSetting(option.key)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{option.icon}</span>
+                            <span className="font-medium text-xs text-gray-900 dark:text-gray-100">{option.label}</span>
+                            {settings[option.key] && (
+                              <span className="ml-auto text-blue-500 dark:text-blue-400">✓</span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Sección: Orientación */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('orientation')}
+                >
+                  <span className="text-gray-900 dark:text-gray-100">🧭 Orientación</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('orientation') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+                {expandedSections.has('orientation') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Orientación</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { key: 'readingGuide' as keyof AccessibilitySettings, label: 'Guía de lectura', icon: '—' },
+                        { key: 'readingMask' as keyof AccessibilitySettings, label: 'Máscara de lectura', icon: '🔳' },
+                        { key: 'bigBlackCursor' as keyof AccessibilitySettings, label: 'Cursor grande negro', icon: '↖️' },
+                        { key: 'bigWhiteCursor' as keyof AccessibilitySettings, label: 'Cursor grande blanco', icon: '↗️' },
+                      ].map((option) => (
+                        <button
+                          key={option.key}
+                          className={`accessibility-option p-2 border rounded-lg text-left transition-colors ${
+                            settings[option.key] 
+                              ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
+                              : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          }`}
+                          onClick={() => toggleSetting(option.key)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{option.icon}</span>
+                            <span className="font-medium text-xs text-gray-900 dark:text-gray-100">{option.label}</span>
+                            {settings[option.key] && (
+                              <span className="ml-auto text-blue-500 dark:text-blue-400">✓</span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Encabezado: Accesibilidad Motriz */}
+              <div className="px-2 py-2 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-lg border-l-4 border-green-500 mt-4">
+                <h3 className="text-sm font-bold text-green-700 dark:text-green-300">🖐️ ACCESIBILIDAD MOTRIZ</h3>
+              </div>
+
+              {/* Sección: Motriz */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('motor')}
+                >
+                  <span className="text-gray-900 dark:text-gray-100">⌨️ Controles Motrices</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('motor') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+                {expandedSections.has('motor') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Accesibilidad Motriz</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { key: 'keyboardNavigation' as keyof AccessibilitySettings, label: 'Navegación por teclado', icon: '⌨️', description: 'Tab, Enter, Esc' },
+                        { key: 'visibleFocus' as keyof AccessibilitySettings, label: 'Foco visible', icon: '🎯', description: 'Resaltar elemento activo' },
+                        { key: 'largeButtons' as keyof AccessibilitySettings, label: 'Botones grandes', icon: '🔘', description: 'Aumentar tamaño' },
+                        { key: 'customKeyboardShortcuts' as keyof AccessibilitySettings, label: 'Atajos personalizados', icon: '⚡', description: 'Configurar teclas' },
+                        { key: 'voiceControl' as keyof AccessibilitySettings, label: 'Control por voz', icon: '🎤', description: 'Dictado activado' },
+                        { key: 'blockAutoScroll' as keyof AccessibilitySettings, label: 'Bloquear auto-scroll', icon: '⏸️', description: 'Pausar movimiento' },
+                      ].map((option) => (
+                        <button
+                          key={option.key}
+                          className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
+                            settings[option.key] 
+                              ? 'bg-green-100 border-green-300 dark:bg-green-900 dark:border-green-700 active' 
+                              : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          }`}
+                          onClick={() => toggleSetting(option.key)}
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="text-lg mt-0.5">{option.icon}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-xs text-gray-900 dark:text-gray-100">{option.label}</span>
+                                {settings[option.key] && (
+                                  <span className="text-green-500 dark:text-green-400">✓</span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-gray-500 dark:text-gray-400">{option.description}</span>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Button Size Controls */}
+                    <div className="mt-4">
+                      <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Tamaño de botones</label>
                       <div className="flex gap-2">
                         {['small', 'medium', 'large'].map((size) => (
                           <button
                             key={size}
-                            className={`px-4 py-2 border rounded transition-colors text-sm ${
-                              settings.textSize === size
-                                ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
+                            className={`flex-1 px-3 py-2 border rounded transition-colors text-xs ${
+                              settings.buttonSize === size
+                                ? 'bg-green-100 border-green-300 dark:bg-green-900 dark:border-green-700 text-gray-900 dark:text-gray-100'
                                 : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
                             }`}
-                            onClick={() => updateSetting('textSize', size)}
+                            onClick={() => updateSetting('buttonSize', size)}
                           >
-                            {size === 'small' ? '+' : size === 'medium' ? '++' : '+++'}
+                            {size === 'small' ? 'S' : size === 'medium' ? 'M' : 'L'}
                           </button>
                         ))}
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">Altura de línea</label>
-                      <div className="flex gap-2">
-                        {['small', 'medium', 'large'].map((height) => (
-                          <button
-                            key={height}
-                            className={`px-4 py-2 border rounded transition-colors text-sm ${
-                              settings.lineHeight === height
-                                ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 text-gray-900 dark:text-gray-100'
-                                : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100'
-                            }`}
-                            onClick={() => updateSetting('lineHeight', height)}
-                          >
-                            {height === 'small' ? '+' : height === 'medium' ? '++' : '+++'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Espaciado</label>
-                      <div className="flex gap-2">
-                        {['small', 'medium', 'large'].map((spacing) => (
-                          <button
-                            key={spacing}
-                            className={`px-4 py-2 border rounded transition-colors text-sm ${
-                              settings.textSpacing === spacing
-                                ? 'bg-blue-100 border-blue-300'
-                                : 'hover:bg-gray-50'
-                            }`}
-                            onClick={() => updateSetting('textSpacing', spacing)}
-                          >
-                            {spacing === 'small' ? '+' : spacing === 'medium' ? '++' : '+++'}
-                          </button>
-                        ))}
-                      </div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">Ajusta el tamaño de todos los botones interactivos</p>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {activeSection === 'colors' && (
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Color</h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {[
-                      { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: 'Modo oscuro global', icon: '🌚' },
-                      { key: 'darkContrast' as keyof AccessibilitySettings, label: 'Contraste oscuro', icon: '🌙' },
-                      { key: 'lightContrast' as keyof AccessibilitySettings, label: 'Contraste claro', icon: '☀️' },
-                      { key: 'invertColors' as keyof AccessibilitySettings, label: 'Invertir colores', icon: '⚫' },
-                      { key: 'changeColors' as keyof AccessibilitySettings, label: 'Cambiar colores', icon: '🎨' },
-                      { key: 'highContrast' as keyof AccessibilitySettings, label: 'Alto contraste', icon: '⚫' },
-                      { key: 'highSaturation' as keyof AccessibilitySettings, label: 'Alta saturación', icon: '♦️' },
-                      { key: 'lowSaturation' as keyof AccessibilitySettings, label: 'Baja saturación', icon: '💧' },
-                      { key: 'monochrome' as keyof AccessibilitySettings, label: 'Monocromo', icon: '♠️' },
-                    ].map((option) => (
-                      <button
-                        key={option.key}
-                        className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
-                          settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
-                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
-                        }`}
-                        onClick={() => toggleSetting(option.key)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeSection === 'orientation' && (
-                <div>
-                  <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">Ajustes de Orientación</h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {[
-                      { key: 'readingGuide' as keyof AccessibilitySettings, label: 'Guía de lectura', icon: '—' },
-                      { key: 'readingMask' as keyof AccessibilitySettings, label: 'Máscara de lectura', icon: '🔳' },
-                      { key: 'bigBlackCursor' as keyof AccessibilitySettings, label: 'Cursor grande negro', icon: '↖️' },
-                      { key: 'bigWhiteCursor' as keyof AccessibilitySettings, label: 'Cursor grande blanco', icon: '↗️' },
-                    ].map((option) => (
-                      <button
-                        key={option.key}
-                        className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
-                          settings[option.key] 
-                            ? 'bg-blue-100 border-blue-300 dark:bg-blue-900 dark:border-blue-700 active' 
-                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
-                        }`}
-                        onClick={() => toggleSetting(option.key)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg">{option.icon}</span>
-                          <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{option.label}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

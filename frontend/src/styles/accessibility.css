@@ -612,3 +612,179 @@
 .reading-mask.active::before {
   display: block;
 }
+
+/* ========== MOTOR ACCESSIBILITY STYLES ========== */
+
+/* Keyboard Navigation */
+.keyboard-navigation *:focus {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 3px !important;
+  border-radius: 4px !important;
+}
+
+.keyboard-navigation button:focus,
+.keyboard-navigation a:focus,
+.keyboard-navigation input:focus,
+.keyboard-navigation select:focus,
+.keyboard-navigation textarea:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Visible Focus */
+.visible-focus *:focus {
+  outline: 4px dashed #f59e0b !important;
+  outline-offset: 4px !important;
+  background-color: rgba(251, 191, 36, 0.1) !important;
+}
+
+/* Large Buttons */
+.large-buttons button,
+.large-buttons [role="button"],
+.large-buttons a.button,
+.large-buttons input[type="button"],
+.large-buttons input[type="submit"] {
+  min-height: 48px !important;
+  min-width: 48px !important;
+  padding: 12px 24px !important;
+  font-size: 1.125rem !important;
+}
+
+/* Button Size Adjustments */
+.button-small button,
+.button-small [role="button"] {
+  min-height: 36px !important;
+  min-width: 36px !important;
+  padding: 8px 16px !important;
+  font-size: 0.875rem !important;
+}
+
+.button-medium button,
+.button-medium [role="button"] {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  padding: 10px 20px !important;
+  font-size: 1rem !important;
+}
+
+.button-large button,
+.button-large [role="button"] {
+  min-height: 56px !important;
+  min-width: 56px !important;
+  padding: 14px 28px !important;
+  font-size: 1.25rem !important;
+}
+
+/* Custom Keyboard Shortcuts */
+.custom-shortcuts [data-shortcut] {
+  position: relative;
+}
+
+.custom-shortcuts [data-shortcut]::after {
+  content: " (" attr(data-shortcut) ")";
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+/* Voice Control */
+.voice-control body {
+  position: relative;
+}
+
+.voice-control::before {
+  content: "🎤 Control por voz activo";
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #10b981;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  z-index: 10000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Block Auto-Scroll */
+.block-auto-scroll {
+  scroll-behavior: auto !important;
+}
+
+.block-auto-scroll * {
+  scroll-behavior: auto !important;
+}
+
+.block-auto-scroll video,
+.block-auto-scroll [autoplay] {
+  animation: none !important;
+}
+
+/* Prevent autoplay - Note: This is visual only, actual prevention needs JavaScript */
+.block-auto-scroll video {
+  pointer-events: auto !important;
+}
+
+.block-auto-scroll [data-autoplay] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Touch Target Size Enhancement */
+.large-buttons a,
+.large-buttons button,
+.large-buttons input,
+.large-buttons select {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Skip to main content link (keyboard navigation) */
+.keyboard-navigation .skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #3b82f6;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.keyboard-navigation .skip-to-main:focus {
+  top: 0;
+}
+
+/* Reduce motion for motor accessibility */
+.block-auto-scroll *,
+.block-auto-scroll *::before,
+.block-auto-scroll *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Better click/tap feedback */
+.large-buttons button:active,
+.large-buttons [role="button"]:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Focus trap for modals (keyboard navigation) */
+.keyboard-navigation [role="dialog"],
+.keyboard-navigation [role="alertdialog"] {
+  outline: 3px solid #3b82f6;
+}
+
+/* Increase spacing between interactive elements */
+.large-buttons button + button,
+.large-buttons a + a {
+  margin-left: 12px !important;
+}
+
+.large-buttons button,
+.large-buttons a,
+.large-buttons input {
+  margin: 6px 0 !important;
+}
