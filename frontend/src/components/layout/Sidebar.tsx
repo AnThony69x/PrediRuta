@@ -165,6 +165,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
                         group relative w-full text-left
                         text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800
                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                        ${!isOpen ? 'justify-center' : ''}
                       `}
                       title={`${item.label} (Alt+${item.shortcut})`}
                     >
@@ -212,6 +213,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
                         flex items-center gap-3 px-3 py-2.5 rounded-lg 
                         transition-all duration-200
                         group relative
+                        ${!isOpen ? 'justify-center' : ''}
                         ${isActive 
                           ? 'bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50 text-blue-700 dark:text-blue-300 shadow-sm' 
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -275,13 +277,14 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
           <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
             <Link
               href="/ayuda"
-              className="
+              className={`
                 flex items-center gap-3 px-3 py-2.5 rounded-lg
                 text-gray-600 dark:text-gray-400
                 hover:bg-gray-100 dark:hover:bg-gray-800
                 transition-colors
                 focus:outline-none focus:ring-2 focus:ring-blue-500
-              "
+                ${!isOpen ? 'justify-center' : ''}
+              `}
             >
               <HelpCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
               {isOpen && <span className="text-sm">{t('sidebar.help')}</span>}

@@ -188,10 +188,10 @@ export default function DashboardPage() {
                   focusCenter={focusCenter}
                   segments={segments}
                 />
-                <div className="absolute right-3 top-3 z-[1100]">
+                <div className="absolute right-3 top-3 z-30">
                   <LegendTraffic />
                 </div>
-                <div className="absolute left-3 bottom-3 right-3 z-[1100] max-w-xl">
+                <div className="absolute left-3 bottom-3 right-3 z-30 max-w-xl">
                   <TrafficStatus 
                     viewport={viewport} 
                     backendUrl={backendUrl}
