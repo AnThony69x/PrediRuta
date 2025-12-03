@@ -16,12 +16,14 @@ interface HeaderProps {
   onMenuClick?: () => void;
   showSearch?: boolean;
   showBreadcrumbs?: boolean;
+  sidebarOpen?: boolean;
 }
 
 export function Header({ 
   onMenuClick, 
   showSearch = true, 
-  showBreadcrumbs = true 
+  showBreadcrumbs = true,
+  sidebarOpen = true
 }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
@@ -150,7 +152,7 @@ export function Header({
       </div>
 
       {/* Breadcrumbs */}
-      {showBreadcrumbs && <Breadcrumbs />}
+      {showBreadcrumbs && <Breadcrumbs hideBreadcrumbs={!sidebarOpen} />}
     </header>
   );
 }
