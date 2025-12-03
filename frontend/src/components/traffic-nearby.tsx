@@ -26,21 +26,31 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const fetchAbortRef = useRef<AbortController | null>(null);
 
   const level = useMemo(() => levelFrom(flow || undefined), [flow]);
 
   const fetchFlow = useCallback(async (lat: number, lon: number) => {
+    // Cancelar fetch anterior si existe
+    if (fetchAbortRef.current) {
+      fetchAbortRef.current.abort();
+    }
+    fetchAbortRef.current = new AbortController();
+
     try {
       setLoading(true);
       setError(null);
-  const base = (backendUrl || getBackendUrl()).replace(/\/$/, "");
-  const url = `${base}/api/v1/traffic/status?lat=${lat}&lon=${lon}`;
-      const res = await fetch(url);
+      const base = (backendUrl || getBackendUrl()).replace(/\/$/, "");
+      const url = `${base}/api/v1/traffic/status?lat=${lat}&lon=${lon}`;
+      const res = await fetch(url, { signal: fetchAbortRef.current.signal });
+      
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || `HTTP ${res.status}`);
       }
+      
       const data = await res.json();
       const f: FlowData = {
         currentSpeed: data?.currentSpeed,
@@ -48,39 +58,41 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
         confidence: data?.confidence,
         frc: undefined,
       };
+      
       setFlow(f);
       setUpdatedAt(new Date().toISOString());
       onUpdate?.({ level: levelFrom(f), flow: f, lat, lon });
 
-      // Persistir en backend
-      try {
-  await fetch(`${(backendUrl || getBackendUrl()).replace(/\/$/, "")}/api/v1/traffic/data`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            road_segment_id: null,
-            lat,
-            lon,
-            speed_kmh: f.currentSpeed ?? 0,
-            traffic_level: (() => {
-              const lv = data?.congestionLevel as any;
-              // Mapear del backend (free/moderate/heavy/severe) a 1..4
-              if (lv === "free") return 1;
-              if (lv === "moderate") return 2;
-              if (lv === "heavy") return 3;
-              if (lv === "severe") return 4;
-              return 2;
-            })(),
-            vehicle_count: 0,
-            congestion_factor: f.freeFlowSpeed ? Math.max(0, Math.min(1, 1 - (f.currentSpeed ?? 0) / f.freeFlowSpeed)) : 0,
-            data_source: "tomtom",
-          }),
-        });
-      } catch (e) {
+      // Persistir en backend (sin bloquear)
+      const persistUrl = `${base}/api/v1/traffic/data`;
+      fetch(persistUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          road_segment_id: null,
+          lat,
+          lon,
+          speed_kmh: f.currentSpeed ?? 0,
+          traffic_level: (() => {
+            const lv = data?.congestionLevel as any;
+            if (lv === "free") return 1;
+            if (lv === "moderate") return 2;
+            if (lv === "heavy") return 3;
+            if (lv === "severe") return 4;
+            return 2;
+          })(),
+          vehicle_count: 0,
+          congestion_factor: f.freeFlowSpeed ? Math.max(0, Math.min(1, 1 - (f.currentSpeed ?? 0) / f.freeFlowSpeed)) : 0,
+          data_source: "tomtom",
+        }),
+      }).catch(() => {
         // No bloquear UI si falla persistencia
-      }
+      });
     } catch (e: any) {
-      setError(e?.message || "Error de red");
+      // Ignorar errores de abortController
+      if (e.name !== 'AbortError') {
+        setError(e?.message || "Error de red");
+      }
     } finally {
       setLoading(false);
     }
@@ -102,16 +114,27 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
     );
   }, [fetchFlow]);
 
+  // Obtener ubicación inicial una sola vez
   useEffect(() => {
-    getLocation();
+    if (!hasInitialized) {
+      getLocation();
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, getLocation]);
+
+  // Configurar intervalo de actualización
+  useEffect(() => {
+    if (!coords) return;
+    
+    // Actualizar cada 60 segundos si tenemos coordenadas
     intervalRef.current = window.setInterval(() => {
-      if (coords) fetchFlow(coords.lat, coords.lon);
-      else getLocation();
+      fetchFlow(coords.lat, coords.lon);
     }, 60000);
+
     return () => {
       if (intervalRef.current) window.clearInterval(intervalRef.current);
     };
-  }, [coords, fetchFlow, getLocation]);
+  }, [coords, fetchFlow]);
 
   const info = (() => {
     switch (level) {
@@ -132,6 +155,18 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
     if (!flow?.currentSpeed || !flow?.freeFlowSpeed || flow.freeFlowSpeed <= 0) return 0;
     return Math.round((flow.currentSpeed / flow.freeFlowSpeed) * 100);
   }, [flow]);
+
+  // Cleanup: cancelar requests pendientes al desmontar
+  useEffect(() => {
+    return () => {
+      if (fetchAbortRef.current) {
+        fetchAbortRef.current.abort();
+      }
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={`rounded-xl shadow-lg p-5 bg-white dark:bg-gray-800 border-2 transition-all ${
