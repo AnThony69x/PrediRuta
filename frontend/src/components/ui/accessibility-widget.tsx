@@ -17,6 +17,74 @@ const helpButtonStyles = `
   .pulse {
     animation: pulse 2s infinite;
   }
+
+  /* Estilos de accesibilidad - evitar oscurecimiento extremo */
+  :root.invert-colors {
+    filter: invert(1);
+  }
+
+  :root.monochrome {
+    filter: grayscale(1);
+  }
+
+  :root.low-saturation {
+    filter: saturate(0.5);
+  }
+
+  :root.high-saturation {
+    filter: saturate(2);
+  }
+
+  :root.high-contrast {
+    filter: contrast(1.5);
+  }
+
+  :root.dark-contrast {
+    background-color: #000;
+    color: #fff;
+  }
+
+  :root.light-contrast {
+    background-color: #fff;
+    color: #000;
+  }
+
+  /* Evitar que readingMask y readingGuide causen problemas extremos */
+  :root.reading-mask::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--mouse-y, 0);
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  :root.reading-mask::after {
+    content: '';
+    position: fixed;
+    top: var(--mouse-y, 0);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  :root.reading-guide::before {
+    content: '';
+    position: fixed;
+    top: var(--mouse-y, 0);
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 1001;
+  }
 `;
 
 interface AccessibilitySettings {
@@ -82,7 +150,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       lineHeight: 'large',
       highContrast: true,
       highlightLinks: true,
-      accessibilityDarkMode: true,
+      lightContrast: true,
     }
   },
   {
@@ -92,17 +160,17 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       stopAnimations: true,
       lowSaturation: true,
       hideImages: true,
-      accessibilityDarkMode: true,
+      lightContrast: true,
     }
   },
   {
     name: 'Deficiencia de visión de colores',
     icon: '🔴',
     settings: {
-      changeColors: true,
       highlightLinks: true,
       highlightButtons: true,
       highContrast: true,
+      highSaturation: true,
     }
   },
   {
@@ -112,7 +180,7 @@ const ACCESSIBILITY_PROFILES: AccessibilityProfile[] = [
       readingMask: true,
       highlightHeadings: true,
       stopAnimations: true,
-      accessibilityDarkMode: true,
+      lightContrast: true,
     }
   },
   {
@@ -425,17 +493,12 @@ export function AccessibilityWidget() {
     );
 
     if (isActive) {
-      // Si el perfil está activo, desactivar todas sus configuraciones
-      const resetProfile: Partial<AccessibilitySettings> = {};
-      Object.keys(profile.settings).forEach(key => {
-        const settingKey = key as keyof AccessibilitySettings;
-        const defaultValue = DEFAULT_SETTINGS[settingKey];
-        resetProfile[settingKey] = defaultValue as any;
-      });
-      setSettings(prev => ({ ...prev, ...resetProfile }));
+      // Si el perfil está activo, resetear a valores por defecto
+      setSettings(DEFAULT_SETTINGS);
     } else {
-      // Si no está activo, aplicar el perfil
-      setSettings(prev => ({ ...prev, ...profile.settings }));
+      // Si no está activo, resetear primero y luego aplicar el perfil
+      const newSettings = { ...DEFAULT_SETTINGS, ...profile.settings };
+      setSettings(newSettings);
     }
   };
 
