@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './button';
 
 // Estilos CSS para el botón de ayuda
@@ -54,6 +54,10 @@ interface AccessibilitySettings {
   voiceControl: boolean;
   blockAutoScroll: boolean;
   visibleFocus: boolean;
+  
+  // Audio adjustments
+  talkback: boolean;
+  talkbackSpeed: number;
   
   // Text adjustments
   textSize: 'small' | 'medium' | 'large';
@@ -161,6 +165,8 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   voiceControl: false,
   blockAutoScroll: false,
   visibleFocus: false,
+  talkback: false,
+  talkbackSpeed: 1,
   textSize: 'medium',
   lineHeight: 'medium',
   textSpacing: 'medium',
@@ -172,6 +178,9 @@ export function AccessibilityWidget() {
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_SETTINGS);
   const [activeSection, setActiveSection] = useState<'profiles' | 'content' | 'colors' | 'orientation'>('profiles');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set()); // Todos los acordeones cerrados por defecto
+  const synth = useRef<SpeechSynthesis | null>(null);
+  const currentUtterance = useRef<SpeechSynthesisUtterance | null>(null);
+  const lastSpokenElement = useRef<Element | null>(null);
 
   // Load settings from localStorage
   useEffect(() => {
@@ -210,6 +219,86 @@ export function AccessibilityWidget() {
       return () => document.removeEventListener('mousemove', handleMouseMove);
     }
   }, [settings.readingGuide, settings.readingMask]);
+
+  // Talkback: leer contenido donde está el mouse
+  useEffect(() => {
+    if (!settings.talkback) {
+      if (synth.current?.speaking) {
+        synth.current.cancel();
+      }
+      lastSpokenElement.current = null;
+      return;
+    }
+
+    synth.current = window.speechSynthesis;
+
+    const getTextContent = (element: Element): string => {
+      // Obtener el texto del elemento y sus elementos filho inmediatos
+      let text = '';
+      
+      if (element.getAttribute('aria-label')) {
+        text = element.getAttribute('aria-label') || '';
+      } else if (element.getAttribute('title')) {
+        text = element.getAttribute('title') || '';
+      } else if (element.getAttribute('placeholder')) {
+        text = element.getAttribute('placeholder') || '';
+      } else {
+        text = (element.textContent || '').trim();
+        // Limitar a los primeros 200 caracteres
+        if (text.length > 200) {
+          text = text.substring(0, 200) + '...';
+        }
+      }
+      
+      return text;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const target = e.target as Element;
+      
+      if (!target || target === lastSpokenElement.current) {
+        return;
+      }
+
+      // No leer elementos que no sean interactivos o textuales
+      const isInteractive = ['button', 'a', 'input', 'select', 'textarea', 'label', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div'].includes(target.tagName.toLowerCase());
+      
+      if (!isInteractive || (target.textContent || '').trim() === '') {
+        return;
+      }
+
+      lastSpokenElement.current = target;
+      
+      const text = getTextContent(target);
+      
+      if (text) {
+        // Cancelar el habla anterior
+        if (synth.current?.speaking) {
+          synth.current.cancel();
+        }
+
+        // Crear nueva utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = settings.talkbackSpeed;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        utterance.lang = 'es-ES';
+
+        currentUtterance.current = utterance;
+        
+        // Hablar el texto
+        if (synth.current) {
+          synth.current.speak(utterance);
+        }
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [settings.talkback, settings.talkbackSpeed]);
 
   // Block autoplay when blockAutoScroll is enabled
   useEffect(() => {
@@ -748,6 +837,73 @@ export function AccessibilityWidget() {
                           </div>
                         </button>
                       ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Encabezado: Accesibilidad Auditiva */}
+              <div className="px-2 py-2 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-lg border-l-4 border-purple-500 mt-4">
+                <h3 className="text-sm font-bold text-purple-700 dark:text-purple-300">🔊 ACCESIBILIDAD AUDITIVA</h3>
+              </div>
+
+              {/* Sección: Audio */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <button
+                  className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
+                  onClick={() => toggleSection('audio')}
+                >
+                  <span className="text-gray-900 dark:text-gray-100">🔊 Lectura de Texto</span>
+                  <span className={`transform transition-transform duration-200 ${expandedSections.has('audio') ? 'rotate-180' : ''}`}>
+                    ▼
+                  </span>
+                </button>
+                {expandedSections.has('audio') && (
+                  <div className="p-4 bg-white dark:bg-gray-900">
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Opciones de Audio</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                      <button
+                        className={`accessibility-option p-3 border rounded-lg text-left transition-colors ${
+                          settings.talkback 
+                            ? 'bg-purple-100 border-purple-300 dark:bg-purple-900 dark:border-purple-700 active' 
+                            : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                        }`}
+                        onClick={() => toggleSetting('talkback')}
+                      >
+                        <div className="flex items-start gap-2">
+                          <span className="text-lg mt-0.5">🔊</span>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-xs text-gray-900 dark:text-gray-100">TalkBack (Lectura por Mouse)</span>
+                              {settings.talkback && (
+                                <span className="text-purple-500 dark:text-purple-400">✓</span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400">Lee el contenido donde pase el mouse</span>
+                          </div>
+                        </div>
+                      </button>
+
+                      {settings.talkback && (
+                        <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                          <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Velocidad de lectura</label>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="range"
+                              min="0.5"
+                              max="2"
+                              step="0.1"
+                              value={settings.talkbackSpeed}
+                              onChange={(e) => updateSetting('talkbackSpeed', parseFloat(e.target.value))}
+                              className="flex-1 h-2 bg-gray-300 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            />
+                            <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-8">
+                              {settings.talkbackSpeed.toFixed(1)}x
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-2">Ajusta la velocidad de la voz síntesis</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
