@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -31,6 +31,10 @@ export const LoginForm = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
   const [remainingTime, setRemainingTime] = useState<number>(0);
+  
+  // Refs para evitar múltiples notificaciones
+  const hasShownLockNotification = useRef(false);
+  const hasShownUnlockNotification = useRef(false);
 
   // Verificar si hay un mensaje de registro exitoso y estado de bloqueo
   useEffect(() => {
@@ -58,7 +62,13 @@ export const LoginForm = () => {
         setIsLocked(true);
         setLockoutEndTime(lockoutEnd);
         setRemainingTime(Math.ceil((lockoutEnd - now) / 1000));
-        toast.security("🔒 Cuenta bloqueada", "Tu cuenta está temporalmente bloqueada por seguridad. Por favor espera.");
+        
+        // Mostrar notificación solo una vez
+        if (!hasShownLockNotification.current) {
+          hasShownLockNotification.current = true;
+          const minutes = Math.ceil((lockoutEnd - now) / 60000);
+          toast.security("🔒 Cuenta bloqueada", `Tu cuenta está bloqueada por seguridad. Espera ${minutes} minuto(s).`);
+        }
       } else {
         // El bloqueo ha expirado, limpiar
         localStorage.removeItem('loginLockoutEnd');
@@ -84,7 +94,15 @@ export const LoginForm = () => {
         localStorage.removeItem('loginLockoutEnd');
         localStorage.removeItem('loginFailedAttempts');
         setErr(null);
-        toast.info("✅ Cuenta desbloqueada", "Ya puedes intentar iniciar sesión nuevamente.");
+        
+        // Mostrar notificación de desbloqueo solo una vez
+        if (!hasShownUnlockNotification.current) {
+          hasShownUnlockNotification.current = true;
+          toast.info("✅ Cuenta desbloqueada", "Ya puedes intentar iniciar sesión nuevamente.");
+        }
+        
+        // Resetear flags para el próximo bloqueo
+        hasShownLockNotification.current = false;
       } else {
         setRemainingTime(timeLeft);
       }

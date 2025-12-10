@@ -5,7 +5,7 @@ export type Locale = 'es' | 'en';
 export const translations = {
   es: {
     // Header
-    'header.logout': 'Salir',
+  'header.logout': 'Cerrar sesión',
     'header.login': 'Iniciar sesión',
     'header.register': 'Registrarse',
     'header.search': 'Buscar...',

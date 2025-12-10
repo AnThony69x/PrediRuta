@@ -5,20 +5,31 @@ import { useState, useEffect } from 'react';
 export type Theme = 'light' | 'dark';
 
 export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>('light');
+  // Inicializar desde el DOM para evitar flash
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      // Leer desde localStorage o DOM
+      const savedTheme = localStorage.getItem('theme') as Theme;
+      if (savedTheme) return savedTheme;
+      
+      // Si no hay tema guardado, verificar si el DOM ya tiene la clase 'dark'
+      if (document.documentElement.classList.contains('dark')) {
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
 
   useEffect(() => {
-    // Verificar si hay un tema guardado en localStorage
+    // Sincronizar con localStorage al montar (por si acaso)
     const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme) {
+    if (savedTheme && savedTheme !== theme) {
       setTheme(savedTheme);
       applyTheme(savedTheme);
-    } else {
-      // Verificar preferencia del sistema
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme = prefersDark ? 'dark' : 'light';
-      setTheme(systemTheme);
-      applyTheme(systemTheme);
+    } else if (!savedTheme) {
+      // Si no hay tema guardado, guardar el actual
+      localStorage.setItem('theme', theme);
+      applyTheme(theme);
     }
   }, []);
 

@@ -3,6 +3,7 @@ import "../styles/accessibility.css";
 import "leaflet/dist/leaflet.css";
 import { AccessibilityWidget } from "../components/ui/accessibility-widget";
 import { ToasterProvider } from "../components/ui/toaster";
+import { ThemeProvider } from "../components/ThemeProvider";
 
 export const metadata = {
   title: "PrediRuta",
@@ -33,6 +34,30 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap"
           rel="stylesheet"
         />
+
+        {/* Inline script: apply theme BEFORE hydration to avoid flash */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var theme = localStorage.getItem('theme');
+              var root = document.documentElement;
+              if (theme === 'dark') {
+                root.classList.add('dark');
+              } else if (theme === 'light') {
+                root.classList.remove('dark');
+              } else {
+                // Check system preference
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                  root.classList.add('dark');
+                  localStorage.setItem('theme', 'dark');
+                } else {
+                  root.classList.remove('dark');
+                  localStorage.setItem('theme', 'light');
+                }
+              }
+            } catch (e) { /* silent */ }
+          })();
+        ` }} />
 
         {/* Inline script: read saved accessibility settings from localStorage and apply classes
             BEFORE React hydrates so the font and other accessibility classes don't 'saltar' */}
@@ -94,6 +119,7 @@ export default function RootLayout({ children }) {
         </a>
 
         <ToasterProvider>
+          <ThemeProvider />
           {children}
           <AccessibilityWidget />
         </ToasterProvider>
