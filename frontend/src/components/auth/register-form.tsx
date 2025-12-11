@@ -12,12 +12,14 @@ import { PasswordMatch } from "@/components/ui/password-match";
 import { EmailValidation } from "@/components/ui/email-validation";
 import { NameValidation } from "@/components/ui/name-validation";
 import { useToast } from "@/components/ui/toaster";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export const RegisterForm = () => {
   const router = useRouter();
   const toast = useToast();
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [pass1, setPass1] = useState("");
@@ -36,19 +38,19 @@ export const RegisterForm = () => {
   // Función para validar contraseña
   const validatePassword = (password: string): { isValid: boolean; message?: string } => {
     if (password.length < 8) {
-      return { isValid: false, message: "La contraseña debe tener mínimo 8 caracteres" };
+      return { isValid: false, message: t('auth.passwordMinLength') };
     }
     if (!/(?=.*[a-z])/.test(password)) {
-      return { isValid: false, message: "La contraseña debe contener al menos una letra minúscula" };
+      return { isValid: false, message: t('auth.passwordLowercase') };
     }
     if (!/(?=.*[A-Z])/.test(password)) {
-      return { isValid: false, message: "La contraseña debe contener al menos una letra mayúscula" };
+      return { isValid: false, message: t('auth.passwordUppercase') };
     }
     if (!/(?=.*\d)/.test(password)) {
-      return { isValid: false, message: "La contraseña debe contener al menos un número" };
+      return { isValid: false, message: t('auth.passwordNumber') };
     }
     if (!/(?=.*[@$!%*?&])/.test(password)) {
-      return { isValid: false, message: "La contraseña debe contener al menos un carácter especial (@$!%*?&)" };
+      return { isValid: false, message: t('auth.passwordSpecialChar') };
     }
     return { isValid: true };
   };
@@ -60,42 +62,42 @@ export const RegisterForm = () => {
 
     // Validar nombre completo
     if (!fullName.trim()) {
-      setErr("El nombre completo es requerido");
-      toast.warning("Nombre requerido", "Por favor ingresa tu nombre completo.");
+      setErr(t('auth.fullNameRequired'));
+      toast.warning(t('auth.nameRequired'), t('auth.nameRequiredMessage'));
       return;
     }
     if (fullName.trim().length < 2) {
-      setErr("El nombre debe tener al menos 2 caracteres");
-      toast.warning("Nombre muy corto", "El nombre debe tener al menos 2 caracteres.");
+      setErr(t('auth.fullNameTooShort'));
+      toast.warning(t('auth.nameTooShort'), t('auth.nameTooShortMessage'));
       return;
     }
 
     // Validar email
     if (!validateEmail(email)) {
-      setErr("Por favor ingresa un correo electrónico válido");
-      toast.warning("Email inválido", "Por favor ingresa un correo electrónico válido.");
+      setErr(t('auth.invalidEmail'));
+      toast.warning(t('auth.emailInvalid'), t('auth.emailInvalidMessage'));
       return;
     }
 
     // Validar contraseña
     const passwordValidation = validatePassword(pass1);
     if (!passwordValidation.isValid) {
-      setErr(passwordValidation.message || "Contraseña inválida");
-      toast.warning("🔑 Contraseña débil", passwordValidation.message || "La contraseña no cumple con los requisitos de seguridad.");
+      setErr(passwordValidation.message || t('auth.invalidEmail'));
+      toast.warning(t('auth.passwordWeak'), passwordValidation.message || t('auth.passwordWeakMessage'));
       return;
     }
 
     // Verificar que las contraseñas coincidan
     if (pass1 !== pass2) {
-      setErr("Las contraseñas no coinciden");
-      toast.error("Contraseñas no coinciden", "Las dos contraseñas deben ser idénticas.");
+      setErr(t('auth.passwordsNoMatch'));
+      toast.error(t('auth.passwordsNoMatch'), t('auth.passwordsNoMatchMessage'));
       return;
     }
 
     // Validar aceptación de términos
     if (!acceptedTerms) {
-      setErr("Debes aceptar los términos y condiciones para registrarte");
-      toast.warning("Términos no aceptados", "Debes aceptar los términos y condiciones para poder registrarte.");
+      setErr(t('auth.termsNotAccepted'));
+      toast.warning(t('auth.termsNotAcceptedTitle'), t('auth.termsNotAcceptedMessage'));
       return;
     }
 
@@ -114,18 +116,18 @@ export const RegisterForm = () => {
     setLoading(false);
     if (error) {
       setErr(error.message);
-      toast.error("Error al registrarse", error.message);
+      toast.error(t('auth.registrationError'), error.message);
       return;
     }
     
     // Mostrar mensaje de éxito
-    setMsg("Registro exitoso. Revisa tu correo y confirma para continuar.");
-    toast.success("📧 Verificación de email pendiente", "Registro exitoso. Revisa tu correo y confirma tu cuenta para continuar.");
+    setMsg(t('auth.checkEmailAndConfirm'));
+    toast.success(t('auth.registrationSuccessTitle'), t('auth.registrationSuccessFullMessage'));
     
     // Esperar 3 segundos y luego redireccionar al login con el mensaje
     setTimeout(() => {
       // Guardar el mensaje en sessionStorage para mostrarlo en el login
-      sessionStorage.setItem('registrationSuccess', 'Registro exitoso. Revisa tu correo y confirma para continuar.');
+      sessionStorage.setItem('registrationSuccess', t('auth.checkEmailAndConfirm'));
       router.push('/login');
     }, 3000); // Espera 3 segundos antes de redireccionar
   };
@@ -147,49 +149,49 @@ export const RegisterForm = () => {
       {msg && <Alert type="success">{msg}</Alert>}
       <div className="space-y-3">
         <Input
-          label="Nombre completo"
+          label={t('auth.fullName')}
           type="text"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           required
           autoComplete="name"
-          placeholder="Ej: Juan Pérez"
+          placeholder={t('auth.fullNamePlaceholder')}
         />
         <NameValidation name={fullName} />
       </div>
       <div className="space-y-3">
         <Input
-          label="Correo electrónico"
+          label={t('auth.email')}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          placeholder="tu-email@ejemplo.com"
+          placeholder={t('auth.emailPlaceholder')}
         />
         <EmailValidation email={email} />
       </div>
       <div className="space-y-3">
         <PasswordInput
-          label="Contraseña"
+          label={t('auth.password')}
           value={pass1}
           onChange={(e) => setPass1(e.target.value)}
           required
           minLength={8}
           autoComplete="new-password"
-          placeholder="Crea una contraseña segura"
+          placeholder={t('auth.createPasswordPlaceholder')}
         />
         <PasswordStrength password={pass1} />
       </div>
       <div className="space-y-3">
         <PasswordInput
-          label="Confirmar contraseña"
+          label={t('auth.confirmPassword')}
           value={pass2}
           onChange={(e) => setPass2(e.target.value)}
           required
           minLength={8}
           autoComplete="new-password"
-          placeholder="Confirma tu contraseña"
+          placeholder={t('auth.confirmPasswordPlaceholder')}
         />
         <PasswordMatch password={pass1} confirmPassword={pass2} />
       </div>
@@ -205,21 +207,21 @@ export const RegisterForm = () => {
           required
         />
         <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
-          Acepto los{" "}
+          {t('auth.acceptTerms')}{" "}
           <Link
             href="/terminos-y-condiciones"
             target="_blank"
             className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
           >
-            Términos y Condiciones
+            {t('auth.termsAndConditions')}
           </Link>
-          {" "}y la{" "}
+          {" "}{t('auth.and')}{" "}
           <Link
             href="/politica-privacidad"
             target="_blank"
             className="text-blue-600 hover:underline dark:text-blue-400 font-medium"
           >
-            Política de Privacidad
+            {t('auth.privacyPolicy')}
           </Link>
         </label>
       </div>
@@ -230,17 +232,17 @@ export const RegisterForm = () => {
         type="submit"
         disabled={!isFormValid()}
       >
-        Crear cuenta
+        {t('auth.createAccountButton')}
       </Button>
-      <Separator label="o" />
+      <Separator label={t('auth.orContinueWith')} />
       <OAuthButton provider="google" full />
       <p className="text-center text-sm text-gray-600 dark:text-gray-300">
-        ¿Ya tienes cuenta?{" "}
+        {t('auth.alreadyHaveAccount')}{" "}
         <Link
           className="text-blue-600 hover:underline dark:text-blue-400"
           href="/login"
         >
-          Inicia sesión
+          {t('auth.signInLink')}
         </Link>
       </p>
     </form>

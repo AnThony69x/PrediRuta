@@ -2,6 +2,7 @@
 import { Button } from "./button";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface OAuthButtonProps {
   provider?: "google";
@@ -39,6 +40,7 @@ export const OAuthButton: React.FC<OAuthButtonProps> = ({
   disabled = false
 }) => {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const startOAuth = async () => {
     if (disabled) return;
@@ -56,7 +58,7 @@ export const OAuthButton: React.FC<OAuthButtonProps> = ({
     }
   };
 
-  const label = provider === "google" ? "Continuar con Google" : "Continuar";
+  const label = provider === "google" ? t('auth.signInWithGoogle') : t('auth.orContinueWith');
 
   return (
     <Button

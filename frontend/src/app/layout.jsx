@@ -4,6 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { AccessibilityWidget } from "../components/ui/accessibility-widget";
 import { ToasterProvider } from "../components/ui/toaster";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { LanguageProvider } from "../components/LanguageProvider";
 
 export const metadata = {
   title: "PrediRuta",
@@ -34,6 +35,16 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap"
           rel="stylesheet"
         />
+
+        {/* Inline script: apply language BEFORE hydration */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var locale = localStorage.getItem('locale') || 'es';
+              document.documentElement.lang = locale;
+            } catch (e) { /* silent */ }
+          })();
+        ` }} />
 
         {/* Inline script: apply theme BEFORE hydration to avoid flash */}
         <script dangerouslySetInnerHTML={{ __html: `
@@ -120,6 +131,7 @@ export default function RootLayout({ children }) {
 
         <ToasterProvider>
           <ThemeProvider />
+          <LanguageProvider />
           {children}
           <AccessibilityWidget />
         </ToasterProvider>

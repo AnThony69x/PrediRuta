@@ -1,0 +1,96 @@
+{
+  "hero": {
+    "title": "Optimiza tus rutas con IA",
+    "subtitle": "Sistema inteligente de predicción de tráfico y optimización de rutas que te ayuda a llegar más rápido a tu destino.",
+    "cta": {
+      "start": "Comenzar Gratis",
+      "login": "Iniciar Sesión"
+    }
+  },
+  "features": {
+    "prediction": {
+      "title": "Predicción Inteligente",
+      "desc": "Algoritmos avanzados que predicen el tráfico en tiempo real para optimizar tus rutas."
+    },
+    "routes": {
+      "title": "Rutas Optimizadas",
+      "desc": "Encuentra las mejores rutas considerando tráfico, distancia y tiempo de viaje."
+    },
+    "dashboard": {
+      "title": "Dashboard Completo",
+      "desc": "Visualiza estadísticas detalladas de tus viajes y mejora tu planificación."
+    }
+  },
+  "section1": {
+    "title": "Predicción Inteligente de Tráfico",
+    "desc": "Nuestros algoritmos de inteligencia artificial analizan patrones de tráfico históricos, eventos en tiempo real y condiciones climáticas para predecir el flujo vehicular.",
+    "feature1": {
+      "title": "Análisis en Tiempo Real",
+      "desc": "Procesamiento continuo de datos de tráfico actuales"
+    },
+    "feature2": {
+      "title": "Aprendizaje Automático",
+      "desc": "El sistema mejora sus predicciones con cada viaje"
+    },
+    "feature3": {
+      "title": "Precisión del 95%",
+      "desc": "Predicciones altamente confiables para tu planificación"
+    },
+    "badge": "IA en Acción"
+  },
+  "section2": {
+    "title": "Rutas Optimizadas para Cada Situación",
+    "desc": "Calculamos múltiples rutas alternativas considerando todos los factores que afectan tu viaje, desde el tráfico hasta las preferencias personales.",
+    "feature1": {
+      "title": "Múltiples Opciones",
+      "desc": "Ruta más rápida, más corta o más económica"
+    },
+    "feature2": {
+      "title": "Evita Congestiones",
+      "desc": "Actualización automática ante cambios de tráfico"
+    },
+    "feature3": {
+      "title": "Personalización",
+      "desc": "Adapta las rutas según tus preferencias de conducción"
+    },
+    "badge": "Rutas Inteligentes"
+  },
+  "section3": {
+    "title": "Dashboard de Análisis Avanzado",
+    "desc": "Obtén insights detallados sobre tus patrones de viaje, ahorra tiempo y combustible con estadísticas personalizadas y recomendaciones inteligentes.",
+    "feature1": {
+      "title": "Estadísticas Detalladas",
+      "desc": "Tiempo ahorrado, combustible y emisiones reducidas"
+    },
+    "feature2": {
+      "title": "Historial de Viajes",
+      "desc": "Registro completo con métricas de rendimiento"
+    },
+    "feature3": {
+      "title": "Reportes Personalizados",
+      "desc": "Exporta datos para análisis empresarial o personal"
+    },
+    "badge": "Analytics Avanzados"
+  },
+  "benefits": {
+    "title": "Más que una App de Rutas",
+    "speed": {
+      "title": "Velocidad",
+      "desc": "Reduce hasta un 30% el tiempo de viaje con nuestras predicciones inteligentes"
+    },
+    "savings": {
+      "title": "Ahorro",
+      "desc": "Optimiza el consumo de combustible y reduce costos operativos"
+    },
+    "sustainability": {
+      "title": "Sostenibilidad",
+      "desc": "Contribuye al medio ambiente reduciendo emisiones de CO₂"
+    }
+  },
+  "cta": {
+    "title": "¿Listo para Optimizar tus Rutas?",
+    "subtitle": "Únete a miles de usuarios que ya están ahorrando tiempo y dinero con PrediRuta. Comienza tu prueba gratuita hoy mismo.",
+    "start": "Comenzar Ahora - Gratis",
+    "demo": "Ver Demo"
+  }
+}

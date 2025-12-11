@@ -1,12 +1,17 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegisterForm } from "@/components/auth/register-form";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
+  
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-sm dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-center dark:text-white">Crear cuenta</CardTitle>
+          <CardTitle className="text-center dark:text-white">{t('auth.createAccount')}</CardTitle>
         </CardHeader>
         <CardContent>
           <RegisterForm />

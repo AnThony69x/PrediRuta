@@ -4,7 +4,15 @@ import { useState, useEffect } from 'react';
 import { type Locale, getCurrentLocale, getTranslation, setCurrentLocale } from '@/lib/i18n';
 
 export function useTranslation() {
-  const [locale, setLocale] = useState<Locale>(getCurrentLocale());
+  // Usar 'es' como default durante SSR para evitar hydration mismatch
+  const [locale, setLocale] = useState<Locale>('es');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Actualizar al idioma real solo en el cliente
+    setIsClient(true);
+    setLocale(getCurrentLocale());
+  }, []);
 
   useEffect(() => {
     // Escuchar cambios de idioma

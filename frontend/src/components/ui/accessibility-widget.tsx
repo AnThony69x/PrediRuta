@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './button';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // Estilos CSS para el botón de ayuda
 const helpButtonStyles = `
@@ -242,6 +243,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
 };
 
 export function AccessibilityWidget() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_SETTINGS);
   const [activeSection, setActiveSection] = useState<'profiles' | 'content' | 'colors' | 'orientation'>('profiles');
@@ -537,7 +539,7 @@ export function AccessibilityWidget() {
       <button
         className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center pulse"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Abrir ayuda y configuración de accesibilidad"
+        aria-label={t('accessibility.ariaLabel')}
       >
         {/* Icono de silla de ruedas */}
         <svg
@@ -630,14 +632,14 @@ export function AccessibilityWidget() {
           <div className="p-6">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Accesibilidad</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{t('accessibility.title')}</h2>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={resetSettings}
                   className="flex items-center gap-1 px-3 py-1 text-sm"
                 >
-                  🔄 Reset
+                  🔄 {t('accessibility.reset')}
                 </Button>
                 <Button
                   variant="outline"
@@ -653,7 +655,7 @@ export function AccessibilityWidget() {
             <div className="flex flex-col gap-2 mb-6">
               {/* Encabezado: Accesibilidad Visual */}
               <div className="px-2 py-2 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg border-l-4 border-blue-500">
-                <h3 className="text-sm font-bold text-blue-700 dark:text-blue-300">👁️ ACCESIBILIDAD VISUAL</h3>
+                <h3 className="text-sm font-bold text-blue-700 dark:text-blue-300">{t('accessibility.visualTitle')}</h3>
               </div>
 
               {/* Sección: Perfiles */}
@@ -662,14 +664,14 @@ export function AccessibilityWidget() {
                   className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                   onClick={() => toggleSection('profiles')}
                 >
-                  <span className="text-gray-900 dark:text-gray-100">👤 Perfiles</span>
+                  <span className="text-gray-900 dark:text-gray-100">👤 {t('accessibility.profiles')}</span>
                   <span className={`transform transition-transform duration-200 ${expandedSections.has('profiles') ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </button>
                 {expandedSections.has('profiles') && (
                   <div className="p-4 bg-white dark:bg-gray-900">
-                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Perfiles de Accesibilidad</h3>
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">{t('accessibility.profilesTitle')}</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {ACCESSIBILITY_PROFILES.map((profile) => {
                         const isActive = isProfileActive(profile);
@@ -710,24 +712,24 @@ export function AccessibilityWidget() {
                   className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                   onClick={() => toggleSection('content')}
                 >
-                  <span className="text-gray-900 dark:text-gray-100">📝 Contenido</span>
+                  <span className="text-gray-900 dark:text-gray-100">📝 {t('accessibility.content')}</span>
                   <span className={`transform transition-transform duration-200 ${expandedSections.has('content') ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </button>
                 {expandedSections.has('content') && (
                   <div className="p-4 bg-white dark:bg-gray-900">
-                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Contenido</h3>
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">{t('accessibility.contentTitle')}</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {[
-                        { key: 'readableFont' as keyof AccessibilitySettings, label: 'Fuente legible', icon: 'A' },
-                        { key: 'dyslexiaFont' as keyof AccessibilitySettings, label: 'Fuente dislexia', icon: 'Aa' },
-                        { key: 'highlightHeadings' as keyof AccessibilitySettings, label: 'Resaltar títulos', icon: 'H' },
-                        { key: 'highlightLinks' as keyof AccessibilitySettings, label: 'Resaltar enlaces', icon: '🔗' },
-                        { key: 'highlightButtons' as keyof AccessibilitySettings, label: 'Resaltar botones', icon: '⭕' },
-                        { key: 'hideImages' as keyof AccessibilitySettings, label: 'Ocultar imágenes', icon: '🖼️' },
-                        { key: 'tooltips' as keyof AccessibilitySettings, label: 'Tooltips', icon: '💭' },
-                        { key: 'stopAnimations' as keyof AccessibilitySettings, label: 'Sin animaciones', icon: '⏸️' },
+                        { key: 'readableFont' as keyof AccessibilitySettings, label: t('accessibility.readableFont'), icon: 'A' },
+                        { key: 'dyslexiaFont' as keyof AccessibilitySettings, label: t('accessibility.dyslexiaFont'), icon: 'Aa' },
+                        { key: 'highlightHeadings' as keyof AccessibilitySettings, label: t('accessibility.highlightHeadings'), icon: 'H' },
+                        { key: 'highlightLinks' as keyof AccessibilitySettings, label: t('accessibility.highlightLinks'), icon: '🔗' },
+                        { key: 'highlightButtons' as keyof AccessibilitySettings, label: t('accessibility.highlightButtons'), icon: '⭕' },
+                        { key: 'hideImages' as keyof AccessibilitySettings, label: t('accessibility.hideImages'), icon: '🖼️' },
+                        { key: 'tooltips' as keyof AccessibilitySettings, label: t('accessibility.tooltips'), icon: '💭' },
+                        { key: 'stopAnimations' as keyof AccessibilitySettings, label: t('accessibility.stopAnimations'), icon: '⏸️' },
                       ].map((option) => (
                         <button
                           key={option.key}
@@ -752,7 +754,7 @@ export function AccessibilityWidget() {
                     {/* Text Size Controls */}
                     <div className="mt-4 space-y-3">
                       <div>
-                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Tamaño de texto</label>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">{t('accessibility.textSize')}</label>
                         <div className="flex gap-2">
                           {['small', 'medium', 'large'].map((size) => (
                             <button
@@ -771,7 +773,7 @@ export function AccessibilityWidget() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Altura de línea</label>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">{t('accessibility.lineHeight')}</label>
                         <div className="flex gap-2">
                           {['small', 'medium', 'large'].map((height) => (
                             <button
@@ -790,7 +792,7 @@ export function AccessibilityWidget() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">Espaciado</label>
+                        <label className="block text-xs font-medium mb-2 text-gray-900 dark:text-gray-100">{t('accessibility.textSpacing')}</label>
                         <div className="flex gap-2">
                           {['small', 'medium', 'large'].map((spacing) => (
                             <button
@@ -818,25 +820,25 @@ export function AccessibilityWidget() {
                   className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                   onClick={() => toggleSection('colors')}
                 >
-                  <span className="text-gray-900 dark:text-gray-100">🎨 Colores</span>
+                  <span className="text-gray-900 dark:text-gray-100">🎨 {t('accessibility.colors')}</span>
                   <span className={`transform transition-transform duration-200 ${expandedSections.has('colors') ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </button>
                 {expandedSections.has('colors') && (
                   <div className="p-4 bg-white dark:bg-gray-900">
-                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Color</h3>
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">{t('accessibility.colorsTitle')}</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {[
-                        { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: 'Modo oscuro global', icon: '🌚' },
-                        { key: 'darkContrast' as keyof AccessibilitySettings, label: 'Contraste oscuro', icon: '🌙' },
-                        { key: 'lightContrast' as keyof AccessibilitySettings, label: 'Contraste claro', icon: '☀️' },
-                        { key: 'invertColors' as keyof AccessibilitySettings, label: 'Invertir colores', icon: '⚫' },
-                        { key: 'changeColors' as keyof AccessibilitySettings, label: 'Cambiar colores', icon: '🎨' },
-                        { key: 'highContrast' as keyof AccessibilitySettings, label: 'Alto contraste', icon: '⚫' },
-                        { key: 'highSaturation' as keyof AccessibilitySettings, label: 'Alta saturación', icon: '♦️' },
-                        { key: 'lowSaturation' as keyof AccessibilitySettings, label: 'Baja saturación', icon: '💧' },
-                        { key: 'monochrome' as keyof AccessibilitySettings, label: 'Monocromo', icon: '♠️' },
+                        { key: 'accessibilityDarkMode' as keyof AccessibilitySettings, label: t('accessibility.darkModeGlobal'), icon: '🌚' },
+                        { key: 'darkContrast' as keyof AccessibilitySettings, label: t('accessibility.darkContrast'), icon: '🌙' },
+                        { key: 'lightContrast' as keyof AccessibilitySettings, label: t('accessibility.lightContrast'), icon: '☀️' },
+                        { key: 'invertColors' as keyof AccessibilitySettings, label: t('accessibility.invertColors'), icon: '⚫' },
+                        { key: 'changeColors' as keyof AccessibilitySettings, label: t('accessibility.changeColors'), icon: '🎨' },
+                        { key: 'highContrast' as keyof AccessibilitySettings, label: t('accessibility.highContrast'), icon: '⚫' },
+                        { key: 'highSaturation' as keyof AccessibilitySettings, label: t('accessibility.highSaturation'), icon: '♦️' },
+                        { key: 'lowSaturation' as keyof AccessibilitySettings, label: t('accessibility.lowSaturation'), icon: '💧' },
+                        { key: 'monochrome' as keyof AccessibilitySettings, label: t('accessibility.monochrome'), icon: '♠️' },
                       ].map((option) => (
                         <button
                           key={option.key}
@@ -867,20 +869,20 @@ export function AccessibilityWidget() {
                   className="w-full text-left px-4 py-3 text-sm font-medium bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between"
                   onClick={() => toggleSection('orientation')}
                 >
-                  <span className="text-gray-900 dark:text-gray-100">🧭 Orientación</span>
+                  <span className="text-gray-900 dark:text-gray-100">🧭 {t('accessibility.orientation')}</span>
                   <span className={`transform transition-transform duration-200 ${expandedSections.has('orientation') ? 'rotate-180' : ''}`}>
                     ▼
                   </span>
                 </button>
                 {expandedSections.has('orientation') && (
                   <div className="p-4 bg-white dark:bg-gray-900">
-                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Orientación</h3>
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">{t('accessibility.orientationTitle')}</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {[
-                        { key: 'readingGuide' as keyof AccessibilitySettings, label: 'Guía de lectura', icon: '—' },
-                        { key: 'readingMask' as keyof AccessibilitySettings, label: 'Máscara de lectura', icon: '🔳' },
-                        { key: 'bigBlackCursor' as keyof AccessibilitySettings, label: 'Cursor grande negro', icon: '↖️' },
-                        { key: 'bigWhiteCursor' as keyof AccessibilitySettings, label: 'Cursor grande blanco', icon: '↗️' },
+                        { key: 'readingGuide' as keyof AccessibilitySettings, label: t('accessibility.readingGuide'), icon: '—' },
+                        { key: 'readingMask' as keyof AccessibilitySettings, label: t('accessibility.readingMask'), icon: '🔳' },
+                        { key: 'bigBlackCursor' as keyof AccessibilitySettings, label: t('accessibility.bigBlackCursor'), icon: '↖️' },
+                        { key: 'bigWhiteCursor' as keyof AccessibilitySettings, label: t('accessibility.bigWhiteCursor'), icon: '↗️' },
                       ].map((option) => (
                         <button
                           key={option.key}
@@ -907,7 +909,7 @@ export function AccessibilityWidget() {
 
               {/* Encabezado: Accesibilidad Auditiva */}
               <div className="px-2 py-2 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-lg border-l-4 border-purple-500 mt-4">
-                <h3 className="text-sm font-bold text-purple-700 dark:text-purple-300">🔊 ACCESIBILIDAD AUDITIVA</h3>
+                <h3 className="text-sm font-bold text-purple-700 dark:text-purple-300">{t('accessibility.auditiveTitle')}</h3>
               </div>
 
               {/* Sección: Audio */}
@@ -974,7 +976,7 @@ export function AccessibilityWidget() {
 
               {/* Encabezado: Accesibilidad Motriz */}
               <div className="px-2 py-2 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-lg border-l-4 border-green-500 mt-4">
-                <h3 className="text-sm font-bold text-green-700 dark:text-green-300">🖐️ ACCESIBILIDAD MOTRIZ</h3>
+                <h3 className="text-sm font-bold text-green-700 dark:text-green-300">{t('accessibility.motrizTitle')}</h3>
               </div>
 
               {/* Sección: Motriz */}
@@ -990,7 +992,7 @@ export function AccessibilityWidget() {
                 </button>
                 {expandedSections.has('motor') && (
                   <div className="p-4 bg-white dark:bg-gray-900">
-                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">Ajustes de Accesibilidad Motriz</h3>
+                    <h3 className="text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">{t('accessibility.motorTitle')}</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {[
                         { key: 'keyboardNavigation' as keyof AccessibilitySettings, label: 'Navegación por teclado', icon: '⌨️', description: 'Tab, Enter, Esc' },
