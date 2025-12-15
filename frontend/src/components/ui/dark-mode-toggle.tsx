@@ -9,8 +9,8 @@ export const DarkModeToggle = () => {
 
   // Detectar el estado actual del modo oscuro
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    setIsDark(savedDarkMode === 'true');
+    const savedTheme = localStorage.getItem('theme');
+    setIsDark(savedTheme === 'dark');
   }, []);
 
   const toggleDarkMode = () => {

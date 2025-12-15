@@ -24,26 +24,15 @@ export const useAuth = () => {
     const root = document.documentElement;
     if (isDark) {
       root.classList.add("dark");
-      localStorage.setItem('darkMode', 'true');
+      localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove("dark");
-      localStorage.setItem('darkMode', 'false');
+      localStorage.setItem('theme', 'light');
     }
   };
 
-  // Inicializar modo oscuro desde localStorage al cargar
-  useEffect(() => {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'true') {
-      applyDarkMode(true);
-    } else if (savedDarkMode === 'false') {
-      applyDarkMode(false);
-    } else {
-      // Si no hay preferencia guardada, usar preferencia del sistema
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyDarkMode(prefersDark);
-    }
-  }, []);
+  // Nota: El tema oscuro ahora es manejado por ThemeProvider y useTheme
+  // applyDarkMode solo se usa para sincronizar con preferencias de usuario autenticado
 
   useEffect(() => {
     // Obtener sesión inicial
@@ -201,7 +190,23 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      // Las cookies se limpiarán automáticamente en el listener
+      // Limpieza local inmediata de cookies para asegurar estado consistente
+      document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'supabase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'sb-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+      // Actualizar estado local inmediatamente
+      setAuthState({ user: null, loading: false, isAuthenticated: false });
+
+      // Redirigir explícitamente al inicio para mejorar UX
+      try {
+        router.push('/');
+      } catch (pushError) {
+        // En entornos donde router.push pueda fallar silenciosamente, solo loguear
+        console.warn('Redirect after signOut failed:', pushError);
+      }
     } catch (error) {
       console.error('Error signing out:', error);
     }

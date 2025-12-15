@@ -2,8 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -28,7 +30,7 @@ export default function ForgotPasswordPage() {
       // Esto previene ataques de enumeración de usuarios
       return { exists: true, error: null };
     } catch (err) {
-      return { exists: false, error: "Error verificando el email" };
+      return { exists: false, error: t('auth.errorCheckingEmail') };
     }
   };
 
@@ -41,7 +43,7 @@ export default function ForgotPasswordPage() {
 
     // Validar formato del email
     if (!validateEmail(email)) {
-      setError("Por favor ingresa un email válido");
+      setError(t('auth.invalidEmail'));
       setLoading(false);
       setChecking(false);
       return;
@@ -55,7 +57,7 @@ export default function ForgotPasswordPage() {
         setError(checkError);
       } else {
         setEmailSent(true);
-        setMessage("Te hemos enviado un enlace de recuperación a tu email. Revisa tu bandeja de entrada y spam.");
+        setMessage(t('auth.emailSentMessage'));
       }
     } catch (err) {
       setError("Ocurrió un error inesperado. Por favor intenta de nuevo.");
@@ -76,7 +78,7 @@ export default function ForgotPasswordPage() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent mb-4">
-              Email Enviado
+              {t('auth.checkEmailMessage')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
               {message}
@@ -86,7 +88,7 @@ export default function ForgotPasswordPage() {
                 href="/login"
                 className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl inline-block text-center"
               >
-                Volver al Login
+                {t('auth.backToLogin')}
               </Link>
               <button
                 onClick={() => {
@@ -116,7 +118,7 @@ export default function ForgotPasswordPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-400 dark:to-cyan-400 bg-clip-text text-transparent mb-2">
-            ¿Olvidaste tu contraseña?
+            {t('auth.forgotPasswordTitle')}
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
             No te preocupes, te ayudamos a recuperarla
@@ -127,7 +129,7 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Correo electrónico
+              {t('auth.email')}
             </label>
             <input
               id="email"

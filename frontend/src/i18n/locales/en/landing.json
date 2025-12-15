@@ -1,0 +1,96 @@
+{
+  "hero": {
+    "title": "Optimize Your Routes with AI",
+    "subtitle": "Intelligent traffic prediction and route optimization system that helps you reach your destination faster.",
+    "cta": {
+      "start": "Start Free",
+      "login": "Sign In"
+    }
+  },
+  "features": {
+    "prediction": {
+      "title": "Intelligent Prediction",
+      "desc": "Advanced algorithms that predict traffic in real-time to optimize your routes."
+    },
+    "routes": {
+      "title": "Optimized Routes",
+      "desc": "Find the best routes considering traffic, distance, and travel time."
+    },
+    "dashboard": {
+      "title": "Complete Dashboard",
+      "desc": "View detailed statistics of your trips and improve your planning."
+    }
+  },
+  "section1": {
+    "title": "Intelligent Traffic Prediction",
+    "desc": "Our artificial intelligence algorithms analyze historical traffic patterns, real-time events, and weather conditions to predict traffic flow.",
+    "feature1": {
+      "title": "Real-Time Analysis",
+      "desc": "Continuous processing of current traffic data"
+    },
+    "feature2": {
+      "title": "Machine Learning",
+      "desc": "The system improves its predictions with each trip"
+    },
+    "feature3": {
+      "title": "95% Accuracy",
+      "desc": "Highly reliable predictions for your planning"
+    },
+    "badge": "AI in Action"
+  },
+  "section2": {
+    "title": "Optimized Routes for Every Situation",
+    "desc": "We calculate multiple alternative routes considering all factors that affect your trip, from traffic to personal preferences.",
+    "feature1": {
+      "title": "Multiple Options",
+      "desc": "Fastest, shortest, or most economical route"
+    },
+    "feature2": {
+      "title": "Avoid Congestion",
+      "desc": "Automatic update for traffic changes"
+    },
+    "feature3": {
+      "title": "Customization",
+      "desc": "Adapt routes to your driving preferences"
+    },
+    "badge": "Smart Routes"
+  },
+  "section3": {
+    "title": "Advanced Analytics Dashboard",
+    "desc": "Get detailed insights about your travel patterns, save time and fuel with personalized statistics and intelligent recommendations.",
+    "feature1": {
+      "title": "Detailed Statistics",
+      "desc": "Time saved, fuel and reduced emissions"
+    },
+    "feature2": {
+      "title": "Trip History",
+      "desc": "Complete log with performance metrics"
+    },
+    "feature3": {
+      "title": "Custom Reports",
+      "desc": "Export data for business or personal analysis"
+    },
+    "badge": "Advanced Analytics"
+  },
+  "benefits": {
+    "title": "More Than a Route App",
+    "speed": {
+      "title": "Speed",
+      "desc": "Reduce travel time by up to 30% with our intelligent predictions"
+    },
+    "savings": {
+      "title": "Savings",
+      "desc": "Optimize fuel consumption and reduce operating costs"
+    },
+    "sustainability": {
+      "title": "Sustainability",
+      "desc": "Contribute to the environment by reducing CO₂ emissions"
+    }
+  },
+  "cta": {
+    "title": "Ready to Optimize Your Routes?",
+    "subtitle": "Join thousands of users who are already saving time and money with PrediRuta. Start your free trial today.",
+    "start": "Start Now - Free",
+    "demo": "View Demo"
+  }
+}

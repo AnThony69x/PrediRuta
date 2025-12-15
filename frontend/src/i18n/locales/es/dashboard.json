@@ -1,0 +1,15 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Aquí tienes una vista general del sistema",
+  "greeting": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches"
+  },
+  "traffic": {
+    "summary": "Resumen de tráfico",
+    "map": "Mapa de tráfico",
+    "mapHint": "Usa \"Mi ubicación\" para centrar el mapa",
+    "nearby": "Tráfico cercano"
+  }
+}

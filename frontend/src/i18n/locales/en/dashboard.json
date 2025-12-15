@@ -1,0 +1,15 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Here you have an overview of the system",
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "traffic": {
+    "summary": "Traffic Summary",
+    "map": "Traffic Map",
+    "mapHint": "Use \"My location\" to center the map",
+    "nearby": "Nearby Traffic"
+  }
+}

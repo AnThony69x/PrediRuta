@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toaster";
 import { Tooltip } from "@/components/ui/tooltip";
 import { FieldHelper } from "@/components/ui/field-helper";
 import { HelpPanel } from "@/components/ui/help-panel";
+import { useTranslation } from "@/hooks/useTranslation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +21,7 @@ const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutos en milisegundos
 export const LoginForm = () => {
   const router = useRouter();
   const toast = useToast();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -31,13 +33,17 @@ export const LoginForm = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockoutEndTime, setLockoutEndTime] = useState<number | null>(null);
   const [remainingTime, setRemainingTime] = useState<number>(0);
+  
+  // Refs para evitar múltiples notificaciones
+  const hasShownLockNotification = useRef(false);
+  const hasShownUnlockNotification = useRef(false);
 
   // Verificar si hay un mensaje de registro exitoso y estado de bloqueo
   useEffect(() => {
     const registrationMessage = sessionStorage.getItem('registrationSuccess');
     if (registrationMessage) {
       setSuccessMsg(registrationMessage);
-      toast.success("Registro exitoso", registrationMessage);
+      toast.success(t('auth.registrationSuccess'), registrationMessage);
       // Limpiar el mensaje del sessionStorage después de mostrarlo
       sessionStorage.removeItem('registrationSuccess');
     }
@@ -58,14 +64,21 @@ export const LoginForm = () => {
         setIsLocked(true);
         setLockoutEndTime(lockoutEnd);
         setRemainingTime(Math.ceil((lockoutEnd - now) / 1000));
-        toast.security("🔒 Cuenta bloqueada", "Tu cuenta está temporalmente bloqueada por seguridad. Por favor espera.");
+        
+        // Mostrar notificación solo una vez
+        if (!hasShownLockNotification.current) {
+          hasShownLockNotification.current = true;
+          const minutes = Math.ceil((lockoutEnd - now) / 60000);
+          const message = t('auth.accountLockedMessage').replace('{attempts}', MAX_ATTEMPTS.toString());
+          toast.security(t('auth.accountLockedTitle'), `${message} ${t('auth.timeRemaining').replace('{time}', minutes.toString())}`);
+        }
       } else {
         // El bloqueo ha expirado, limpiar
         localStorage.removeItem('loginLockoutEnd');
         localStorage.removeItem('loginFailedAttempts');
       }
     }
-  }, [toast]);
+  }, [toast, t]);
 
   // Temporizador para el desbloqueo
   useEffect(() => {
@@ -84,7 +97,15 @@ export const LoginForm = () => {
         localStorage.removeItem('loginLockoutEnd');
         localStorage.removeItem('loginFailedAttempts');
         setErr(null);
-        toast.info("✅ Cuenta desbloqueada", "Ya puedes intentar iniciar sesión nuevamente.");
+        
+        // Mostrar notificación de desbloqueo solo una vez
+        if (!hasShownUnlockNotification.current) {
+          hasShownUnlockNotification.current = true;
+          toast.info(t('auth.accountUnlocked'), t('auth.accountUnlockedMessage'));
+        }
+        
+        // Resetear flags para el próximo bloqueo
+        hasShownLockNotification.current = false;
       } else {
         setRemainingTime(timeLeft);
       }
@@ -108,22 +129,23 @@ export const LoginForm = () => {
       const minutes = Math.floor(remainingTime / 60);
       const seconds = remainingTime % 60;
       const timeMessage = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      setErr(`Cuenta bloqueada temporalmente. Intenta de nuevo en ${timeMessage}`);
-      toast.security("🔒 Cuenta bloqueada", `Por favor espera ${timeMessage} minutos antes de intentar nuevamente.`);
+      const errorMessage = t('auth.accountLockedWait').replace('{time}', timeMessage);
+      setErr(errorMessage);
+      toast.security(t('auth.accountLockedTitle'), errorMessage);
       return;
     }
 
     // Validar email
     if (!validateEmail(email)) {
-      setErr("Por favor ingresa un correo electrónico válido");
-      toast.warning("Email inválido", "Por favor ingresa un correo electrónico válido.");
+      setErr(t('auth.invalidEmail'));
+      toast.warning(t('auth.emailInvalid'), t('auth.emailInvalidMessage'));
       return;
     }
 
     // Validar contraseña
     if (!password.trim()) {
-      setErr("La contraseña es requerida");
-      toast.warning("Contraseña requerida", "Por favor ingresa tu contraseña.");
+      setErr(t('auth.passwordRequired'));
+      toast.warning(t('auth.passwordRequired'), t('auth.passwordRequiredMessage'));
       return;
     }
 
@@ -147,14 +169,14 @@ export const LoginForm = () => {
         setLockoutEndTime(lockoutEnd);
         setRemainingTime(Math.ceil(LOCKOUT_DURATION / 1000));
         localStorage.setItem('loginLockoutEnd', lockoutEnd.toString());
-        const errorMessage = `Demasiados intentos fallidos. Tu cuenta ha sido bloqueada temporalmente por 5 minutos por seguridad.`;
+        const errorMessage = t('auth.tooManyAttempts');
         setErr(errorMessage);
-        toast.security("🔒 Cuenta bloqueada temporalmente", errorMessage);
+        toast.security(t('auth.accountLockedTitle'), errorMessage);
       } else {
         const attemptsLeft = MAX_ATTEMPTS - newFailedAttempts;
-        const errorMessage = `Credenciales incorrectas. Te quedan ${attemptsLeft} intento${attemptsLeft !== 1 ? 's' : ''}.`;
+        const errorMessage = t('auth.invalidCredentials').replace('{attempts}', attemptsLeft.toString());
         setErr(errorMessage);
-        toast.error("⚠️ Intento de login fallido", errorMessage);
+        toast.error(t('auth.loginFailed'), errorMessage);
       }
       return;
     }
@@ -163,7 +185,7 @@ export const LoginForm = () => {
     setFailedAttempts(0);
     localStorage.removeItem('loginFailedAttempts');
     localStorage.removeItem('loginLockoutEnd');
-    toast.success("✅ Inicio de sesión exitoso", "Bienvenido de nuevo a PrediRuta.");
+    toast.success(t('auth.loginSuccess'), t('auth.loginSuccessMessage'));
     router.push("/dashboard");
   };
 
@@ -177,12 +199,12 @@ export const LoginForm = () => {
         {isLocked && (
           <Alert type="error">
             <div className="flex flex-col gap-2">
-              <p className="font-semibold">🔒 Cuenta bloqueada temporalmente</p>
+              <p className="font-semibold">{t('auth.accountLockedTitle')}</p>
               <p className="text-sm">
-                Por razones de seguridad, tu cuenta ha sido bloqueada después de {MAX_ATTEMPTS} intentos fallidos.
+                {t('auth.accountLockedMessage').replace('{attempts}', MAX_ATTEMPTS.toString())}
               </p>
               <p className="text-sm font-medium">
-                Tiempo restante: {Math.floor(remainingTime / 60)}:{(remainingTime % 60).toString().padStart(2, '0')} minutos
+                {t('auth.timeRemaining').replace('{time}', `${Math.floor(remainingTime / 60)}:${(remainingTime % 60).toString().padStart(2, '0')}`)}
               </p>
             </div>
           </Alert>
@@ -192,9 +214,9 @@ export const LoginForm = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Correo electrónico
+              {t('auth.email')}
             </label>
-            <Tooltip content="Ingresa el correo con el que te registraste en PrediRuta" position="right" />
+            <Tooltip content={t('auth.emailTooltip')} position="right" />
           </div>
           <Input
             id="email"
@@ -203,12 +225,12 @@ export const LoginForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            placeholder="tu-email@ejemplo.com"
+            placeholder={t('auth.emailPlaceholder')}
             disabled={isLocked}
           />
           {!email && (
             <FieldHelper type="info">
-              Usa el mismo correo electrónico con el que creaste tu cuenta
+              {t('auth.emailHelper')}
             </FieldHelper>
           )}
         </div>
@@ -217,9 +239,9 @@ export const LoginForm = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Contraseña
+              {t('auth.password')}
             </label>
-            <Tooltip content="Ingresa tu contraseña. Si la olvidaste, puedes recuperarla usando el enlace de abajo" position="right" />
+            <Tooltip content={t('auth.passwordTooltip')} position="right" />
           </div>
           <PasswordInput
             id="password"
@@ -227,36 +249,36 @@ export const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            placeholder="Ingresa tu contraseña"
+            placeholder={t('auth.passwordPlaceholder')}
             disabled={isLocked}
           />
           {failedAttempts > 0 && !isLocked && (
             <FieldHelper type="error">
-              Intento fallido. Te quedan {MAX_ATTEMPTS - failedAttempts} intentos
+              {t('auth.attemptsLeft').replace('{attempts}', (MAX_ATTEMPTS - failedAttempts).toString())}
             </FieldHelper>
           )}
         </div>
 
         <Button loading={loading} full type="submit" disabled={isLocked}>
-          {isLocked ? "Cuenta bloqueada" : "Iniciar sesión"}
+          {isLocked ? t('auth.accountLocked') : t('auth.loginButton')}
         </Button>
-        <Separator label="o" />
+        <Separator label={t('auth.orContinueWith')} />
         <OAuthButton provider="google" full disabled={isLocked} />
         <div className="text-center">
           <Link
             href="/forgot-password"
             className={`text-sm text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
           >
-            ¿Olvidaste tu contraseña?
+            {t('auth.forgotPassword')}
           </Link>
         </div>
         <p className="text-center text-sm text-gray-600 dark:text-gray-300">
-          ¿No tienes cuenta?{" "}
+          {t('auth.noAccount')}{" "}
           <Link
             className={`text-blue-600 hover:underline dark:text-blue-400 ${isLocked ? 'pointer-events-none opacity-50' : ''}`}
             href="/register"
           >
-            Regístrate
+            {t('auth.signUp')}
           </Link>
         </p>
       </form>
