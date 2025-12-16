@@ -38,8 +38,8 @@ const rutasHistorialMock: RutaHistorial[] = [
   {
     id: 1,
     fecha: "2025-10-28 08:30",
-    origen: "Calle Gran Vía 1, Madrid",
-    destino: "Aeropuerto Adolfo Suárez Madrid-Barajas",
+    origen: "Av. 4 de Noviembre, Manta, Manabí",
+    destino: "Aeropuerto Internacional Eloy Alfaro, Manta",
     distancia: 14.5,
     duracion: 22,
     tiempoAhorrado: 8,
@@ -48,7 +48,7 @@ const rutasHistorialMock: RutaHistorial[] = [
   {
     id: 2,
     fecha: "2025-10-27 18:15",
-    origen: "Plaza Mayor, Madrid",
+    origen: "Centro de Manta, Manabí",
     destino: "Estadio Santiago Bernabéu",
     distancia: 4.2,
     duracion: 15,
@@ -59,7 +59,7 @@ const rutasHistorialMock: RutaHistorial[] = [
     id: 3,
     fecha: "2025-10-26 07:45",
     origen: "Atocha Renfe",
-    destino: "Parque Warner Madrid",
+    destino: "Playa Murciélago, Manta",
     distancia: 32.7,
     duracion: 35,
     tiempoAhorrado: 12,

@@ -66,7 +66,7 @@ export function SearchBar() {
     // TODO: Integrar con API de geocodificación (TomTom Search API / Nominatim)
     // Simulación de resultados por ahora
     const mockResults: SearchResult[] = [
-      { id: '1', title: 'Madrid, España', description: 'Capital de España', url: '/dashboard?city=madrid' },
+      { id: '1', title: 'Manta, Manabí', description: 'Puerto principal de Ecuador', url: '/dashboard?city=manta' },
       { id: '2', title: 'Barcelona, España', description: 'Cataluña', url: '/dashboard?city=barcelona' },
       { id: '3', title: 'Dashboard de Tráfico', description: 'Ver mapa de tráfico', url: '/dashboard' },
       { id: '4', title: 'Predicciones', description: 'Predicciones de tráfico', url: '/predicciones' },

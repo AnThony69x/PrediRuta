@@ -150,9 +150,6 @@ export function Header({
           </div>
         )}
       </div>
-
-      {/* Breadcrumbs */}
-      {showBreadcrumbs && <Breadcrumbs hideBreadcrumbs={!sidebarOpen} />}
     </header>
   );
 }

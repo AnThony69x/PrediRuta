@@ -100,7 +100,10 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
 
   const getLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      setError("Geolocalización no disponible");
+      // Fallback a Manta, Ecuador si no hay geolocalización
+      const mantaCoords = { lat: -0.95, lon: -80.72 };
+      setCoords(mantaCoords);
+      fetchFlow(mantaCoords.lat, mantaCoords.lon);
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -109,7 +112,13 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
         setCoords({ lat: latitude, lon: longitude });
         fetchFlow(latitude, longitude);
       },
-      () => setError("No se pudo obtener ubicación"),
+      () => {
+        // Si falla geolocalización, usar Manta, Ecuador por defecto
+        const mantaCoords = { lat: -0.95, lon: -80.72 };
+        setCoords(mantaCoords);
+        fetchFlow(mantaCoords.lat, mantaCoords.lon);
+        setError("Usando ubicación de Manta, Ecuador");
+      },
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, [fetchFlow]);
@@ -215,8 +224,9 @@ export function TrafficNearby({ onUpdate, backendUrl }: { onUpdate?: (p: { level
           </div>
           {(error.includes('Point too far') || error.includes('nearest existing segment')) && (
             <div className="mt-3 text-xs text-red-600 dark:text-red-400 space-y-1 pl-7">
-              <p>• TomTom no tiene datos de tráfico vehicular en Ecuador.</p>
-              <p>• Prueba con una ubicación en Europa o USA para ver datos en vivo.</p>
+              <p>• Sin datos de tráfico disponibles en esta ubicación específica.</p>
+              <p>• TomTom tiene mejor cobertura en carreteras principales y avenidas.</p>
+              <p>• Intenta con otra ubicación o espera unos minutos.</p>
             </div>
           )}
         </div>

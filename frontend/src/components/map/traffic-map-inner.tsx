@@ -40,8 +40,9 @@ function FitToLocation() {
     <button
       aria-label="Usar mi ubicación"
       onClick={handleClick}
-      className="absolute z-[1000] right-3 bottom-3 rounded-md bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800/90 dark:text-gray-100"
+      className="absolute z-[1000] right-3 bottom-20 rounded-lg bg-white/95 backdrop-blur-sm px-4 py-2.5 text-sm font-semibold text-blue-600 shadow-lg hover:bg-white hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800/95 dark:text-blue-400 dark:hover:bg-gray-800 transition-all flex items-center gap-2 border border-blue-200 dark:border-blue-800"
     >
+      <span className="text-lg">📍</span>
       Mi ubicación
     </button>
   );
@@ -75,8 +76,8 @@ function ViewportWatcher({ onChange }: { onChange?: TrafficMapInnerProps["onView
 }
 
 export function TrafficMapInner({
-  center = [40.4168, -3.7038], // Madrid por defecto en lugar de Quito
-  zoom = 12,
+  center = [-0.95, -80.72], // Manta, Ecuador por defecto
+  zoom = 15, // Zoom más cercano por defecto
   className,
   onReady,
   onViewportChange,
@@ -133,9 +134,30 @@ export function TrafficMapInner({
         <ScaleControl position="bottomleft" />
         <FitToLocation />
 
-        {/* Marcador de ubicación del usuario como círculo para evitar issues de assets */}
+        {/* Marcador de ubicación del usuario - círculo azul con pulso */}
         {userLocation && (
-          <CircleMarker center={userLocation} radius={8} pathOptions={{ color: "#2563eb", fillColor: "#3b82f6", fillOpacity: 0.9 }} />
+          <>
+            <CircleMarker 
+              center={userLocation} 
+              radius={12} 
+              pathOptions={{ 
+                color: "#2563eb", 
+                fillColor: "#3b82f6", 
+                fillOpacity: 0.3,
+                weight: 2
+              }} 
+            />
+            <CircleMarker 
+              center={userLocation} 
+              radius={6} 
+              pathOptions={{ 
+                color: "#1e40af", 
+                fillColor: "#3b82f6", 
+                fillOpacity: 1,
+                weight: 2
+              }} 
+            />
+          </>
         )}
 
         {/* Segmentos de tráfico coloreados */}
@@ -159,7 +181,8 @@ function FocusOnCenter({ center }: { center?: [number, number] }) {
   const map = useMap();
   useEffect(() => {
     if (!center) return;
-    map.setView(center, Math.max(map.getZoom(), 13), { animate: true });
+    // Usar zoom 16 para vista más cercana
+    map.setView(center, 16, { animate: true, duration: 1 });
   }, [center, map]);
   return null;
 }

@@ -42,9 +42,9 @@ const generarRutasSimuladas = (origen: string, destino: string, evitarPeajes: bo
       peajes: !evitarPeajes,
       velocidadPromedio: 43.5,
       coordenadas: [
-        { lat: 40.4168, lng: -3.7038 },
-        { lat: 40.4200, lng: -3.7000 },
-        { lat: 40.4250, lng: -3.6950 },
+        { lat: -0.95, lng: -80.72 },
+        { lat: -0.9450, lng: -80.7150 },
+        { lat: -0.9400, lng: -80.7100 },
       ],
       alternativa: false
     },
@@ -57,9 +57,9 @@ const generarRutasSimuladas = (origen: string, destino: string, evitarPeajes: bo
       peajes: false,
       velocidadPromedio: 41.0,
       coordenadas: [
-        { lat: 40.4168, lng: -3.7038 },
-        { lat: 40.4180, lng: -3.6980 },
-        { lat: 40.4250, lng: -3.6950 },
+        { lat: -0.95, lng: -80.72 },
+        { lat: -0.9480, lng: -80.7180 },
+        { lat: -0.9400, lng: -80.7100 },
       ],
       alternativa: true
     },
@@ -72,9 +72,9 @@ const generarRutasSimuladas = (origen: string, destino: string, evitarPeajes: bo
       peajes: true,
       velocidadPromedio: 47.7,
       coordenadas: [
-        { lat: 40.4168, lng: -3.7038 },
-        { lat: 40.4220, lng: -3.7100 },
-        { lat: 40.4250, lng: -3.6950 },
+        { lat: -0.95, lng: -80.72 },
+        { lat: -0.9520, lng: -80.7250 },
+        { lat: -0.9400, lng: -80.7100 },
       ],
       alternativa: true
     }
@@ -251,7 +251,7 @@ export default function RutasPage() {
                   type="text"
                   value={formData.origen}
                   onChange={e => setFormData({ ...formData, origen: e.target.value })}
-                  placeholder="Ej: Calle Gran Vía 1, Madrid"
+                  placeholder="Ej: Av. 4 de Noviembre, Manta"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   disabled={loading}
                   required
@@ -268,7 +268,7 @@ export default function RutasPage() {
                   type="text"
                   value={formData.destino}
                   onChange={e => setFormData({ ...formData, destino: e.target.value })}
-                  placeholder="Ej: Aeropuerto Adolfo Suárez Madrid-Barajas"
+                  placeholder="Ej: Aeropuerto Internacional Eloy Alfaro, Manta"
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   disabled={loading}
                   required
