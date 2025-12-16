@@ -22,11 +22,11 @@ const ROUTE_LABELS: Record<string, string> = {
   '/terminos-y-condiciones': 'Términos y Condiciones',
 };
 
-export function Breadcrumbs() {
+export function Breadcrumbs({ hideBreadcrumbs = false }) {
   const pathname = usePathname();
 
-  // No mostrar breadcrumbs en la página de inicio o páginas de auth
-  if (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register')) {
+  // No mostrar breadcrumbs en la página de inicio, páginas de auth, o cuando sidebar está cerrado
+  if (hideBreadcrumbs || pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register')) {
     return null;
   }
 
