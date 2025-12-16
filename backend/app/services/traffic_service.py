@@ -16,6 +16,24 @@ def _cache_key(lat: float, lon: float) -> str:
 
 
 async def get_traffic_status_for_point(lat: float, lon: float) -> Dict[str, Any]:
+    """
+    Obtiene el estado del tráfico para un punto específico usando TomTom Traffic API.
+    
+    ✅ FUNCIONA EN ECUADOR (incluyendo Manta, Quito, Guayaquil)
+    
+    TomTom tiene cobertura global incluyendo:
+    - Carreteras principales y autopistas
+    - Avenidas urbanas importantes
+    - Velocidad estimada y flujo de tráfico
+    - Comparación con velocidad normal (freeFlowSpeed)
+    
+    Ejemplo de coordenadas Ecuador:
+    - Manta: lat=-0.95, lon=-80.72
+    - Quito: lat=-0.22, lon=-78.51
+    - Guayaquil: lat=-2.19, lon=-79.88
+    
+    API Endpoint: https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json
+    """
     provider = os.getenv("TRAFFIC_PROVIDER", "tomtom").lower()
     if provider not in ("tomtom",):
         return {"status": "unavailable", "code": 503, "message": f"Proveedor no soportado: {provider}"}

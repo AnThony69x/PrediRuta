@@ -148,9 +148,6 @@ export function Header({
           </div>
         )}
       </div>
-
-      {/* Breadcrumbs */}
-      {showBreadcrumbs && <Breadcrumbs />}
     </header>
   );
 }
