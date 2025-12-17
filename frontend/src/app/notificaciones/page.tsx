@@ -37,7 +37,7 @@ const notificacionesMock: Notificacion[] = [
     id: 2,
     tipo: 'info',
     titulo: 'Predicci\u00f3n actualizada',
-    mensaje: 'Nuevas predicciones disponibles para tu ruta habitual Madrid Centro - Aeropuerto.',
+    mensaje: 'Nuevas predicciones disponibles para tu ruta habitual Centro de Manta - Aeropuerto.',
     fecha: '2025-10-28 07:30',
     leida: false
   },

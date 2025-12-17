@@ -27,6 +27,7 @@ export function AppLayout({
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         showSearch={showSearch}
         showBreadcrumbs={showBreadcrumbs}
+        sidebarOpen={sidebarOpen}
       />
 
       <div className="flex flex-1">
