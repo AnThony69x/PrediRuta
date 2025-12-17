@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { Logo } from './Logo';
 import { SearchBar } from './SearchBar';
 import { LanguageSelector } from './LanguageSelector';
@@ -10,7 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { UserAvatar } from '../ui/user-avatar';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
+import { Menu, Settings, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -27,6 +28,20 @@ export function Header({
 }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar el menú al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 dark:from-blue-800 dark:via-cyan-800 dark:to-indigo-800 shadow-lg">
@@ -77,32 +92,60 @@ export function Header({
             {/* Usuario autenticado o botones de auth */}
             {user ? (
               <div className="flex items-center gap-2">
-                <Link href="/perfil" className="group hidden sm:block">
-                  <div className="flex items-center gap-2 hover:bg-white/10 rounded-lg px-2 py-1 transition-colors">
+                {/* Menú desplegable de usuario */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="group hidden sm:flex items-center gap-2 hover:bg-white/10 rounded-lg px-2 py-1 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+                  >
                     <UserAvatar user={user} size="sm" showName={false} />
                     <span className="text-sm text-white/90 group-hover:text-white hidden lg:block">
                       {user.user_metadata?.full_name?.split(' ')[0] || 'Usuario'}
                     </span>
-                  </div>
-                </Link>
-                
-                <Button
-                  variant="outline"
-                  onClick={signOut}
-                  className="
-                    hidden sm:flex
-                    border-white/30 dark:border-white/30 
-                    bg-white/10 dark:bg-white/10
-                    text-white dark:text-white 
-                    hover:bg-white/20 dark:hover:bg-white/20 
-                    hover:border-white/50 dark:hover:border-white/50
-                    text-xs px-3 py-1
-                    font-medium
-                    shadow-sm
-                  "
-                >
-                  {t('header.logout')}
-                </Button>
+                  </button>
+
+                  {/* Dropdown menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {user.user_metadata?.full_name || user.email}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                      <div className="py-1">
+                        <Link
+                          href="/perfil"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Settings className="w-4 h-4" />
+                          <span>Mi Perfil</span>
+                        </Link>
+                        <Link
+                          href="/configuracion"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          <Settings className="w-4 h-4" />
+                          <span>Configuración</span>
+                        </Link>
+                        <button
+                          onClick={() => {
+                            signOut();
+                            setIsDropdownOpen(false);
+                          }}
+                          className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>{t('header.logout')}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Menú móvil simple */}
                 <div className="sm:hidden">

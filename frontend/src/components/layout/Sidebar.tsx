@@ -7,8 +7,7 @@ import {
   Home, 
   Map, 
   TrendingUp, 
-  Clock, 
-  Settings,
+  Clock,
   ChevronLeft,
   ChevronRight,
   HelpCircle,
@@ -72,18 +71,10 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
     },
     { 
       id: 5, 
-      label: t('sidebar.settings'), 
-      href: '/configuracion', 
-      icon: Settings, 
-      shortcut: '5',
-      description: t('sidebar.settings.desc')
-    },
-    { 
-      id: 6, 
       label: t('sidebar.assistant'), 
       href: '#', 
       icon: Bot, 
-      shortcut: '6',
+      shortcut: '5',
       description: t('sidebar.assistant.desc')
     },
   ];
@@ -97,8 +88,8 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
         onToggle();
       }
       
-      // Alt+1-6: Navegar directamente a secciones
-      if (e.altKey && /^[1-6]$/.test(e.key)) {
+      // Alt+1-5: Navegar directamente a secciones
+      if (e.altKey && /^[1-5]$/.test(e.key)) {
         e.preventDefault();
         const item = MENU_ITEMS.find(i => i.shortcut === e.key);
         if (item) {
@@ -326,7 +317,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               <p className="font-semibold mb-2">Atajos de teclado:</p>
               <ul className="space-y-1">
                 <li><kbd className="bg-gray-700 px-1 rounded">Alt+S</kbd> Toggle menú</li>
-                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-6</kbd> Navegación rápida</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-5</kbd> Navegación rápida</li>
               </ul>
             </div>
           </div>

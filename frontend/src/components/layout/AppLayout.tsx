@@ -18,7 +18,7 @@ export function AppLayout({
   showBreadcrumbs = true,
   showSidebar = true 
 }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
