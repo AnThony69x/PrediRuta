@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// URL del ChatAgent backend
+const CHATAGENT_URL = process.env.NEXT_PUBLIC_CHATAGENT_URL || 'http://localhost:8001';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,67 +14,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not found in environment variables');
-      return NextResponse.json(
-        { error: 'GEMINI_API_KEY is not configured' },
-        { status: 500 }
-      );
-    }
-
-    const systemPrompt = `Eres un asistente virtual amable y experto en tráfico vial, rutas y movilidad urbana. 
-Tu nombre es "PrediRuta Assistant". 
-
-Tus capacidades principales:
-- Consultas sobre tráfico en tiempo real y predicciones de congestión
-- Recomendaciones de rutas optimizadas y alternativas
-- Información sobre historiales de viajes y patrones de tráfico
-- Consejos para conducción eficiente y segura
-- Información sobre la aplicación PrediRuta y sus funcionalidades
-
-Responde siempre en español, de forma clara, concisa, amigable y útil. Si no tienes información específica, sé honesto al respecto.`;
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${systemPrompt}\n\nUsuario: ${message}`,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
-        }),
-      }
-    );
+    // Llamar al ChatAgent backend
+    const response = await fetch(`${CHATAGENT_URL}/api/v1/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        question: message,
+      }),
+    });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Gemini API error:', errorData);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('ChatAgent error:', errorData);
       return NextResponse.json(
-        { error: 'Error communicating with Gemini API', details: errorData },
+        { 
+          error: 'Error communicating with ChatAgent', 
+          details: errorData,
+          message: 'Asegúrate de que el ChatAgent está corriendo en http://localhost:8001'
+        },
         { status: response.status }
       );
     }
 
     const data = await response.json();
 
-    const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      'Lo siento, no pude generar una respuesta en este momento.';
+    // El ChatAgent devuelve { answer: "..." }
+    const reply = data.answer || 'Lo siento, no pude generar una respuesta en este momento.';
 
     return NextResponse.json({ reply });
   } catch (error) {

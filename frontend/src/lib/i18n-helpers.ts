@@ -50,7 +50,7 @@ export function getLanguageName(locale: Locale): string {
 export function getLanguageFlag(locale: Locale): string {
   const flags: Record<Locale, string> = {
     es: '🇪🇸',
-    en: '🇬🇧',
+    en: '🇺🇸',
   };
   return flags[locale];
 }
