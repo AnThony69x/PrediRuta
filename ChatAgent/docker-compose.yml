@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  chatagent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prediruta-chatagent
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DEBUG=true
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped
+    networks:
+      - prediruta-network
+
+networks:
+  prediruta-network:
+    driver: bridge
