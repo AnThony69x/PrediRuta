@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { type Locale, getCurrentLocale, getTranslation, setCurrentLocale } from '@/lib/i18n';
 
 export function useTranslation() {
@@ -8,33 +8,47 @@ export function useTranslation() {
   const [locale, setLocale] = useState<Locale>('es');
   const [isClient, setIsClient] = useState(false);
 
+  // Efecto para inicializar en el cliente
   useEffect(() => {
-    // Actualizar al idioma real solo en el cliente
     setIsClient(true);
-    setLocale(getCurrentLocale());
+    const currentLocale = getCurrentLocale();
+    setLocale(currentLocale);
   }, []);
 
+  // Efecto para escuchar cambios de idioma desde otros componentes o pestañas
   useEffect(() => {
-    // Escuchar cambios de idioma
-    const handleLocaleChange = (event: CustomEvent<{ locale: Locale }>) => {
-      setLocale(event.detail.locale);
+    const handleLocaleChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ locale: Locale }>;
+      setLocale(customEvent.detail.locale);
     };
 
-    window.addEventListener('localeChange', handleLocaleChange as EventListener);
+    window.addEventListener('localeChange', handleLocaleChange);
     
+    // Escuchar cambios en localStorage desde otras pestañas
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'locale' && e.newValue) {
+        setLocale(e.newValue as Locale);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
-      window.removeEventListener('localeChange', handleLocaleChange as EventListener);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
-  const t = (key: string): string => {
+  // Función de traducción memoizada
+  const t = useCallback((key: string): string => {
     return getTranslation(key, locale);
-  };
+  }, [locale]);
 
-  const changeLocale = (newLocale: Locale) => {
-    setCurrentLocale(newLocale);
+  // Función para cambiar idioma
+  const changeLocale = useCallback((newLocale: Locale) => {
     setLocale(newLocale);
-  };
+    setCurrentLocale(newLocale);
+  }, []);
 
-  return { t, locale, changeLocale };
+  return { t, locale, changeLocale, isClient };
 }

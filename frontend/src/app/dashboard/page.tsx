@@ -1,6 +1,7 @@
 "use client";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { TrafficMap } from "@/components/map/traffic-map";
 import { useEffect, useState } from "react";
 import { LegendTraffic } from "@/components/legend-traffic";
@@ -22,6 +23,7 @@ const CITIES_WITH_COVERAGE = [
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const [viewport, setViewport] = useState<{ center: [number, number]; zoom: number; bbox: { west: number; south: number; east: number; north: number } } | null>(null);
   const backendUrl = getBackendUrl();
   const [userLoc, setUserLoc] = useState<[number, number] | undefined>(undefined);
@@ -66,7 +68,7 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block flex items-center gap-2">
                 <span className="text-xl">🇪🇨</span>
-                <span>Selecciona una ciudad de Ecuador</span>
+                <span>{t('dashboard.citySelector.label')}</span>
               </label>
               <select
                 value={selectedCity?.name || ""}
