@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 // Tipos de datos (luego se moverán a un archivo types separado)
@@ -204,7 +205,7 @@ function BarChart({ data, title = "Niveles de Congestión" }: { data: Congestion
 }
 
 // Componente de resumen mejorado
-function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
+function ResumenPrediccion({ data, t }: { data: PrediccionData | null, t: any }) {
   if (!data) {
     return (
       <div className="bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center">
@@ -230,7 +231,7 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
           <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          Resumen de Predicción
+          {t('sidebar.predictions')} - {data.zona}
         </h2>
       </div>
 
@@ -238,7 +239,7 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Información de zona */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-2">Zona</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">{t('dashboard.predictions.zone')}</h3>
             <div className="text-2xl font-bold text-blue-800">{data.zona}</div>
             <div className="text-sm text-blue-600 mt-1">
               {data.hora} - {new Date(data.fecha).toLocaleDateString()}
@@ -247,12 +248,12 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
 
           {/* Velocidad estimada */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Velocidad Estimada</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">{t('dashboard.predictions.estimatedSpeed')}</h3>
             <div className="text-2xl font-bold text-gray-800">
               {velocidadActual?.velocidad || 0} km/h
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              Confianza: {((velocidadActual?.confianza || 0) * 100).toFixed(0)}%
+              {t('dashboard.predictions.confidence')}: {((velocidadActual?.confianza || 0) * 100).toFixed(0)}%
             </div>
           </div>
 
@@ -262,24 +263,24 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
             (congestionZona?.congestion || 0) >= 0.4 ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'
           }`}>
             <h3 className={`font-semibold mb-2 ${congestionZona?.color || 'text-gray-900'}`}>
-              Congestión
+              {t('dashboard.predictions.congestion')}
             </h3>
             <div className={`text-2xl font-bold ${congestionZona?.color || 'text-gray-800'}`}>
               {congestionZona?.nivel || 'Desconocida'}
             </div>
             <div className={`text-sm mt-1 ${congestionZona?.color || 'text-gray-600'}`}>
-              {((congestionZona?.congestion || 0) * 100).toFixed(0)}% de saturación
+              {((congestionZona?.congestion || 0) * 100).toFixed(0)}{t('dashboard.predictions.saturation')}
             </div>
           </div>
 
           {/* Confianza general */}
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h3 className="font-semibold text-purple-900 mb-2">Confianza General</h3>
+            <h3 className="font-semibold text-purple-900 mb-2">{t('dashboard.predictions.generalConfidence')}</h3>
             <div className="text-2xl font-bold text-purple-800">
               {(data.confianza * 100).toFixed(0)}%
             </div>
             <div className="text-sm text-purple-600 mt-1">
-              Basado en datos históricos
+              {t('dashboard.predictions.basedOnHistorical')}
             </div>
           </div>
         </div>
@@ -287,7 +288,7 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
         {/* Última actualización */}
         <div className="mt-6 pt-4 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-500">
-            Última actualización: {new Date(data.ultimaActualizacion).toLocaleString()}
+            {t('dashboard.predictions.lastUpdate')}: {new Date(data.ultimaActualizacion).toLocaleString()}
           </p>
         </div>
       </div>
@@ -296,6 +297,7 @@ function ResumenPrediccion({ data }: { data: PrediccionData | null }) {
 }
 
 export default function PrediccionesPage() {
+  const { t } = useTranslation();
   // Estados para filtros
   const [zona, setZona] = useState("Centro");
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10));
@@ -321,7 +323,7 @@ export default function PrediccionesPage() {
       setPrediccionData(data);
       
     } catch (err) {
-      setError("Error al obtener la predicción. Intenta nuevamente.");
+      setError(t('dashboard.predictions.error'));
     } finally {
       setLoading(false);
     }
@@ -334,10 +336,10 @@ export default function PrediccionesPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Predicciones de Tráfico
+            {t('sidebar.predictions')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Obtén predicciones precisas del tráfico en tiempo real para planificar mejor tus rutas
+            {t('routes.subtitle')}
           </p>
         </div>
 
@@ -346,7 +348,7 @@ export default function PrediccionesPage() {
           <form onSubmit={consultarPrediccion} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Zona
+                {t('dashboard.predictions.zone')}
               </label>
               <select 
                 value={zona} 
@@ -364,7 +366,7 @@ export default function PrediccionesPage() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fecha
+                {t('dashboard.predictions.date')}
               </label>
               <input 
                 type="date" 
@@ -377,7 +379,7 @@ export default function PrediccionesPage() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Hora
+                {t('dashboard.predictions.time')}
               </label>
               <input 
                 type="time" 
@@ -402,14 +404,14 @@ export default function PrediccionesPage() {
                   <svg className="animate-spin h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  <span>Consultando...</span>
+                  <span>{t('dashboard.predictions.querying')}</span>
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <span>Consultar</span>
+                  <span>{t('dashboard.predictions.query')}</span>
                 </>
               )}
             </button>
@@ -428,7 +430,7 @@ export default function PrediccionesPage() {
                 </div>
               </div>
             ) : (
-              <ResumenPrediccion data={prediccionData} />
+              <ResumenPrediccion data={prediccionData} t={t} />
             )}
           </div>
         )}
@@ -438,11 +440,11 @@ export default function PrediccionesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <LineChart 
               data={prediccionData.velocidades}
-              title="Análisis de Velocidades"
+              title={t('dashboard.predictions.speedAnalysis')}
             />
             <BarChart 
               data={prediccionData.congestion}
-              title="Niveles de Congestión"
+              title={t('dashboard.predictions.congestionLevels')}
             />
           </div>
         )}
@@ -466,10 +468,10 @@ export default function PrediccionesPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              Comienza tu consulta
+              {t('dashboard.predictions.startQuery')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-              Selecciona una zona, fecha y hora en el formulario de arriba para obtener predicciones de tráfico precisas y actualizadas.
+              {t('dashboard.predictions.selectZoneDateTime')}
             </p>
           </div>
         )}

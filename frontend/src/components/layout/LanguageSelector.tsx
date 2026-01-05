@@ -2,12 +2,15 @@
 
 import { Globe } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getLanguageName, getLanguageFlag } from '@/lib/i18n-helpers';
 
 export function LanguageSelector() {
   const { locale, changeLocale } = useTranslation();
 
   const handleChange = (newLang: 'es' | 'en') => {
-    changeLocale(newLang);
+    if (newLang !== locale) {
+      changeLocale(newLang);
+    }
   };
 
   return (
@@ -35,14 +38,15 @@ export function LanguageSelector() {
             pr-8
             hover:bg-white/20
             transition-colors
+            font-medium
           "
           aria-label="Seleccionar idioma de la interfaz"
         >
           <option value="es" className="bg-gray-800 text-white">
-            🇪🇸 Español
+            {getLanguageFlag('es')} {getLanguageName('es')}
           </option>
           <option value="en" className="bg-gray-800 text-white">
-            🇬🇧 English
+            {getLanguageFlag('en')} {getLanguageName('en')}
           </option>
         </select>
 
