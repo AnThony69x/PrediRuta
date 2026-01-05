@@ -79,15 +79,24 @@ export default function ConfiguracionPage() {
   const [cambiosPendientes, setCambiosPendientes] = useState(false);
   const [mostrarResetConfirmacion, setMostrarResetConfirmacion] = useState(false);
 
+  // Cargar configuración inicial desde localStorage
+  useEffect(() => {
+    const currentTheme = localStorage.getItem('theme');
+    const isDark = currentTheme === 'dark';
+    
+    setConfig(prev => ({
+      ...prev,
+      modoOscuro: isDark
+    }));
+  }, []);
+
   // Cargar configuración al montar
   useEffect(() => {
     cargarConfiguracion();
   }, [user]);
 
-  // Aplicar modo oscuro cuando cambie
-  useEffect(() => {
-    applyDarkMode(config.modoOscuro);
-  }, [config.modoOscuro, applyDarkMode]);
+  // No aplicar automáticamente, solo cuando el usuario cambie manualmente
+  // El ThemeProvider ya maneja la aplicación del tema
 
   const cargarConfiguracion = async () => {
     if (!user) return;
@@ -105,9 +114,14 @@ export default function ConfiguracionPage() {
       }
 
       if (data?.preferences) {
+        // Cargar configuración pero mantener el modo oscuro del localStorage
+        const currentTheme = localStorage.getItem('theme');
+        const isDark = currentTheme === 'dark';
+        
         setConfig(prevConfig => ({
           ...prevConfig,
-          ...data.preferences.configuracion
+          ...data.preferences.configuracion,
+          modoOscuro: isDark // Siempre usar el valor de localStorage
         }));
       }
     } catch (err) {
@@ -121,6 +135,11 @@ export default function ConfiguracionPage() {
   ) => {
     setConfig(prev => ({ ...prev, [campo]: valor }));
     setCambiosPendientes(true);
+    
+    // Aplicar modo oscuro inmediatamente cuando cambia
+    if (campo === 'modoOscuro') {
+      applyDarkMode(valor as boolean);
+    }
   };
 
   const guardarConfiguracion = async () => {
@@ -237,7 +256,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('notificacionesEmail', !config.notificacionesEmail)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     config.notificacionesEmail ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -254,7 +273,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('notificacionesPush', !config.notificacionesPush)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     config.notificacionesPush ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -271,7 +290,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('alertasTrafico', !config.alertasTrafico)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     config.alertasTrafico ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -288,7 +307,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('alertasAccidentes', !config.alertasAccidentes)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     config.alertasAccidentes ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -316,7 +335,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('evitarPeajes', !config.evitarPeajes)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                     config.evitarPeajes ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -333,7 +352,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('evitarAutopistas', !config.evitarAutopistas)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                     config.evitarAutopistas ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -350,7 +369,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('rutaMasRapida', !config.rutaMasRapida)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                     config.rutaMasRapida ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -367,7 +386,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('mostrarAlternativas', !config.mostrarAlternativas)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                     config.mostrarAlternativas ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -448,7 +467,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('guardarHistorial', !config.guardarHistorial)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 ${
                     config.guardarHistorial ? 'bg-red-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -465,7 +484,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('compartirUbicacion', !config.compartirUbicacion)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 ${
                     config.compartirUbicacion ? 'bg-red-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -482,7 +501,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('analiticasAnonimas', !config.analiticasAnonimas)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 ${
                     config.analiticasAnonimas ? 'bg-red-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -510,7 +529,7 @@ export default function ConfiguracionPage() {
                 </div>
                 <button
                   onClick={() => handleChange('modoOscuro', !config.modoOscuro)}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     config.modoOscuro ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
@@ -601,3 +620,4 @@ export default function ConfiguracionPage() {
     </AppLayout>
   );
 }
+
