@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ChatAgent API - PrediRuta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status.error {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status.loading {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .result pre {
+            background: #f1f3f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+
+        .chat-demo {
+            margin-top: 20px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .answer-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .summary h3 {
+            margin-bottom: 10px;
+        }
+
+        .summary .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Test ChatAgent API</h1>
+            <p>PrediRuta - Sistema de Predicción de Rutas</p>
+            <p style="font-size: 0.9rem; margin-top: 10px;">
+                URL: <strong id="apiUrl">http://localhost:8001</strong>
+            </p>
+        </div>
+
+        <div class="content">
+            <!-- Test 1: Health Check -->
+            <div class="test-section">
+                <h2>
+                    🏥 Test 1: Health Check
+                    <span id="status1" class="status pending">Pendiente</span>
+                </h2>
+                <div id="result1" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 2: Service Info -->
+            <div class="test-section">
+                <h2>
+                    ℹ️ Test 2: Información del Servicio
+                    <span id="status2" class="status pending">Pendiente</span>
+                </h2>
+                <div id="result2" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- Test 3: Chat Test -->
+            <div class="test-section">
+                <h2>
+                    💬 Test 3: Consulta al Agente
+                    <span id="status3" class="status pending">Pendiente</span>
+                </h2>
+                <div id="result3" class="result" style="display: none;"></div>
+            </div>
+
+            <!-- Demo Interactivo -->
+            <div class="test-section chat-demo">
+                <h2>🎮 Demo Interactivo</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Prueba el ChatAgent con tus propias preguntas:
+                </p>
+                <div class="chat-input">
+                    <input 
+                        type="text" 
+                        id="userQuestion" 
+                        placeholder="¿Qué vía es mejor para ir de Tarqui al Centro?"
+                        value="¿Qué vía es más recomendable para ir de Tarqui al Centro?"
+                    />
+                    <button onclick="askCustomQuestion()" id="askBtn">
+                        Preguntar
+                    </button>
+                </div>
+                <div id="customAnswer" style="display: none;"></div>
+            </div>
+
+            <!-- Resumen -->
+            <div id="summary" class="summary" style="display: none;">
+                <h3>📊 Resumen de Tests</h3>
+                <div class="score" id="scoreDisplay">0/3</div>
+                <p id="summaryMessage"></p>
+            </div>
+
+            <!-- Botón para ejecutar tests -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="runAllTests()" id="runTestsBtn" style="font-size: 1.1rem; padding: 15px 40px;">
+                    ▶️ Ejecutar Todos los Tests
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+        let testsPassed = 0;
+        const totalTests = 3;
+
+        // Actualizar URL en el header
+        document.getElementById('apiUrl').textContent = API_URL;
+
+        function updateStatus(testNum, status, message = '') {
+            const statusEl = document.getElementById(`status${testNum}`);
+            const resultEl = document.getElementById(`result${testNum}`);
+            
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = status === 'loading' ? 'Ejecutando...' : 
+                                   status === 'success' ? '✅ Exitoso' : 
+                                   status === 'error' ? '❌ Error' : 'Pendiente';
+            
+            if (message) {
+                resultEl.innerHTML = message;
+                resultEl.style.display = 'block';
+            }
+        }
+
+        async function testHealth() {
+            updateStatus(1, 'loading');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/health`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus(1, 'success', `
+                        <strong>✅ Servicio disponible</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `);
+                    testsPassed++;
+                    return true;
+                } else {
+                    updateStatus(1, 'error', `<strong>Error ${response.status}</strong>`);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus(1, 'error', `
+                    <strong>❌ No se pudo conectar</strong>
+                    <p>Error: ${error.message}</p>
+                    <p style="color: #dc3545; margin-top: 10px;">
+                        💡 Asegúrate de que el servidor está corriendo en ${API_URL}
+                    </p>
+                `);
+                return false;
+            }
+        }
+
+        async function testServiceInfo() {
+            updateStatus(2, 'loading');
+            
+            try {
+                const response = await fetch(`${API_URL}/`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus(2, 'success', `
+                        <strong>Información del Servicio:</strong>
+                        <p><strong>Nombre:</strong> ${data.name}</p>
+                        <p><strong>Versión:</strong> ${data.version}</p>
+                        <p><strong>Descripción:</strong> ${data.description}</p>
+                        <pre>${JSON.stringify(data.endpoints, null, 2)}</pre>
+                    `);
+                    testsPassed++;
+                    return true;
+                } else {
+                    updateStatus(2, 'error', `<strong>Error ${response.status}</strong>`);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus(2, 'error', `<strong>Error:</strong> ${error.message}`);
+                return false;
+            }
+        }
+
+        async function testChat() {
+            updateStatus(3, 'loading');
+            
+            const testQuestion = '¿Cuáles son las vías principales de Manta?';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: testQuestion }),
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus(3, 'success', `
+                        <strong>Pregunta:</strong> ${testQuestion}
+                        <div class="answer-box">
+                            <strong>📝 Respuesta del Agente:</strong><br><br>
+                            ${data.answer.replace(/\n/g, '<br>')}
+                        </div>
+                    `);
+                    testsPassed++;
+                    return true;
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    updateStatus(3, 'error', `
+                        <strong>Error ${response.status}</strong>
+                        <p>${errorData.detail || 'Error desconocido'}</p>
+                    `);
+                    return false;
+                }
+            } catch (error) {
+                updateStatus(3, 'error', `<strong>Error:</strong> ${error.message}`);
+                return false;
+            }
+        }
+
+        async function askCustomQuestion() {
+            const input = document.getElementById('userQuestion');
+            const answerDiv = document.getElementById('customAnswer');
+            const btn = document.getElementById('askBtn');
+            
+            const question = input.value.trim();
+            if (!question) {
+                alert('Por favor, escribe una pregunta');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Consultando...';
+            answerDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/v1/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question }),
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    answerDiv.innerHTML = `
+                        <div class="answer-box">
+                            <strong>📝 Respuesta:</strong><br><br>
+                            ${data.answer.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    answerDiv.style.display = 'block';
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    answerDiv.innerHTML = `
+                        <div class="result" style="background: #ffe6e6; border-color: #dc3545;">
+                            <strong>❌ Error ${response.status}</strong>
+                            <p>${errorData.detail || 'Error al obtener respuesta'}</p>
+                        </div>
+                    `;
+                    answerDiv.style.display = 'block';
+                }
+            } catch (error) {
+                answerDiv.innerHTML = `
+                    <div class="result" style="background: #ffe6e6; border-color: #dc3545;">
+                        <strong>❌ Error de conexión</strong>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                answerDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Preguntar';
+            }
+        }
+
+        async function runAllTests() {
+            testsPassed = 0;
+            const btn = document.getElementById('runTestsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Ejecutando tests...';
+            
+            document.getElementById('summary').style.display = 'none';
+            
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testServiceInfo();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            await testChat();
+            
+            // Mostrar resumen
+            const summaryDiv = document.getElementById('summary');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const summaryMessage = document.getElementById('summaryMessage');
+            
+            scoreDisplay.textContent = `${testsPassed}/${totalTests}`;
+            
+            if (testsPassed === totalTests) {
+                summaryMessage.innerHTML = '🎉 ¡Excelente! Todos los tests pasaron correctamente.<br>El ChatAgent está funcionando perfectamente.';
+            } else if (testsPassed > 0) {
+                summaryMessage.innerHTML = `⚠️ ${testsPassed} de ${totalTests} tests pasaron.<br>Revisa los errores arriba.`;
+            } else {
+                summaryMessage.innerHTML = '❌ Todos los tests fallaron.<br>Asegúrate de que el servidor está corriendo.';
+            }
+            
+            summaryDiv.style.display = 'block';
+            
+            btn.disabled = false;
+            btn.textContent = '🔄 Ejecutar Tests Nuevamente';
+        }
+
+        // Permitir enviar pregunta con Enter
+        document.getElementById('userQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askCustomQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
