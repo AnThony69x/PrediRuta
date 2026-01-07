@@ -85,7 +85,7 @@ pip install -r requirements.txt
 
 El archivo `.env` ya está configurado con tu API key:
 ```env
-GEMINI_API_KEY=AIzaSyAJLeiyisKr52m6UJS3nwTxm5G0lZj14wQ
+GEMINI_API_KEY=AIzaSyA*****************************
 ```
 
 ## 🏃‍♂️ Ejecución
