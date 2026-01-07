@@ -12,6 +12,17 @@ except Exception:
 
 from app.routes import traffic
 
+# Dataset de tráfico Ecuador
+try:
+    from app.routes import dataset
+    from app.routes import predictions_real
+    from app.routes import routes_history_real
+except Exception as e:
+    dataset = None
+    predictions_real = None
+    routes_history_real = None
+    print(f"⚠️ Error importando rutas de dataset: {e}")
+
 # Cargar variables de entorno
 load_dotenv()
 
@@ -39,11 +50,19 @@ if origins_env:
         if not origins:
             origins = [frontend_origin]
 else:
-    origins = [frontend_origin]
+    # Orígenes permitidos por defecto (incluye null para archivos locales)
+    origins = [
+        frontend_origin,
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "null"  # Para archivos HTML locales (file://)
+    ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Permitir todos los orígenes para desarrollo
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,6 +76,19 @@ if predictions is not None:
 
 # Tráfico
 app.include_router(traffic.router)
+
+# Dataset Ecuador (datos históricos)
+if dataset is not None:
+    app.include_router(dataset.router)
+
+# Predicciones con datos reales
+if predictions_real is not None:
+    app.include_router(predictions_real.router)
+
+# Rutas e Historial con datos reales
+if routes_history_real is not None:
+    app.include_router(routes_history_real.router_routes)
+    app.include_router(routes_history_real.router_history)
 
 @app.get("/")
 async def root():
