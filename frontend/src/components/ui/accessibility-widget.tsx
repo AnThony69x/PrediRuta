@@ -541,10 +541,10 @@ export function AccessibilityWidget() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label={t('accessibility.ariaLabel')}
       >
-        {/* Icono de silla de ruedas */}
+        {/* Icono de silla de ruedas mejorado */}
         <svg
-          width="28"
-          height="28"
+          width="30"
+          height="30"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -552,65 +552,94 @@ export function AccessibilityWidget() {
         >
           {/* Persona/Cabeza */}
           <circle 
-            cx="16" 
-            cy="4" 
+            cx="15.5" 
+            cy="3.5" 
             r="2" 
             fill="currentColor"
           />
-          {/* Cuerpo */}
+          
+          {/* Respaldo de la silla */}
           <path 
-            d="M14 7.5h3.5l.5 6h-2" 
+            d="M13.5 7 L13.5 12.5" 
             stroke="currentColor" 
-            strokeWidth="1.5" 
+            strokeWidth="2" 
+            strokeLinecap="round"
+          />
+          
+          {/* Brazo y cuerpo */}
+          <path 
+            d="M13.5 8 L17.5 8 L18 14" 
+            stroke="currentColor" 
+            strokeWidth="2" 
             strokeLinecap="round" 
             strokeLinejoin="round"
-            fill="none"
           />
-          {/* Rueda grande */}
-          <circle 
-            cx="10" 
-            cy="17" 
-            r="5" 
-            stroke="currentColor" 
-            strokeWidth="1.5"
-            fill="none"
-          />
-          {/* Centro de la rueda */}
-          <circle 
-            cx="10" 
-            cy="17" 
-            r="1" 
-            fill="currentColor"
-          />
-          {/* Radio de la rueda */}
-          <line 
-            x1="10" 
-            y1="17" 
-            x2="13.5" 
-            y2="14.5" 
-            stroke="currentColor" 
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          {/* Conexión del cuerpo a la rueda */}
+          
+          {/* Asiento */}
           <path 
-            d="M14 13.5L10 17" 
+            d="M13.5 12.5 L18 14" 
             stroke="currentColor" 
-            strokeWidth="1.5"
+            strokeWidth="2" 
             strokeLinecap="round"
           />
-          {/* Rueda pequeña delantera */}
+          
+          {/* Rueda grande trasera */}
           <circle 
-            cx="17" 
-            cy="19.5" 
-            r="1.5" 
+            cx="10" 
+            cy="17" 
+            r="5.5" 
+            stroke="currentColor" 
+            strokeWidth="2"
+            fill="none"
+          />
+          
+          {/* Centro de la rueda trasera */}
+          <circle 
+            cx="10" 
+            cy="17" 
+            r="1.2" 
             fill="currentColor"
           />
+          
+          {/* Radios de la rueda (6 radios para realismo) */}
+          <line x1="10" y1="17" x2="10" y2="11.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="17" x2="14.8" y2="14.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="17" x2="14.8" y2="19.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="17" x2="10" y2="22.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="17" x2="5.2" y2="19.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="10" y1="17" x2="5.2" y2="14.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          
+          {/* Estructura del marco - conecta el asiento a la rueda */}
+          <path 
+            d="M13.5 12.5 L10 17" 
+            stroke="currentColor" 
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          
+          {/* Rueda delantera pequeña */}
+          <circle 
+            cx="18" 
+            cy="20" 
+            r="2" 
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+          />
+          
+          {/* Centro de rueda delantera */}
+          <circle 
+            cx="18" 
+            cy="20" 
+            r="0.6" 
+            fill="currentColor"
+          />
+          
           {/* Conexión a rueda delantera */}
           <path 
-            d="M16 13.5L17 18" 
+            d="M18 14 L18 18" 
             stroke="currentColor" 
-            strokeWidth="1.5"
+            strokeWidth="2"
             strokeLinecap="round"
           />
         </svg>
