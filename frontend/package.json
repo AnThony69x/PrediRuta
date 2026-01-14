@@ -9,7 +9,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
+    "vercel-check": "node vercel-check.js",
+    "prebuild": "node vercel-check.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
