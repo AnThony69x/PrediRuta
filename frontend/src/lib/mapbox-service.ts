@@ -48,6 +48,7 @@ export interface DirectionsRoute {
 
 /**
  * Geocodificación directa: convertir dirección en coordenadas
+ * Retorna la respuesta completa de Mapbox para mantener compatibilidad
  */
 export async function geocodeForward(
   query: string,
@@ -57,7 +58,7 @@ export async function geocodeForward(
     limit?: number;
     language?: string;
   }
-): Promise<GeocodeResult[]> {
+): Promise<{ features: Array<{ center: [number, number]; place_name: string; text: string; }> }> {
   const params = new URLSearchParams({
     access_token: MAPBOX_CONFIG.accessToken,
     limit: String(options?.limit || 5),
@@ -81,20 +82,7 @@ export async function geocodeForward(
     }
 
     const data = await response.json();
-
-    return data.features.map((feature: any) => ({
-      name: feature.text,
-      place_name: feature.place_name,
-      coordinates: {
-        longitude: feature.center[0],
-        latitude: feature.center[1],
-      },
-      bbox: feature.bbox,
-      place_type: feature.place_type,
-      relevance: feature.relevance,
-      address: feature.address,
-      context: feature.context,
-    }));
+    return data;
   } catch (error) {
     console.error('Error en geocodificación:', error);
     throw error;
@@ -156,10 +144,11 @@ export async function geocodeReverse(
 }
 
 /**
- * Obtener direcciones entre puntos
+ * Obtener direcciones entre dos puntos
  */
 export async function getDirections(
-  coordinates: Coordinates[],
+  origin: [number, number],
+  destination: [number, number],
   options?: {
     profile?: 'driving-traffic' | 'driving' | 'walking' | 'cycling';
     alternatives?: boolean;
@@ -167,10 +156,11 @@ export async function getDirections(
     geometries?: 'geojson' | 'polyline' | 'polyline6';
     overview?: 'full' | 'simplified' | 'false';
     annotations?: string[];
+    exclude?: 'toll' | 'motorway' | 'ferry';
   }
-): Promise<DirectionsRoute[]> {
+): Promise<{ routes: DirectionsRoute[]; waypoints: any[] }> {
   const profile = options?.profile || 'driving-traffic';
-  const coordsString = coordinates.map(c => `${c.longitude},${c.latitude}`).join(';');
+  const coordsString = `${origin[0]},${origin[1]};${destination[0]},${destination[1]}`;
 
   const params = new URLSearchParams({
     access_token: MAPBOX_CONFIG.accessToken,
@@ -180,10 +170,14 @@ export async function getDirections(
     overview: options?.overview || 'full',
   });
 
-  if (options?.annotations && options.annotations.length > 0) {
+  if (options?.annotations && options?.annotations.length > 0) {
     params.append('annotations', options.annotations.join(','));
   } else {
     params.append('annotations', 'duration,distance,speed,congestion');
+  }
+
+  if (options?.exclude) {
+    params.append('exclude', options.exclude);
   }
 
   const url = `${MAPBOX_CONFIG.api.directions}/${profile}/${coordsString}?${params}`;
@@ -195,8 +189,7 @@ export async function getDirections(
     }
 
     const data = await response.json();
-
-    return data.routes || [];
+    return data;
   } catch (error) {
     console.error('Error obteniendo direcciones:', error);
     throw error;

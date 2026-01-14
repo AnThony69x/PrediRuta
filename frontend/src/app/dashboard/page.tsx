@@ -5,8 +5,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { TrafficMap } from "@/components/map/mapbox-traffic-map";
 import { useEffect, useState } from "react";
 import { LegendTraffic } from "@/components/legend-traffic";
-import { TrafficNearby } from "@/components/traffic-nearby";
-import { getBackendUrl } from "@/lib/backend-url";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { ECUADOR_CITIES } from "@/config/mapbox";
 
@@ -18,7 +16,6 @@ export default function DashboardPage() {
     zoom: number; 
     bbox: { west: number; south: number; east: number; north: number } 
   } | null>(null);
-  const backendUrl = getBackendUrl();
   const [userLoc, setUserLoc] = useState<[number, number] | undefined>(undefined);
   const [focusCenter, setFocusCenter] = useState<[number, number] | undefined>(ECUADOR_CITIES[0]?.coords);
   const [selectedCity, setSelectedCity] = useState<typeof ECUADOR_CITIES[number]>(ECUADOR_CITIES[0]);
@@ -106,18 +103,6 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Panel de tráfico cercano - Abajo */}
-          <div className="max-w-7xl mx-auto">
-            <TrafficNearby
-              backendUrl={backendUrl}
-              onUpdate={({ level, flow, lat, lon }) => {
-                // Mapbox usa [lon, lat], no [lat, lon]
-                setUserLoc([lon, lat]);
-                setFocusCenter([lon, lat]);
-              }}
-            />
           </div>
         </div>
       </AppLayout>
