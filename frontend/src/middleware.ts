@@ -8,7 +8,8 @@ const protectedRoutes = [
   '/perfil',
   '/configuracion',
   '/historial',
-  '/notificaciones'
+  '/notificaciones',
+  '/asistente'
 ];
 
 // Rutas que requieren permisos especiales (admin, etc.)

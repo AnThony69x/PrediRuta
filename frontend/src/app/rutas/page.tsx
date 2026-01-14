@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { MapPin, Navigation, Clock, TrendingUp, AlertCircle, Zap, Settings } from "lucide-react";
 
@@ -173,6 +174,7 @@ function RutaCard({ ruta, seleccionada, onClick }: { ruta: Ruta, seleccionada: b
 
 // Componente principal
 export default function RutasPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     origen: '',
     destino: '',
@@ -195,10 +197,10 @@ export default function RutasPage() {
     try {
       // Validaciones
       if (!formData.origen.trim()) {
-        throw new Error('El origen es obligatorio');
+        throw new Error(t('dashboard.routes.originRequired'));
       }
       if (!formData.destino.trim()) {
-        throw new Error('El destino es obligatorio');
+        throw new Error(t('dashboard.routes.destinationRequired'));
       }
 
       // Simulación de delay de API
@@ -230,10 +232,10 @@ export default function RutasPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Planificador de Rutas
+            {t('sidebar.routes')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Calcula la ruta más rápida considerando tráfico en tiempo real, distancia y tus preferencias
+            {t('routes.subtitle')}
           </p>
         </div>
 
@@ -245,7 +247,7 @@ export default function RutasPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <MapPin className="w-4 h-4 inline mr-2" />
-                  Origen *
+                  {t('routes.origin')} *
                 </label>
                 <input
                   type="text"
@@ -262,7 +264,7 @@ export default function RutasPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Navigation className="w-4 h-4 inline mr-2" />
-                  Destino *
+                  {t('routes.destination')} *
                 </label>
                 <input
                   type="text"
@@ -281,7 +283,7 @@ export default function RutasPage() {
               <div className="flex items-center mb-3">
                 <Settings className="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400" />
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Preferencias de ruta
+                  {t('routes.preferences')}
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -293,7 +295,7 @@ export default function RutasPage() {
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     disabled={loading}
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Evitar peajes</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{t('dashboard.routes.avoidTolls')}</span>
                 </label>
 
                 <label className="flex items-center space-x-3 cursor-pointer">
@@ -304,7 +306,7 @@ export default function RutasPage() {
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     disabled={loading}
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Evitar autopistas</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{t('dashboard.routes.avoidHighways')}</span>
                 </label>
 
                 <label className="flex items-center space-x-3 cursor-pointer">
@@ -315,7 +317,7 @@ export default function RutasPage() {
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     disabled={loading}
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Priorizar velocidad</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{t('dashboard.routes.prioritizeSpeed')}</span>
                 </label>
               </div>
             </div>
@@ -333,12 +335,12 @@ export default function RutasPage() {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Calculando rutas...</span>
+                  <span>{t('routes.calculating')}</span>
                 </>
               ) : (
                 <>
                   <Navigation className="w-5 h-5" />
-                  <span>Calcular Ruta</span>
+                  <span>{t('routes.calculate')}</span>
                 </>
               )}
             </button>

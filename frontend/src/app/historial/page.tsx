@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { 
   Clock, 
@@ -115,6 +116,7 @@ const prediccionesHistorialMock: PrediccionHistorial[] = [
 ];
 
 export default function HistorialPage() {
+  const { t } = useTranslation();
   const [vistaActiva, setVistaActiva] = useState<'rutas' | 'predicciones' | 'estadisticas'>('rutas');
   const [filtroFecha, setFiltroFecha] = useState<'todas' | 'hoy' | 'semana' | 'mes'>('todas');
   const [mostrarConfirmacionEliminar, setMostrarConfirmacionEliminar] = useState(false);
@@ -152,10 +154,10 @@ export default function HistorialPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
             <Clock className="w-8 h-8 mr-3" />
-            Historial
+            {t('dashboard.history.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Consulta tus rutas anteriores, predicciones pasadas y estadísticas de uso
+            {t('sidebar.history.desc')}
           </p>
         </div>
 
@@ -170,7 +172,7 @@ export default function HistorialPage() {
             }`}
           >
             <Navigation className="w-5 h-5" />
-            <span>Rutas ({totalRutas})</span>
+            <span>{t('sidebar.routes')} ({totalRutas})</span>
           </button>
 
           <button
@@ -182,7 +184,7 @@ export default function HistorialPage() {
             }`}
           >
             <TrendingUp className="w-5 h-5" />
-            <span>Predicciones ({prediccionesHistorialMock.length})</span>
+            <span>{t('sidebar.predictions')} ({prediccionesHistorialMock.length})</span>
           </button>
 
           <button
@@ -194,7 +196,7 @@ export default function HistorialPage() {
             }`}
           >
             <BarChart3 className="w-5 h-5" />
-            <span>Estadísticas</span>
+            <span>{t('dashboard.history.statistics')}</span>
           </button>
         </div>
 
@@ -207,10 +209,10 @@ export default function HistorialPage() {
               onChange={e => setFiltroFecha(e.target.value as any)}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
-              <option value="todas">Todas las fechas</option>
-              <option value="hoy">Hoy</option>
-              <option value="semana">Última semana</option>
-              <option value="mes">Último mes</option>
+              <option value="todas">{t('dashboard.history.allDates')}</option>
+              <option value="hoy">{t('dashboard.history.today')}</option>
+              <option value="semana">{t('dashboard.history.thisWeek')}</option>
+              <option value="mes">{t('dashboard.history.thisMonth')}</option>
             </select>
           </div>
 
@@ -220,7 +222,7 @@ export default function HistorialPage() {
               className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
             >
               <Download className="w-4 h-4" />
-              <span>Exportar CSV</span>
+              <span>{t('dashboard.history.export')}</span>
             </button>
 
             <button
@@ -228,7 +230,7 @@ export default function HistorialPage() {
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Eliminar Todo</span>
+              <span>{t('dashboard.history.deleteAll')}</span>
             </button>
           </div>
         </div>
@@ -287,19 +289,19 @@ export default function HistorialPage() {
 
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Distancia</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.history.distance')}</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                       {ruta.distancia} km
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Duración</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.history.duration')}</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
                       {ruta.duracion} min
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Tiempo ahorrado</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.history.timeSaved')}</p>
                     <p className="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
                       +{ruta.tiempoAhorrado} min
                     </p>
@@ -370,25 +372,25 @@ export default function HistorialPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
               <Navigation className="w-8 h-8 mb-3 opacity-80" />
-              <p className="text-sm opacity-90 mb-1">Rutas consultadas</p>
+              <p className="text-sm opacity-90 mb-1">{t('dashboard.history.queriedRoutes')}</p>
               <p className="text-3xl font-bold">{totalRutas}</p>
             </div>
 
             <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-6 text-white">
               <MapPin className="w-8 h-8 mb-3 opacity-80" />
-              <p className="text-sm opacity-90 mb-1">Kilómetros recorridos</p>
+              <p className="text-sm opacity-90 mb-1">{t('dashboard.history.kilometers')}</p>
               <p className="text-3xl font-bold">{totalKm.toFixed(1)} km</p>
             </div>
 
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
               <Clock className="w-8 h-8 mb-3 opacity-80" />
-              <p className="text-sm opacity-90 mb-1">Tiempo ahorrado</p>
+              <p className="text-sm opacity-90 mb-1">{t('dashboard.history.timeSaved')}</p>
               <p className="text-3xl font-bold">{totalTiempoAhorrado} min</p>
             </div>
 
             <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
               <TrendingUp className="w-8 h-8 mb-3 opacity-80" />
-              <p className="text-sm opacity-90 mb-1">Precisión promedio</p>
+              <p className="text-sm opacity-90 mb-1">{t('dashboard.history.averagePrecision')}</p>
               <p className="text-3xl font-bold">{precisionPromedio.toFixed(0)}%</p>
             </div>
           </div>
@@ -399,24 +401,23 @@ export default function HistorialPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                ¿Eliminar todo el historial?
+                {t('dashboard.history.deleteConfirm')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Esta acción eliminará permanentemente todas tus rutas y predicciones guardadas. 
-                No se puede deshacer.
+                {t('dashboard.history.deleteMessage')}
               </p>
               <div className="flex space-x-4">
                 <button
                   onClick={eliminarHistorial}
                   className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                 >
-                  Sí, eliminar todo
+                  {t('dashboard.history.confirmDelete')}
                 </button>
                 <button
                   onClick={() => setMostrarConfirmacionEliminar(false)}
                   className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
                 >
-                  Cancelar
+                  {t('dashboard.history.cancel')}
                 </button>
               </div>
             </div>

@@ -7,8 +7,7 @@ import {
   Home, 
   Map, 
   TrendingUp, 
-  Clock, 
-  Settings,
+  Clock,
   ChevronLeft,
   ChevronRight,
   HelpCircle,
@@ -72,18 +71,10 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
     },
     { 
       id: 5, 
-      label: t('sidebar.settings'), 
-      href: '/configuracion', 
-      icon: Settings, 
-      shortcut: '5',
-      description: t('sidebar.settings.desc')
-    },
-    { 
-      id: 6, 
       label: t('sidebar.assistant'), 
-      href: '#', 
+      href: '/asistente', 
       icon: Bot, 
-      shortcut: '6',
+      shortcut: '5',
       description: t('sidebar.assistant.desc')
     },
   ];
@@ -97,17 +88,12 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
         onToggle();
       }
       
-      // Alt+1-6: Navegar directamente a secciones
-      if (e.altKey && /^[1-6]$/.test(e.key)) {
+      // Alt+1-5: Navegar directamente a secciones
+      if (e.altKey && /^[1-5]$/.test(e.key)) {
         e.preventDefault();
         const item = MENU_ITEMS.find(i => i.shortcut === e.key);
-        if (item) {
-          if (item.href === '#') {
-            // Asistente Virtual - mostrar alerta temporal
-            alert('El asistente virtual se integrará próximamente con IA avanzada.');
-          } else {
-            router.push(item.href);
-          }
+        if (item && item.href !== '#') {
+          router.push(item.href);
         }
       }
     };
@@ -152,61 +138,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               
               return (
                 <li key={item.id} role="none">
-                  {item.href === '#' ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        alert('El asistente virtual se integrará próximamente con IA avanzada.');
-                      }}
-                      role="menuitem"
-                      className={`
-                        flex items-center gap-3 px-3 py-2.5 rounded-lg 
-                        transition-all duration-200
-                        group relative w-full text-left
-                        text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800
-                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                        ${!isOpen ? 'justify-center' : ''}
-                      `}
-                      title={`${item.label} (Alt+${item.shortcut})`}
-                    >
-                      {/* Icono */}
-                      <Icon 
-                        className="w-5 h-5 shrink-0 text-gray-500 dark:text-gray-400"
-                        aria-hidden="true"
-                      />
-                      
-                      {/* Texto y atajo (visible cuando está expandido) */}
-                      {isOpen && (
-                        <>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">
-                              {item.label}
-                            </p>
-                            {item.description && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                          <kbd 
-                            className="
-                              hidden lg:inline-flex items-center justify-center
-                              px-1.5 py-0.5 
-                              text-xs font-mono 
-                              bg-gray-200 dark:bg-gray-700 
-                              text-gray-600 dark:text-gray-300
-                              rounded
-                              opacity-0 group-hover:opacity-100
-                              transition-opacity
-                            "
-                          >
-                            Alt+{item.shortcut}
-                          </kbd>
-                        </>
-                      )}
-                    </button>
-                  ) : (
-                    <Link
+                  <Link
                       href={item.href}
                       role="menuitem"
                       className={`
@@ -267,7 +199,6 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 dark:bg-blue-400 rounded-r" />
                       )}
                     </Link>
-                  )}
                 </li>
               );
             })}
@@ -326,7 +257,7 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               <p className="font-semibold mb-2">Atajos de teclado:</p>
               <ul className="space-y-1">
                 <li><kbd className="bg-gray-700 px-1 rounded">Alt+S</kbd> Toggle menú</li>
-                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-6</kbd> Navegación rápida</li>
+                <li><kbd className="bg-gray-700 px-1 rounded">Alt+1-5</kbd> Navegación rápida</li>
               </ul>
             </div>
           </div>

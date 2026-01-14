@@ -10,15 +10,17 @@ interface AppLayoutProps {
   showSearch?: boolean;
   showBreadcrumbs?: boolean;
   showSidebar?: boolean;
+  hideFooter?: boolean;
 }
 
 export function AppLayout({ 
   children, 
   showSearch = true, 
   showBreadcrumbs = true,
-  showSidebar = true 
+  showSidebar = true,
+  hideFooter = false
 }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -49,7 +51,7 @@ export function AppLayout({
             {children}
           </div>
           {/* Footer */}
-          <Footer />
+          {!hideFooter && <Footer />}
         </main>
       </div>
     </div>
