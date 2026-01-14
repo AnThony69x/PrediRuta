@@ -1,6 +1,7 @@
 import "./globals.css";
 import "../styles/accessibility.css";
-import "leaflet/dist/leaflet.css";
+// Leaflet ha sido reemplazado por Mapbox GL JS
+// import "leaflet/dist/leaflet.css";
 import { AccessibilityWidget } from "../components/ui/accessibility-widget";
 import { ToasterProvider } from "../components/ui/toaster";
 import { ThemeProvider } from "../components/ThemeProvider";

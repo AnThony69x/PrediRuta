@@ -12,6 +12,13 @@ except Exception:
 
 from app.routes import traffic
 
+# Mapbox APIs
+try:
+    from app.routes import mapbox
+except Exception as e:
+    mapbox = None
+    print(f"⚠️ Error importando rutas de Mapbox: {e}")
+
 # Dataset de tráfico Ecuador
 try:
     from app.routes import dataset
@@ -76,6 +83,10 @@ if predictions is not None:
 
 # Tráfico
 app.include_router(traffic.router)
+
+# Mapbox APIs
+if mapbox is not None:
+    app.include_router(mapbox.router)
 
 # Dataset Ecuador (datos históricos)
 if dataset is not None:

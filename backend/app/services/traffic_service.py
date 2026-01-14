@@ -1,8 +1,10 @@
 import os
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import httpx
+from app.config.mapbox import mapbox_config
+from app.services.mapbox_directions import get_route_with_traffic
 
 
 # Caché en memoria muy simple con TTL
@@ -17,30 +19,33 @@ def _cache_key(lat: float, lon: float) -> str:
 
 async def get_traffic_status_for_point(lat: float, lon: float) -> Dict[str, Any]:
     """
-    Obtiene el estado del tráfico para un punto específico usando TomTom Traffic API.
+    Obtiene el estado del tráfico para un punto específico usando Mapbox.
     
     ✅ FUNCIONA EN ECUADOR (incluyendo Manta, Quito, Guayaquil)
     
-    TomTom tiene cobertura global incluyendo:
-    - Carreteras principales y autopistas
-    - Avenidas urbanas importantes
-    - Velocidad estimada y flujo de tráfico
-    - Comparación con velocidad normal (freeFlowSpeed)
+    Mapbox proporciona información de tráfico global incluyendo:
+    - Datos de tráfico en tiempo real
+    - Velocidades actuales vs flujo libre
+    - Niveles de congestión
+    - Compatible con todas las ciudades principales de Ecuador
     
     Ejemplo de coordenadas Ecuador:
     - Manta: lat=-0.95, lon=-80.72
     - Quito: lat=-0.22, lon=-78.51
     - Guayaquil: lat=-2.19, lon=-79.88
     
-    API Endpoint: https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json
+    Nota: Mapbox proporciona datos de tráfico principalmente a través de:
+    1. Directions API con perfil "driving-traffic"
+    2. Vector tiles con capa de tráfico
+    
+    Para un punto específico, calculamos una ruta corta alrededor del punto
+    para obtener información de congestión.
     """
-    provider = os.getenv("TRAFFIC_PROVIDER", "tomtom").lower()
-    if provider not in ("tomtom",):
-        return {"status": "unavailable", "code": 503, "message": f"Proveedor no soportado: {provider}"}
-
-    api_key = os.getenv("TRAFFIC_API_KEY")
-    if not api_key:
-        return {"status": "unavailable", "code": 428, "message": "Falta TRAFFIC_API_KEY en el backend"}
+    
+    # Validar configuración
+    valid, message = mapbox_config.validate()
+    if not valid:
+        return {"status": "unavailable", "code": 428, "message": message}
 
     key = _cache_key(lat, lon)
     now = time.time()
@@ -48,60 +53,166 @@ async def get_traffic_status_for_point(lat: float, lon: float) -> Dict[str, Any]
     if cached and (now - cached["t"]) < _TTL_SECONDS:
         return cached["v"]
 
-    # TomTom Traffic Flow Segment Data API v4
-    # Intento 1: absolute; Fallback: relative0 si absolute falla (planes que no incluyen absolute)
-    endpoints = [
-        ("absolute", "https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json"),
-        ("relative0", "https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json"),
-    ]
-    params = {"point": f"{lat},{lon}", "unit": "KMPH", "key": api_key}
+    # Estrategia: Crear una ruta corta alrededor del punto para obtener datos de tráfico
+    # Offset pequeño (~500m) en diferentes direcciones
+    offset = 0.005  # Aproximadamente 500 metros
+    
+    # Punto inicial (el punto consultado)
+    start = (lon, lat)
+    # Punto final (ligeramente al norte)
+    end = (lon, lat + offset)
+    
+    try:
+        # Obtener ruta con información de tráfico
+        route_data = await get_route_with_traffic(start, end, alternatives=False)
+        
+        if route_data.get("status") != "ok":
+            return {
+                "status": "unavailable",
+                "code": route_data.get("code", 503),
+                "message": f"No se pudo obtener datos de tráfico: {route_data.get('message', 'Error desconocido')}",
+            }
+        
+        # Extraer información de la ruta
+        routes = route_data.get("routes", [])
+        if not routes:
+            return {
+                "status": "unavailable",
+                "code": 404,
+                "message": "No hay datos de tráfico disponibles para este punto",
+            }
+        
+        route = routes[0]
+        legs = route.get("legs", [])
+        
+        if not legs:
+            return {
+                "status": "unavailable",
+                "code": 404,
+                "message": "No hay información de segmentos para esta ruta",
+            }
+        
+        leg = legs[0]
+        annotation = leg.get("annotation", {})
+        
+        # Obtener velocidades y congestión
+        speeds = annotation.get("speed", [])
+        congestion_levels = annotation.get("congestion", [])
+        duration = leg.get("duration", 0)
+        distance = leg.get("distance", 0)
+        
+        # Calcular velocidad promedio actual
+        current_speed = None
+        if distance > 0 and duration > 0:
+            # Velocidad en km/h
+            current_speed = (distance / duration) * 3.6
+        
+        # Determinar nivel de congestión promedio
+        congestion_level = "unknown"
+        if congestion_levels:
+            # Mapbox devuelve: low, moderate, heavy, severe
+            # Contar ocurrencias
+            congestion_counts = {}
+            for level in congestion_levels:
+                congestion_counts[level] = congestion_counts.get(level, 0) + 1
+            
+            # Nivel más común
+            congestion_level = max(congestion_counts.items(), key=lambda x: x[1])[0] if congestion_counts else "unknown"
+        
+        # Estimar velocidad de flujo libre (aproximación)
+        # En flujo libre, típicamente se viaja a velocidad límite o cercana
+        # Para Ecuador: ~60-80 km/h en vías urbanas principales
+        free_flow_speed = current_speed * 1.5 if current_speed else 60.0
+        
+        # Mapear congestion_level a valores numéricos para compatibilidad
+        congestion_map = {
+            "low": 0.2,
+            "moderate": 0.5,
+            "heavy": 0.7,
+            "severe": 0.9,
+            "unknown": 0.0,
+        }
+        
+        result = {
+            "status": "ok",
+            "provider": "mapbox",
+            "currentSpeed": round(current_speed, 1) if current_speed else None,
+            "freeFlowSpeed": round(free_flow_speed, 1),
+            "confidence": 1.0 if congestion_levels else 0.5,
+            "roadClosure": False,
+            "congestionLevel": congestion_level,
+            "congestionValue": congestion_map.get(congestion_level, 0.0),
+            "coordinates": {"lat": lat, "lon": lon},
+        }
+        
+        # Guardar en cache
+        _cache[key] = {"t": now, "v": result}
+        return result
+        
+    except Exception as e:
+        error_result = {
+            "status": "unavailable",
+            "code": 500,
+            "message": f"Error al obtener tráfico: {str(e)}",
+        }
+        return error_result
 
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        last_error = None
-        for mode, url in endpoints:
-            try:
-                resp = await client.get(url, params=params)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    break
-                else:
-                    error_body = resp.text[:500]  # Más detalle
-                    last_error = {
-                        "status": "unavailable",
-                        "code": resp.status_code,
-                        "message": f"TomTom {mode} HTTP {resp.status_code}: {error_body}",
-                    }
-                    # Log para debugging
-                    print(f"❌ TomTom {mode} falló: {resp.status_code} - {error_body}")
-            except httpx.RequestError as e:
-                last_error = {"status": "unavailable", "code": 503, "message": f"Error de red: {e}"}
-                print(f"❌ Error de red en TomTom {mode}: {e}")
-        else:
-            # Ningún endpoint funcionó
-            return last_error or {"status": "unavailable", "code": 502, "message": "Proveedor TomTom no disponible"}
 
-    # TomTom response shape (simplificado):
-    # {
-    #   "flowSegmentData": {
-    #       "frc": "FRC3",
-    #       "currentSpeed": 45,
-    #       "freeFlowSpeed": 65,
-    #       "confidence": 0.98,
-    #       ...
-    #   }
-    # }
-    fsd: Optional[Dict[str, Any]] = data.get("flowSegmentData") if isinstance(data, dict) else None
-    if not fsd:
-        return {"status": "unavailable", "code": 502, "message": "Respuesta TomTom sin flowSegmentData"}
-
-    result = {
-        "status": "ok",
-        "provider": "tomtom",
-        "currentSpeed": fsd.get("currentSpeed"),
-        "freeFlowSpeed": fsd.get("freeFlowSpeed"),
-        "confidence": fsd.get("confidence"),
-        "raw": data,
-    }
-
-    _cache[key] = {"t": now, "v": result}
-    return result
+async def get_traffic_for_route(
+    coordinates: list[Tuple[float, float]]
+) -> Dict[str, Any]:
+    """
+    Obtiene información detallada de tráfico para una ruta completa.
+    
+    Args:
+        coordinates: Lista de tuplas (longitud, latitud) que forman la ruta
+    
+    Returns:
+        Información de tráfico segmentada por la ruta
+    """
+    
+    if not coordinates or len(coordinates) < 2:
+        return {
+            "status": "error",
+            "code": 400,
+            "message": "Se requieren al menos 2 coordenadas",
+        }
+    
+    try:
+        from app.services.mapbox_directions import get_directions
+        
+        # Obtener ruta con datos de tráfico
+        route_data = await get_directions(
+            coordinates=coordinates,
+            profile="driving-traffic",
+            alternatives=False,
+            annotations=["duration", "distance", "speed", "congestion"],
+        )
+        
+        if route_data.get("status") != "ok":
+            return route_data
+        
+        routes = route_data.get("routes", [])
+        if not routes:
+            return {
+                "status": "error",
+                "code": 404,
+                "message": "No se encontró ruta",
+            }
+        
+        route = routes[0]
+        
+        return {
+            "status": "ok",
+            "provider": "mapbox",
+            "route": route,
+            "total_distance": route.get("distance"),
+            "total_duration": route.get("duration"),
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "code": 500,
+            "message": f"Error: {str(e)}",
+        }
