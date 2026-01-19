@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
+import { limpiarHistorialLocalAlCerrarSesion } from '@/lib/history-service';
 
 export interface AuthState {
   user: User | null;
@@ -189,6 +190,9 @@ export const useAuth = () => {
 
   const signOut = async () => {
     try {
+      // Limpiar historial local antes de cerrar sesión
+      await limpiarHistorialLocalAlCerrarSesion();
+      
       await supabase.auth.signOut();
       // Limpieza local inmediata de cookies para asegurar estado consistente
       document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';

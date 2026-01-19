@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useHistory } from "@/hooks/useHistory";
 import { 
   Clock, 
   MapPin, 
@@ -12,139 +13,69 @@ import {
   Trash2,
   Filter,
   Calendar,
-  BarChart3
+  BarChart3,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
-
-interface RutaHistorial {
-  id: number;
-  fecha: string;
-  origen: string;
-  destino: string;
-  distancia: number;
-  duracion: number;
-  tiempoAhorrado: number;
-  trafico: 'fluido' | 'moderado' | 'congestionado';
-}
-
-interface PrediccionHistorial {
-  id: number;
-  fecha: string;
-  zona: string;
-  horaConsulta: string;
-  precisionReal: number;
-  congestionPredicha: number;
-}
-
-const rutasHistorialMock: RutaHistorial[] = [
-  {
-    id: 1,
-    fecha: "2025-10-28 08:30",
-    origen: "Av. 4 de Noviembre, Manta, Manabí",
-    destino: "Aeropuerto Internacional Eloy Alfaro, Manta",
-    distancia: 14.5,
-    duracion: 22,
-    tiempoAhorrado: 8,
-    trafico: 'fluido'
-  },
-  {
-    id: 2,
-    fecha: "2025-10-27 18:15",
-    origen: "Centro de Manta, Manabí",
-    destino: "Estadio Santiago Bernabéu",
-    distancia: 4.2,
-    duracion: 15,
-    tiempoAhorrado: 5,
-    trafico: 'moderado'
-  },
-  {
-    id: 3,
-    fecha: "2025-10-26 07:45",
-    origen: "Atocha Renfe",
-    destino: "Playa Murciélago, Manta",
-    distancia: 32.7,
-    duracion: 35,
-    tiempoAhorrado: 12,
-    trafico: 'congestionado'
-  },
-  {
-    id: 4,
-    fecha: "2025-10-25 14:00",
-    origen: "Universidad Complutense",
-    destino: "Centro Comercial La Vaguada",
-    distancia: 8.9,
-    duracion: 18,
-    tiempoAhorrado: 3,
-    trafico: 'fluido'
-  },
-  {
-    id: 5,
-    fecha: "2025-10-24 09:30",
-    origen: "Hospital La Paz",
-    destino: "Museo del Prado",
-    distancia: 6.3,
-    duracion: 20,
-    tiempoAhorrado: 7,
-    trafico: 'moderado'
-  }
-];
-
-const prediccionesHistorialMock: PrediccionHistorial[] = [
-  {
-    id: 1,
-    fecha: "2025-10-28",
-    zona: "Centro",
-    horaConsulta: "08:00",
-    precisionReal: 92,
-    congestionPredicha: 0.75
-  },
-  {
-    id: 2,
-    fecha: "2025-10-27",
-    zona: "Norte",
-    horaConsulta: "18:00",
-    precisionReal: 88,
-    congestionPredicha: 0.45
-  },
-  {
-    id: 3,
-    fecha: "2025-10-26",
-    zona: "Sur",
-    horaConsulta: "07:30",
-    precisionReal: 95,
-    congestionPredicha: 0.85
-  }
-];
 
 export default function HistorialPage() {
   const { t } = useTranslation();
   const [vistaActiva, setVistaActiva] = useState<'rutas' | 'predicciones' | 'estadisticas'>('rutas');
   const [filtroFecha, setFiltroFecha] = useState<'todas' | 'hoy' | 'semana' | 'mes'>('todas');
   const [mostrarConfirmacionEliminar, setMostrarConfirmacionEliminar] = useState(false);
+  const [eliminandoRuta, setEliminandoRuta] = useState<string | null>(null);
 
-  // Calcular estadísticas
-  const totalRutas = rutasHistorialMock.length;
-  const totalKm = rutasHistorialMock.reduce((sum, r) => sum + r.distancia, 0);
-  const totalTiempoAhorrado = rutasHistorialMock.reduce((sum, r) => sum + r.tiempoAhorrado, 0);
-  const precisionPromedio = prediccionesHistorialMock.reduce((sum, p) => sum + p.precisionReal, 0) / prediccionesHistorialMock.length;
+  // Usar el hook de historial con datos reales
+  const {
+    rutas,
+    predicciones,
+    estadisticas,
+    loading,
+    error,
+    eliminarRutaPorId,
+    limpiarHistorial,
+    exportarCSV,
+    actualizarFiltros,
+    recargar,
+    totalRutas,
+    totalPredicciones,
+    tieneHistorial
+  } = useHistory({ autoLoad: true });
 
-  const exportarHistorial = () => {
-    // Simulación de exportación a CSV
-    const csv = rutasHistorialMock.map(r => 
-      `${r.fecha},${r.origen},${r.destino},${r.distancia},${r.duracion},${r.tiempoAhorrado}`
-    ).join('\n');
-    
-    const blob = new Blob([`Fecha,Origen,Destino,Distancia(km),Duración(min),TiempoAhorrado(min)\n${csv}`], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `historial-prediruta-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+  // Actualizar filtros cuando cambie el filtro de fecha
+  useEffect(() => {
+    actualizarFiltros({ fecha: filtroFecha });
+  }, [filtroFecha, actualizarFiltros]);
+
+  // Calcular estadísticas locales si no están disponibles desde el hook
+  const totalKm = estadisticas?.totalKm || rutas.reduce((sum, r) => sum + r.distancia, 0);
+  const totalTiempoAhorrado = estadisticas?.totalTiempoAhorrado || rutas.reduce((sum, r) => sum + r.tiempoAhorrado, 0);
+  const precisionPromedio = estadisticas?.precisionPromedio || 
+    (predicciones.length > 0 ? predicciones.reduce((sum, p) => sum + p.precisionReal, 0) / predicciones.length : 0);
+
+  const exportarHistorial = async () => {
+    const success = await exportarCSV();
+    if (!success) {
+      alert('Error al exportar el historial');
+    }
   };
 
-  const eliminarHistorial = () => {
-    // Simulación de eliminación
-    console.log('Historial eliminado');
-    setMostrarConfirmacionEliminar(false);
+  const eliminarHistorialCompleto = async () => {
+    const success = await limpiarHistorial();
+    if (success) {
+      setMostrarConfirmacionEliminar(false);
+    } else {
+      alert('Error al eliminar el historial');
+    }
+  };
+
+  const eliminarRutaIndividual = async (id: string) => {
+    setEliminandoRuta(id);
+    const success = await eliminarRutaPorId(id);
+    setEliminandoRuta(null);
+    if (!success) {
+      alert('Error al eliminar la ruta');
+    }
   };
 
   return (
@@ -184,7 +115,7 @@ export default function HistorialPage() {
             }`}
           >
             <TrendingUp className="w-5 h-5" />
-            <span>{t('sidebar.predictions')} ({prediccionesHistorialMock.length})</span>
+            <span>{t('sidebar.predictions')} ({totalPredicciones})</span>
           </button>
 
           <button
@@ -227,7 +158,8 @@ export default function HistorialPage() {
 
             <button
               onClick={() => setMostrarConfirmacionEliminar(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+              disabled={!tieneHistorial || loading}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="w-4 h-4" />
               <span>{t('dashboard.history.deleteAll')}</span>
@@ -236,9 +168,38 @@ export default function HistorialPage() {
         </div>
 
         {/* Contenido según vista activa */}
-        {vistaActiva === 'rutas' && (
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <span className="ml-3 text-gray-600 dark:text-gray-400">Cargando historial...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center space-x-3">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-red-900 dark:text-red-200">Error al cargar historial</p>
+              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && !tieneHistorial && (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 p-12 text-center">
+            <Clock className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No hay historial disponible
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Comienza a consultar rutas y predicciones para ver tu historial aquí.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && vistaActiva === 'rutas' && rutas.length > 0 && (
           <div className="space-y-4">
-            {rutasHistorialMock.map(ruta => (
+            {rutas.map(ruta => (
               <div
                 key={ruta.id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
@@ -248,12 +209,18 @@ export default function HistorialPage() {
                     <div className="flex items-center space-x-2 mb-2">
                       <Calendar className="w-4 h-4 text-gray-500" />
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(ruta.fecha).toLocaleString('es-ES')}
+                        {new Date(ruta.fecha).toLocaleString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        ruta.trafico === 'fluido' ? 'bg-green-100 text-green-800' :
-                        ruta.trafico === 'moderado' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                        ruta.trafico === 'fluido' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                        ruta.trafico === 'moderado' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                       }`}>
                         {ruta.trafico === 'fluido' ? '🟢 Fluido' :
                          ruta.trafico === 'moderado' ? '🟡 Moderado' :
@@ -282,8 +249,16 @@ export default function HistorialPage() {
                     </div>
                   </div>
 
-                  <button className="text-gray-400 hover:text-red-600 transition-colors">
-                    <Trash2 className="w-5 h-5" />
+                  <button 
+                    onClick={() => eliminarRutaIndividual(ruta.id)}
+                    disabled={eliminandoRuta === ruta.id}
+                    className="text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                  >
+                    {eliminandoRuta === ruta.id ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
 
@@ -291,7 +266,7 @@ export default function HistorialPage() {
                   <div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.history.distance')}</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {ruta.distancia} km
+                      {ruta.distancia.toFixed(1)} km
                     </p>
                   </div>
                   <div>
@@ -312,9 +287,9 @@ export default function HistorialPage() {
           </div>
         )}
 
-        {vistaActiva === 'predicciones' && (
+        {!loading && !error && vistaActiva === 'predicciones' && predicciones.length > 0 && (
           <div className="space-y-4">
-            {prediccionesHistorialMock.map(pred => (
+            {predicciones.map(pred => (
               <div
                 key={pred.id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
@@ -325,7 +300,11 @@ export default function HistorialPage() {
                       {pred.zona}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {new Date(pred.fecha).toLocaleDateString('es-ES')} - {pred.horaConsulta}
+                      {new Date(pred.fecha).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })} - {pred.horaConsulta}
                     </p>
                   </div>
                   <div className="text-right">
@@ -353,9 +332,9 @@ export default function HistorialPage() {
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Estado</p>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      pred.precisionReal >= 90 ? 'bg-green-100 text-green-800' :
-                      pred.precisionReal >= 75 ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      pred.precisionReal >= 90 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                      pred.precisionReal >= 75 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                     }`}>
                       {pred.precisionReal >= 90 ? 'Excelente' :
                        pred.precisionReal >= 75 ? 'Buena' :
@@ -368,7 +347,7 @@ export default function HistorialPage() {
           </div>
         )}
 
-        {vistaActiva === 'estadisticas' && (
+        {!loading && !error && vistaActiva === 'estadisticas' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
               <Navigation className="w-8 h-8 mb-3 opacity-80" />
@@ -393,6 +372,33 @@ export default function HistorialPage() {
               <p className="text-sm opacity-90 mb-1">{t('dashboard.history.averagePrecision')}</p>
               <p className="text-3xl font-bold">{precisionPromedio.toFixed(0)}%</p>
             </div>
+
+            {estadisticas?.rutasMasFrecuentes && estadisticas.rutasMasFrecuentes.length > 0 && (
+              <div className="md:col-span-2 lg:col-span-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Rutas más frecuentes
+                </h3>
+                <div className="space-y-3">
+                  {estadisticas.rutasMasFrecuentes.map((ruta, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center space-x-3 flex-1">
+                        <span className="text-lg font-bold text-gray-400">#{idx + 1}</span>
+                        <div className="flex items-center space-x-2 text-sm">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                          <span className="text-gray-900 dark:text-white font-medium">{ruta.origen}</span>
+                          <Navigation className="w-4 h-4 text-emerald-600" />
+                          <span className="text-gray-900 dark:text-white font-medium">{ruta.destino}</span>
+                        </div>
+                      </div>
+                      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-sm font-medium">
+                        {ruta.count} {ruta.count === 1 ? 'vez' : 'veces'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -408,10 +414,18 @@ export default function HistorialPage() {
               </p>
               <div className="flex space-x-4">
                 <button
-                  onClick={eliminarHistorial}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                  onClick={eliminarHistorialCompleto}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
-                  {t('dashboard.history.confirmDelete')}
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Eliminando...
+                    </>
+                  ) : (
+                    t('dashboard.history.confirmDelete')
+                  )}
                 </button>
                 <button
                   onClick={() => setMostrarConfirmacionEliminar(false)}

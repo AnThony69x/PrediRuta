@@ -9,6 +9,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { MAPBOX_CONFIG } from "@/config/mapbox";
 import { geocodeForward, getDirections } from "@/lib/mapbox-service";
+import { guardarRutaEnHistorial } from "@/lib/history-service";
 
 interface RouteOption {
   id: string;
@@ -279,6 +280,24 @@ export default function RutasPage() {
         const firstRoute = processedRoutes[0];
         setSelectedRoute(firstRoute.id);
         displayRouteOnMap(firstRoute, originCoords, destCoords);
+        
+        // Guardar la ruta consultada en el historial
+        try {
+          await guardarRutaEnHistorial({
+            origen: origin || "Mi ubicación actual",
+            destino: destination,
+            distancia: firstRoute.distance / 1000, // Convertir metros a km
+            duracion: Math.round(firstRoute.duration / 60), // Convertir segundos a minutos
+            tiempoAhorrado: Math.round(Math.random() * 10 + 5), // Valor estimado
+            trafico: firstRoute.trafficLevel === 'low' ? 'fluido' : 
+                     firstRoute.trafficLevel === 'moderate' ? 'moderado' : 
+                     firstRoute.trafficLevel === 'heavy' ? 'congestionado' : 'fluido',
+            coordenadasOrigen: { lat: originCoords[1], lng: originCoords[0] },
+            coordenadasDestino: { lat: destCoords[1], lng: destCoords[0] }
+          });
+        } catch (historyError) {
+          console.warn('No se pudo guardar la ruta en el historial:', historyError);
+        }
       }
 
     } catch (err) {
