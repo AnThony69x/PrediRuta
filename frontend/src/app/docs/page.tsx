@@ -114,30 +114,97 @@ export default function DocsPage() {
                         <Network className="w-5 h-5 mr-2 text-blue-600" />
                         Arquitectura General
                       </h3>
-                      <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-8 aspect-video flex items-center justify-center">
+                      <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 mb-4">
                         <img 
                           src="/docs/diagramas/arquitectura_general.jpg" 
-                          alt="Arquitectura" 
-                          className="max-w-full max-h-full object-contain"
+                          alt="Arquitectura General del Sistema" 
+                          className="w-full h-auto rounded"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            e.currentTarget.parentElement!.innerHTML = '<p class="text-gray-500">Diagrama de arquitectura no disponible</p>';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">Diagrama no disponible</p>';
+                            }
                           }}
                         />
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-3">
-                        Diagrama que muestra la arquitectura de microservicios del sistema.
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        Diagrama que muestra la arquitectura de microservicios del sistema PrediRuta 2.0.
                       </p>
+                      <a
+                        href="/docs/diagramas/arquitectura_general.jpg"
+                        download="PrediRuta-Arquitectura.jpg"
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Descargar Diagrama
+                      </a>
                     </div>
 
                     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold mb-4">Casos de Uso</h3>
-                      <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Consultar ruta \u00f3ptima</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Ver predicciones de tr\u00e1fico</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Gestionar perfil de usuario</li>
-                        <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-600" /> Configurar notificaciones</li>
+                      <h3 className="text-lg font-semibold mb-4">Componentes del Sistema</h3>
+                      <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+                        <li className="flex items-start">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong>Frontend (Next.js):</strong> Interfaz de usuario responsive con React
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong>Backend (FastAPI):</strong> API REST para gestión de rutas y predicciones
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong>ChatAgent (Gemini):</strong> Asistente virtual inteligente
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong>Base de Datos (Supabase):</strong> Almacenamiento de usuarios y rutas
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <strong>Mapbox API:</strong> Servicios de mapas y geocodificación
+                          </div>
+                        </li>
                       </ul>
+                    </div>
+
+                    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold mb-4">Casos de Uso Principales</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Consultar Ruta</h4>
+                          <p className="text-sm text-blue-800 dark:text-blue-400">
+                            El usuario ingresa origen y destino para obtener rutas optimizadas
+                          </p>
+                        </div>
+                        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-green-900 dark:text-green-300 mb-2">Ver Predicciones</h4>
+                          <p className="text-sm text-green-800 dark:text-green-400">
+                            Consulta predicciones de tráfico para planificar viajes futuros
+                          </p>
+                        </div>
+                        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">Gestionar Perfil</h4>
+                          <p className="text-sm text-purple-800 dark:text-purple-400">
+                            Actualiza información personal y preferencias de configuración
+                          </p>
+                        </div>
+                        <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4">
+                          <h4 className="font-semibold text-orange-900 dark:text-orange-300 mb-2">Usar Asistente</h4>
+                          <p className="text-sm text-orange-800 dark:text-orange-400">
+                            Consulta información mediante el chatbot inteligente
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -256,52 +323,55 @@ export default function DocsPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <a
-                      href="#"
-                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
+                      href="/docs/manual-usuario.md"
+                      download="PrediRuta-Manual-Usuario.md"
+                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group cursor-pointer"
                     >
                       <FileText className="w-10 h-10 text-blue-600 group-hover:text-blue-700" />
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">Manual de Usuario</h3>
-                        <p className="text-sm text-gray-500">PDF - 2.4 MB</p>
+                        <p className="text-sm text-gray-500">Markdown - Guía completa</p>
                       </div>
                       <Download className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />
                     </a>
 
                     <a
-                      href="#"
-                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
+                      href="/docs/api-documentation.md"
+                      download="PrediRuta-API-Docs.md"
+                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group cursor-pointer"
                     >
                       <Code className="w-10 h-10 text-green-600 group-hover:text-green-700" />
                       <div>
                         <h3 className="font-semibold text-gray-900 dark:text-white">Documentaci\u00f3n API</h3>
-                        <p className="text-sm text-gray-500">PDF - 1.8 MB</p>
+                        <p className="text-sm text-gray-500">Markdown - Referencia API</p>
                       </div>
                       <Download className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />
                     </a>
 
                     <a
-                      href="#"
-                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
+                      href="/docs/diagramas/arquitectura_general.jpg"
+                      download="PrediRuta-Arquitectura.jpg"
+                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group cursor-pointer"
                     >
                       <Network className="w-10 h-10 text-purple-600 group-hover:text-purple-700" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Diagramas UML</h3>
-                        <p className="text-sm text-gray-500">ZIP - 3.1 MB</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Diagrama de Arquitectura</h3>
+                        <p className="text-sm text-gray-500">JPG - Arquitectura del sistema</p>
                       </div>
                       <Download className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />
                     </a>
 
-                    <a
-                      href="#"
-                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
+                    <button
+                      onClick={() => window.open('http://localhost:8000/docs', '_blank')}
+                      className="flex items-center space-x-4 p-6 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group cursor-pointer text-left"
                     >
                       <Shield className="w-10 h-10 text-orange-600 group-hover:text-orange-700" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Informe WCAG 2.2</h3>
-                        <p className="text-sm text-gray-500">PDF - 1.2 MB</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">API Interactiva</h3>
+                        <p className="text-sm text-gray-500">Swagger UI - Backend</p>
                       </div>
-                      <Download className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />
-                    </a>
+                      <Eye className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />
+                    </button>
                   </div>
                 </div>
               )}
