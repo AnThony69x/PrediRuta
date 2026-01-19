@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+// Build timestamp: Updated to force Vercel rebuild
 const nextConfig = {
   reactStrictMode: true,
   
