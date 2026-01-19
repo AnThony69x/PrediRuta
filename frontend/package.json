@@ -17,15 +17,18 @@
     "@supabase/supabase-js": "^2.58.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.544.0",
     "mapbox-gl": "^3.1.2",
     "next": "^14.2.33",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
     "react-map-gl": "^7.1.7",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.8",
     "@types/mapbox-gl": "^3.1.0",
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.3",

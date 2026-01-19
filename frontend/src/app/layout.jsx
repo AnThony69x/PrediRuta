@@ -30,12 +30,6 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        
-        {/* Load OpenDyslexic for accessibility */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap"
-          rel="stylesheet"
-        />
 
         {/* Inline script: apply language BEFORE hydration */}
         <script dangerouslySetInnerHTML={{ __html: `
