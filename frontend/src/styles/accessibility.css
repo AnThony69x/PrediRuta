@@ -1,7 +1,6 @@
 /* Accessibility Styles */
 
-/* OpenDyslexic Font */
-@import url('https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap');
+/* Usar Comic Sans MS como fuente para dislexia (disponible en la mayoría de sistemas) */
 
 /* ========== SIDE MENU SPECIFIC STYLES ========== */
 
@@ -47,11 +46,11 @@
 }
 
 .dyslexia-font {
-  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+  font-family: 'Comic Sans MS', Verdana, Arial, sans-serif !important;
 }
 
 .dyslexia-font * {
-  font-family: 'OpenDyslexic', 'Comic Sans MS', cursive !important;
+  font-family: 'Comic Sans MS', Verdana, Arial, sans-serif !important;
 }
 
 /* ========== TEXT SIZE ADJUSTMENTS ========== */
