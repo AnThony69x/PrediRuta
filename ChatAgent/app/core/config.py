@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     Configuración de la aplicación del agente de chat.
     Las variables se cargan desde el archivo .env
     """
-    GEMINI_API_KEY: str
+    GEMINI_API_KEY: str = "default_key_required"  # Valor por defecto para desarrollo
     APP_NAME: str = "PrediRuta Chat Agent"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
