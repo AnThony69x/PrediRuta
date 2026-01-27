@@ -244,50 +244,6 @@ export default function AyudaPage() {
 
           {/* Sidebar - Recursos y Contacto */}
           <div className="space-y-6">
-            {/* Recursos útiles */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4">
-                <h2 className="text-lg font-bold text-white flex items-center">
-                  <Book className="w-5 h-5 mr-2" />
-                  Recursos Útiles
-                </h2>
-              </div>
-              <div className="p-6 space-y-3">
-                <a
-                  href="/docs"
-                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
-                >
-                  <FileText className="w-5 h-5 text-emerald-600 group-hover:text-emerald-700" />
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">Documentación</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Guías técnicas y API</p>
-                  </div>
-                </a>
-
-                <a
-                  href="#tutoriales"
-                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
-                >
-                  <Video className="w-5 h-5 text-emerald-600 group-hover:text-emerald-700" />
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">Video Tutoriales</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Aprende paso a paso</p>
-                  </div>
-                </a>
-
-                <a
-                  href="#guia"
-                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
-                >
-                  <Book className="w-5 h-5 text-emerald-600 group-hover:text-emerald-700" />
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">Guía de Usuario</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Manual completo</p>
-                  </div>
-                </a>
-              </div>
-            </div>
-
             {/* Formulario de contacto */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
