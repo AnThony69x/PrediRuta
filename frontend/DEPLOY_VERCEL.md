@@ -47,26 +47,39 @@ vercel
 
 ## ⚙️ Paso 3: Configurar Variables de Entorno en Vercel
 
+⚠️ **IMPORTANTE: Las claves API NUNCA se suben a GitHub. Solo se configuran en Vercel.**
+
 1. Ve a tu proyecto en Vercel Dashboard
 2. Settings → Environment Variables
 3. Añade las siguientes variables (para **Production, Preview y Development**):
 
+### Variables del Sistema (URLs Públicas)
 ```
-# Backend y ChatAgent (Ya configuradas automáticamente)
 NEXT_PUBLIC_BACKEND_API_URL=https://prediruta-backend-production.up.railway.app
 BACKEND_API_URL=https://prediruta-backend-production.up.railway.app
 NEXT_PUBLIC_CHATAGENT_URL=https://prediruta-chatagent-production.up.railway.app
-
-# Mapbox (REQUERIDO - Reemplaza con tu token)
-NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.eyJ1IjoiTUlfVVNVQVJJTyIsImEiOiJjbHh4eHh4eHh4In0.xxxxx
-NEXT_PUBLIC_MAPBOX_STYLE=mapbox://styles/mapbox/streets-v12
-
-# Supabase (REQUERIDO - Reemplaza con tus credenciales)
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xxxxx
-
-# Aplicación
 NODE_ENV=production
+```
+
+### Variables Privadas (⚠️ OBTEN TUS PROPIAS CLAVES)
+
+#### Mapbox (REQUERIDO)
+1. Ve a https://account.mapbox.com/access-tokens/
+2. Crea un token público con restricciones de URL
+3. Añade en Vercel:
+```
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=[TU_TOKEN_AQUI]
+NEXT_PUBLIC_MAPBOX_STYLE=mapbox://styles/mapbox/streets-v12
+```
+
+#### Supabase (REQUERIDO)
+1. Ve a tu proyecto en https://supabase.com/dashboard
+2. Settings → API
+3. Copia "Project URL" y "anon public" key
+4. Añade en Vercel:
+```
+NEXT_PUBLIC_SUPABASE_URL=[TU_URL_AQUI]
+NEXT_PUBLIC_SUPABASE_ANON_KEY=[TU_KEY_AQUI]
 ```
 
 ## 🔄 Paso 4: Re-desplegar
