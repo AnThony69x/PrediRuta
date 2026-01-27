@@ -19,7 +19,11 @@
   "rewrites": [
     {
       "source": "/backend/:path*",
-      "destination": "https://tu-backend-url.com/:path*"
+      "destination": "https://prediruta-backend-production.up.railway.app/:path*"
+    },
+    {
+      "source": "/chatagent/:path*",
+      "destination": "https://prediruta-chatagent-production.up.railway.app/:path*"
     }
   ]
 }
