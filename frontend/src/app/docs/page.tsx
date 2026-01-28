@@ -20,7 +20,7 @@ export default function DocsPage() {
   const secciones = [
     { id: 'guia-usuario', nombre: 'Gu\u00eda de Usuario', icono: Book },
     { id: 'diagramas', nombre: 'Diagramas UML', icono: Network },
-    { id: 'api', nombre: 'Documentaci\u00f3n API', icono: Code },
+    { id: 'api', nombre: 'Referencia API', icono: Code },
     { id: 'accesibilidad', nombre: 'Informe de Accesibilidad', icono: Eye },
     { id: 'descargas', nombre: 'Descargas', icono: Download },
   ];
@@ -32,10 +32,10 @@ export default function DocsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
             <FileText className="w-8 h-8 mr-3" />
-            Documentaci\u00f3n T\u00e9cnica
+            Recursos T\u00e9cnicos
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Gu\u00edas, manuales y documentaci\u00f3n t\u00e9cnica del sistema PrediRuta 2.0
+            Gu\u00edas, manuales y recursos t\u00e9cnicos del sistema PrediRuta 2.0
           </p>
         </div>
 
@@ -212,7 +212,7 @@ export default function DocsPage() {
 
               {seccionActiva === 'api' && (
                 <div>
-                  <h2 className="text-2xl font-bold mb-6">Documentaci\u00f3n de API</h2>
+                  <h2 className="text-2xl font-bold mb-6">Referencia de API</h2>
                   
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6 mb-6">
                     <h3 className="font-semibold mb-2">Base URL</h3>
@@ -342,7 +342,7 @@ export default function DocsPage() {
                     >
                       <Code className="w-10 h-10 text-green-600 group-hover:text-green-700" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Documentaci\u00f3n API</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Referencia API</h3>
                         <p className="text-sm text-gray-500">Markdown - Referencia API</p>
                       </div>
                       <Download className="w-5 h-5 ml-auto text-gray-400 group-hover:text-gray-600" />

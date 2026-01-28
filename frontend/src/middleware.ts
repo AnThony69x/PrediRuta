@@ -31,7 +31,7 @@ const publicRoutes = [
   '/politica-privacidad',    // Política de Privacidad
   '/terminos',   // Alias de términos
   '/privacidad', // Alias de privacidad
-  '/docs',       // Documentación - Acceso a guías
+  '/docs',       // Recursos - Acceso a guías
   '/ayuda',      // Ayuda - Resolver dudas
   '/contacto',   // Contacto
   '/404',        // Error - Página no encontrada

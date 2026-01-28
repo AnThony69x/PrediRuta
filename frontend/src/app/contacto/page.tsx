@@ -184,7 +184,7 @@ export default function ContactoPage() {
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     <strong>¿Necesitas ayuda inmediata?</strong>
                     <br />
-                    Consulta nuestra <a href="/docs" className="text-blue-600 dark:text-blue-400 hover:underline">documentación</a> o visita la sección de <a href="/ayuda" className="text-blue-600 dark:text-blue-400 hover:underline">ayuda</a>.
+                    Consulta nuestros <a href="/docs" className="text-blue-600 dark:text-blue-400 hover:underline">recursos</a> o visita la sección de <a href="/ayuda" className="text-blue-600 dark:text-blue-400 hover:underline">ayuda</a>.
                   </p>
                 </CardContent>
               </Card>

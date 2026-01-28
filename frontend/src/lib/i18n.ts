@@ -70,7 +70,7 @@ export const translations = {
     footer: {
       systemName: 'PrediRuta – Sistema de Predicción de Tráfico Vehicular',
       help: 'Ayuda',
-      documentation: 'Documentación',
+      documentation: 'Recursos',
       contact: 'Contacto',
       rights: 'Todos los derechos reservados',
       version: 'Versión',

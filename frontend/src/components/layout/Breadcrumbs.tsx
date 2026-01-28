@@ -13,7 +13,7 @@ const ROUTE_LABELS: Record<string, string> = {
   '/perfil': 'Perfil',
   '/configuracion': 'Configuración',
   '/ayuda': 'Ayuda',
-  '/docs': 'Documentación',
+  '/docs': 'Recursos',
   '/historial': 'Historial',
   '/notificaciones': 'Notificaciones',
   '/login': 'Iniciar Sesión',
