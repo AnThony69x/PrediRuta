@@ -30,6 +30,15 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   
+  // Configuración de Webpack
+  webpack: (config, { isServer }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'src/'),
+    };
+    return config;
+  },
+  
   // Headers de seguridad
   async headers() {
     return [
